@@ -15,7 +15,7 @@ namespace LookIT.Models
         public string ModeratorId { get; set; }
         [Required(ErrorMessage = "Moderaturul trebuie sa existe")]
         public virtual ApplicationUser Moderator {get; set;}
-
         public virtual ICollection<GroupMember> Members { get; set; }
+        public virtual ICollection<Message> Messages { get; set; }
     }
 }

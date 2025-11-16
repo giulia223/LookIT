@@ -23,6 +23,8 @@ namespace LookIT.Models
 
         public virtual ICollection<GroupMember> Groups { get; set; }
 
+        public virtual ICollection <Message> SentMessages { get; set; }
+
     }
 }
 
