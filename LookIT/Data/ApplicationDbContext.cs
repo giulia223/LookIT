@@ -1,4 +1,5 @@
 ﻿using LookIT.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,6 +19,7 @@ namespace LookIT.Data
         public DbSet<FollowRequest> FollowRequests { get; set; }
         public DbSet<GroupMember> GroupMembers { get; set; }
         public DbSet<Message> Messages { get; set; }
+        public DbSet<Save> Saves { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -116,6 +118,64 @@ namespace LookIT.Data
                 .WithMany(group => group.Messages)
                 .HasForeignKey(message => message.GroupId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Save>()
+                .HasKey(save => new { save.UserId, save.PostId });
+
+            //daca sterg un user, salvarile NU vor fi sterse automat
+            modelBuilder.Entity<Save>()
+                .HasOne<ApplicationUser>(save => save.User)
+                .WithMany(user => user.SavedPosts)
+                .HasForeignKey(save => save.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            //daca sterg o postare, ea va fi stearsa si din salavrile userilor
+            modelBuilder.Entity<Save>()
+                .HasOne<Post>(save => save.Post)
+                .WithMany(post => post.Saves)
+                .HasForeignKey(save => save.PostId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ApplicationUser>()
+                .Property(user => user.Id)
+                 .HasMaxLength(50);
+
+            modelBuilder.Entity<IdentityUserToken<string>>()
+                .Property(userToken => userToken.UserId)
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<IdentityUserLogin<string>>()
+                .Property(userLogin => userLogin.UserId)
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<IdentityUserClaim<string>>()
+                .Property(userClaims => userClaims.UserId)
+                .HasMaxLength(50);
+
+            modelBuilder.Entity<IdentityUserRole<string>>()
+                .Property(userRole => userRole.UserId)
+                .HasMaxLength(50);
+
+            var userKeyNames = new[]
+            {
+                "UserId", 
+                "ModeratorId", 
+                "AuthorId",
+                "FollowerId", 
+                "FollowingId", 
+                "MemberId"
+            };
+
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                var propertiesToUpdate = entityType.GetProperties()
+                    .Where(p => p.ClrType == typeof(string) && userKeyNames.Contains(p.Name));
+
+                foreach (var property in propertiesToUpdate)
+                {
+                    property.SetMaxLength(50);
+                }
+            }
         }
     }
 }

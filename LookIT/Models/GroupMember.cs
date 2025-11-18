@@ -5,9 +5,8 @@
         public DateTime Date { get; set; }
         public string Status { get; set; }
 
-        //aici ar trebui modificat ca PK sa fie _ pentru ca MemberId (nvarchar(450))
-        //are 900 bytes, GroupId (int) are 4 bytes = 904 bytes > 900 bytes (max key size for SQL Server)
-        //ne lamurim mai tarziu cum rezolvam asta
+        // am pus UserId nvarchar(50) 
+        //100 bytes + 4 bytes = 104 bytes < 900 bytes
         public string MemberId { get; set; }
 
         public virtual ApplicationUser Member { get; set; }
