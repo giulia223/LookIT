@@ -18,6 +18,8 @@ namespace LookIT.Models
 
         public virtual ICollection<Like> LikedPosts { get; set; }
 
+        public virtual ICollection<Save> SavedPosts { get; set; }
+
         public virtual ICollection<FollowRequest> SentFollowRequests { get; set; }
         public virtual ICollection<FollowRequest> ReceivedFollowRequests { get; set; }
 
