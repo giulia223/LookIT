@@ -32,7 +32,9 @@ namespace LookIT.Data
                 .HasForeignKey(post => post.AuthorId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            //daca sterg un user, NU vor fi sterse si comentariile asociate pt ca se face ciclu
+            //am fost nevoita sa pun restrict pentru ca s-ar fi format ciclu 
+            //daca un user are comentarii la postarile altor useri, nu il pot sterge
+            //se face manual in controller : sterg comentariile si apoi userul
             modelBuilder.Entity<Comment>()
                 .HasOne<ApplicationUser>(comment =>comment.User)
                 .WithMany(user => user.Comments)
@@ -56,14 +58,18 @@ namespace LookIT.Data
             modelBuilder.Entity<FollowRequest>()
                 .HasKey(followRequest => new { followRequest.FollowerId, followRequest.FollowingId});
 
-            //daca sterg un user, NU vor fi sterse si cererile de follow asociate
+            //am fost nevoita sa pun restrict pentru ca s-ar fi format ciclu 
+            //daca un user a dat follow altor useri, nu il pot sterge
+            //se face manual in controller : sterg sentRequests si apoi userul
             modelBuilder.Entity<FollowRequest>()
                 .HasOne<ApplicationUser>(followRequest => followRequest.Follower)
                 .WithMany(follower => follower.SentFollowRequests)
                 .HasForeignKey(followRequest => followRequest.FollowerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            //daca sterg un user, NU vor fi sterse si cererile de follow asociate
+            //am fost nevoita sa pun restrict pentru ca s-ar fi format ciclu 
+            //daca un user este urmarit de alti useri, nu il pot sterge
+            //se face manual in controller : sterg receivedRequests si apoi userul
             modelBuilder.Entity<FollowRequest>()
                 .HasOne<ApplicationUser>(followRequest => followRequest.Following)
                 .WithMany(following => following.ReceivedFollowRequests)
@@ -73,7 +79,9 @@ namespace LookIT.Data
             modelBuilder.Entity<Like>()
                 .HasKey(like => new { like.UserId, like.PostId });
 
-            //daca sterg un user, NU vor fi sterse si like-urile asociate pt ca se face ciclu
+            //am fost nevoita sa pun restrict pentru ca s-ar fi format ciclu 
+            //daca un user are a dat like la postarile altor useri, nu il pot sterge
+            //se face manual in controller : sterg like urile date si apoi userul
             modelBuilder.Entity<Like>()
                 .HasOne<ApplicationUser>(like => like.User)
                 .WithMany(user => user.LikedPosts)
@@ -122,14 +130,16 @@ namespace LookIT.Data
             modelBuilder.Entity<Save>()
                 .HasKey(save => new { save.UserId, save.PostId });
 
-            //daca sterg un user, salvarile NU vor fi sterse automat
+            //am fost nevoita sa pun restrict pentru ca s-ar fi format ciclu 
+            //daca un user a dat save la postarile altor useri, nu il pot sterge
+            //se face manual in controller : sterg salvarile si apoi userul
             modelBuilder.Entity<Save>()
                 .HasOne<ApplicationUser>(save => save.User)
                 .WithMany(user => user.SavedPosts)
                 .HasForeignKey(save => save.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            //daca sterg o postare, ea va fi stearsa si din salavrile userilor
+            //daca sterg o postare, vor fi sterse si salvarile asociate
             modelBuilder.Entity<Save>()
                 .HasOne<Post>(save => save.Post)
                 .WithMany(post => post.Saves)

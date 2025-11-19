@@ -12,6 +12,7 @@ namespace LookIT.Models
         [Required]
         public int GroupId { get; set; }
         public virtual Group Group { get; set; }
+
         // Optional: mesajele pot fi anonime
         public string? UserId { get; set; }
         public virtual ApplicationUser? User { get; set; }
