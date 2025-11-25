@@ -5,12 +5,15 @@ namespace LookIT.Models
 {
     public class ApplicationUser : IdentityUser
     {
+       
         [StringLength(100, MinimumLength = 3, ErrorMessage = "Numele trebuie să aibă între {2} și {1} caractere.")]
         public string? FullName { get; set; }
 
+       
         [StringLength(500, ErrorMessage = "Descrierea nu poate depăși {1} caractere.")]
         public string? Description { get; set; }
 
+        
         [StringLength(500)]
         public string? ProfilePictureUrl { get; set; }
 

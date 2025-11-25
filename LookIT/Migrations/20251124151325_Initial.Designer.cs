@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LookIT.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251118093050_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20251124151325_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -39,7 +39,8 @@ namespace LookIT.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -49,7 +50,8 @@ namespace LookIT.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("FullName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -75,7 +77,8 @@ namespace LookIT.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("ProfilePictureUrl")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<bool>("Public")
                         .HasColumnType("bit");
@@ -113,7 +116,8 @@ namespace LookIT.Migrations
 
                     b.Property<string>("Content")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
@@ -172,11 +176,13 @@ namespace LookIT.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("GroupName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("ModeratorId")
                         .IsRequired()
@@ -277,13 +283,16 @@ namespace LookIT.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("ImageUrl")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("TextContent")
+                        .HasMaxLength(5000)
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("VideoUrl")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.HasKey("PostId");
 

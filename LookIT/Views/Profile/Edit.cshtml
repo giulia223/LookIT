@@ -1,0 +1,44 @@
+﻿@model LookIT.Models.ApplicationUser
+@{
+    ViewData["Title"] = "Editeaza Profil";
+}
+
+<h2 class="mt-3 text-center">Editeaza Profil</h2>
+
+<form asp-action="Edit" method="post" enctype="multipart/form-data" class="mt-4">
+
+    <div class="text-center mb-4">
+        @if (!string.IsNullOrEmpty(Model.ProfilePictureUrl))
+        {
+            <img src="@Model.ProfilePictureUrl" class="rounded-circle border" style="width:150px;height:150px;object-fit:cover;" />
+        }
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Nume complet</label>
+        <input asp-for="FullName" class="form-control" />
+        <span asp-validation-for="FullName" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Descriere</label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Schimba poza</label>
+        <input type="file" name="profilePicture" class="form-control" />
+    </div>
+
+    <div class="form-check mb-3">
+        <input asp-for="Public" type="checkbox" class="form-check-input" />
+        <label class="form-check-label">Profil public</label>
+    </div>
+
+    <button type="submit" class="btn btn-success w-100">Salveaza modificarile</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

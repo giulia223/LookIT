@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace LookIT.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -30,9 +30,9 @@ namespace LookIT.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ProfilePictureUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FullName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    ProfilePictureUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     Public = table.Column<bool>(type: "bit", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -192,8 +192,8 @@ namespace LookIT.Migrations
                 {
                     GroupId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    GroupName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    GroupName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ModeratorId = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
                 },
@@ -215,9 +215,9 @@ namespace LookIT.Migrations
                     PostId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    TextContent = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    VideoUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TextContent = table.Column<string>(type: "nvarchar(max)", maxLength: 5000, nullable: true),
+                    ImageUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    VideoUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     AuthorId = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
                 },
                 constraints: table =>
@@ -292,7 +292,7 @@ namespace LookIT.Migrations
                     CommentId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Content = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     PostId = table.Column<int>(type: "int", nullable: false)
                 },
