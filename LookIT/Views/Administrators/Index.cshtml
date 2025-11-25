@@ -1,0 +1,61 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using LookIT.Models
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    ViewBag.Title = "Index";
+}
+
+@if (ViewBag.message != null)
+{
+    <h4 class=" alert alert-success p-3 rounded-3 text-center mb-5">@ViewBag.message</h4>
+}
+
+@foreach (var user in ViewBag.Users)
+{
+    <div class="card mb-3">
+
+        <div class="card-body">
+
+            <h5 class="card-title">@user.UserName</h5>
+
+            <div class="card-text">
+                <p><strong>ID:</strong> @user.Id</p>
+                <p><strong>Email:</strong> @user.Email</p>
+
+            </div>
+
+            <hr />
+            @if (!await UserManager.IsInRoleAsync(user, "Administrator"))
+            {   <form asp-controller="Administrators" asp-action="PromoteToAdms" method="post" style="display:inline;">
+                
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@user.Id" />
+
+                    <button type="submit" class="btn btn-sm btn-success"
+                            onclick="return confirm('       ! ATENȚIE !\n   DORITI SA FACETI UTILIZATORUL  -ADMIN- ?\n ACEASTA ACTIUNE ESTE IREVERSIBILA.');">
+                        Upgrade la Admin 
+                    </button>
+                </form>
+            }
+            else
+            {
+                <span class="badge bg-success"> Administrator</span>
+            }
+            <form asp-controller="Administrators" asp-action="DeleteUser" method="post" style="display:inline;">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@user.Id" />
+
+                <button type="submit" class="btn btn-sm btn-danger"
+                    onclick="return confirm('       ! ATENȚIE !\n   DORITI SA STERGETI UTILIZATORUL?\n ACEASTA ACTIUNE ESTE IREVERSIBILA.');">
+                    Stergere Utilizator
+                </button>
+            </form>
+           
+        </div>
+
+    </div>
+
+    <br />
+    <br />
+}

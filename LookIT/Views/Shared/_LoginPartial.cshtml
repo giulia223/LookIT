@@ -3,8 +3,21 @@
 @inject UserManager<ApplicationUser> UserManager
 
 <ul class="navbar-nav">
+
+   
 @if (SignInManager.IsSignedIn(User))
 {
+     var currentUser = await UserManager.GetUserAsync(User);
+        if (currentUser != null && await UserManager.IsInRoleAsync(currentUser, "Administrator"))
+        {
+            <a class="nav-link text-danger fw-bold"
+               asp-area=""
+               asp-controller="Administrators"
+               asp-action="Page">
+                Panou principal ADMIN 
+            </a>
+        }
+
     <li class="nav-item">
         <a  class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity?.Name!</a>
     </li>
@@ -13,7 +26,10 @@
             <button  type="submit" class="nav-link btn btn-link text-dark">Logout</button>
         </form>
     </li>
+       
+       
 }
+    
 else
 {
     <li class="nav-item">
