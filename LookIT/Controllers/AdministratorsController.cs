@@ -11,10 +11,12 @@ namespace LookIT.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ApplicationDbContext _context;
-        public AdministratorsController(UserManager<ApplicationUser> userManager, ApplicationDbContext context)
+        private readonly RoleManager<IdentityRole> _roleManager;
+        public AdministratorsController(UserManager<ApplicationUser> userManager, ApplicationDbContext context, RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _context = context;
+            _roleManager = roleManager;
         }
 
         public IActionResult Page()
@@ -73,7 +75,6 @@ namespace LookIT.Controllers
         }
 
         // afișare comentarii pentru un user
-        [Authorize(Policy = "RequireAdministratorRole")]
         public async Task<IActionResult> ManageComm(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
@@ -151,7 +152,7 @@ namespace LookIT.Controllers
         //stergere user
 
         [HttpPost]
-        [Authorize(Policy = "RequireAdministratorRole")]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> DeleteUser(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
@@ -174,7 +175,7 @@ namespace LookIT.Controllers
         //stergere postare pentru un user
 
         [HttpPost]
-        [Authorize(Policy = "RequireAdministratorRole")]
+        [Authorize(Roles = "Administrator")]
         public IActionResult DeletePost(int Id)
         {
             var post = _context.Posts.Find(Id);
@@ -195,7 +196,7 @@ namespace LookIT.Controllers
         //stergere comentariu pentru un user
 
         [HttpPost]
-        [Authorize(Policy = "RequireAdministratorRole")]
+        [Authorize(Roles = "Administrator")]
 
         public IActionResult DeleteComments(int Id)
         {
@@ -218,7 +219,7 @@ namespace LookIT.Controllers
         //stergere mesaj pentru un user
 
         [HttpPost]
-        [Authorize(Policy = "RequireAdministratorRole")]
+        [Authorize(Roles = "Administrator")]
         public IActionResult DeleteMessage(int Id)
         {
             var msg = _context.Messages.Find(Id);
@@ -239,7 +240,7 @@ namespace LookIT.Controllers
         //stergere grup pentru user
 
         [HttpPost]
-        [Authorize(Policy = "RequireAdministratorRole")]
+        [Authorize(Roles = "Administrator")]
         public IActionResult DeleteGroup(int Id, string userId)
         {
             var grp = _context.Groups.Find(Id);
@@ -257,7 +258,7 @@ namespace LookIT.Controllers
 
         // ACTIUNE PENTRU GESTIONAREA ROLURILOR
         [HttpPost]
-        [Authorize(Policy = "RequireAdministratorRole")]    
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> PromoteToAdms(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
