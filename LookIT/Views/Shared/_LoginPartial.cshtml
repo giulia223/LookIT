@@ -4,7 +4,6 @@
 
 <ul class="navbar-nav">
 
-   
 @if (SignInManager.IsSignedIn(User))
 {
      var currentUser = await UserManager.GetUserAsync(User);
@@ -27,9 +26,7 @@
         </form>
     </li>
        
-       
 }
-    
 else
 {
     <li class="nav-item">
