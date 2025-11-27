@@ -5,11 +5,11 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace LookIT.Controllers
 {
-    public class RegisteredUserController : Controller
+    public class UserController : Controller
     {
 
         private readonly UserManager<ApplicationUser> _userManager;
-        public RegisteredUserController(UserManager<ApplicationUser> userManager)
+        public UserController(UserManager<ApplicationUser> userManager)
         {
             _userManager = userManager;
         }

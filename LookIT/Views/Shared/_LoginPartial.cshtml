@@ -2,8 +2,11 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 
-<ul class="navbar-nav">
 
+
+
+<ul class="navbar-nav">
+   
 @if (SignInManager.IsSignedIn(User))
 {
      var currentUser = await UserManager.GetUserAsync(User);
