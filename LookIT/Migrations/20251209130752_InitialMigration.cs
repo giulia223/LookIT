@@ -218,7 +218,7 @@ namespace LookIT.Migrations
                     TextContent = table.Column<string>(type: "nvarchar(max)", maxLength: 5000, nullable: true),
                     ImageUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     VideoUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    AuthorId = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
+                    AuthorId = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true)
                 },
                 constraints: table =>
                 {
