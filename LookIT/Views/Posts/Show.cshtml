@@ -1,4 +1,6 @@
-﻿@if (ViewBag.Message != null)
+﻿@model LookIT.Models.Post
+
+@if (ViewBag.Message != null)
 {
     <h2 class="p-3 rounded-3 text-center mb-5 alert @ViewBag.Alert">@ViewBag.Message</h2>
 }
@@ -44,13 +46,28 @@
                  style="height: auto; max-height: 600px; object-fit: contain;" />
         }
 
+        @if (@Model.VideoUrl != null)
+        {
+            <div class="mt-2">
+                <video controls preload="metadata" class="w-100 rounded-2 border" style="max-height: 600px; background-color: #000;">
+                    <source src="@Model.VideoUrl" type="video/mp4">
+                    Browserul tău nu suportă redarea acestui videoclip.
+                </video>
+            </div>
+        }
+
     </div>
 
-    <div class="d-flex flex-row justify-content-between px-3 pb-3">
-        <a class="btn btn-success" asp-controller="Posts" asp-action="Edit" asp-route-id="@Model.PostId">Edit</a>
+    @if((ViewBag.AfisareButoane == true && Model.AuthorId == ViewBag.UserCurent)
+    || ViewBag.EsteAdministrator == true)
+    {
+        <div class="d-flex flex-row justify-content-between px-3 pb-3">
+            <a class="btn btn-success" asp-controller="Posts" asp-action="Edit" asp-route-id="@Model.PostId">Edit</a>
 
-        <form method="post" asp-controller="Posts" asp-action="Delete" asp-route-id="@Model.PostId">
-            <button class="btn btn-danger" type="submit">Delete</button>
-        </form>
-    </div>
+            <form method="post" asp-controller="Posts" asp-action="Delete" asp-route-id="@Model.PostId">
+                <button class="btn btn-danger" type="submit">Delete</button>
+            </form>
+        </div>
+    }
+
 </div>

@@ -16,6 +16,7 @@ namespace LookIT.Controllers
         private readonly IWebHostEnvironment _env = env;
 
 
+        //au acces la aceasta metoda atat utilizatorii inregistrati, cat si neinregistrati si administratorii
         [AllowAnonymous]
         public IActionResult Index()
         {
@@ -33,10 +34,10 @@ namespace LookIT.Controllers
             return View();
         }
 
-        //Se afiseaza o singura postare in functie de ID-ul sau
-        //impreuna cu userul care l-a postat
+        //Se afiseaza o singura postare in functie de ID-ul sau impreuna cu userul care a postat-o
         //[HttpGet] implicit
 
+        //au acces la aceasta metoda atat utilizatorii inregistrati, cat si neinregistrati si administratorii
         [AllowAnonymous]
         public IActionResult Show(int id)
         {
@@ -49,6 +50,9 @@ namespace LookIT.Controllers
             {
                 return NotFound();
             }
+
+            SetAccessRights();
+
             if (TempData.ContainsKey("message"))
             {
                 ViewBag.Message = TempData["message"];
@@ -59,7 +63,7 @@ namespace LookIT.Controllers
         }
 
         //Se afiseaza formularul in care se vor completa datele unei posatri
-        //Doar utilizatorii autentificati (users) pot adauga articole in platforma
+        //Doar utilizatorii autentificati (users) si administrtorii pot adauga articole in platforma
         //[HttpsGet] implicit
 
         [Authorize(Roles = "User,Administrator")]
@@ -71,33 +75,45 @@ namespace LookIT.Controllers
         }
 
         //se adauga postarea in baza de date 
-        //Doar utilizatorii autentificati pot face postari in pltaforma
+        //Doar utilizatorii autentificati pot face postari in pltaforma sau administratorii
         [HttpPost]
-        public async Task<IActionResult> New(Post post, IFormFile? Image)
+        public async Task<IActionResult> New(Post post, IFormFile? Image, IFormFile? Video)
         {
+            //variabile boolenane pentru a verifica daca avem continut de tip text, imagine sau videoclip
+            bool hasText = !string.IsNullOrWhiteSpace(post.TextContent);
+            bool hasImage = Image != null && Image.Length > 0;
+            bool hasVideo = Video != null && Video.Length > 0;
             post.Date = DateTime.Now;
 
-            //preluam id-ul utilizatorului care posteaza
+            //preluam ID-ul utilizatorului care posteaza
             post.AuthorId = _userManager.GetUserId(User);
 
-            if (Image != null && Image.Length > 0)
+            if (!hasText && !hasImage && !hasVideo)
             {
-                //Verificam extensia 
+                ModelState.AddModelError(string.Empty, "Postarea nu poate fi goală!");
+                return View(post);
+            }
+            if (hasImage)
+            {
+                //Verificam extensia pentru imagine
                 var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
 
                 var fileExtension = Path.GetExtension(Image.FileName).ToLower();
 
                 if (!allowedExtensions.Contains(fileExtension))
                 {
-                    ModelState.AddModelError("Image", "Fisierul trebuie sa fie imagine (jpg, jpeg, png, gif) sau video (mp4, mov).");
+                    ModelState.AddModelError("Image", "Fisierul trebuie sa fie imagine (jpg, jpeg, png, gif).");
                     return View(post);
                 }
 
                 //Cale stocare
+                //generam un GUID pentru a stoca fisiere sub o denumire unica 
+                //conflicte pot aparea in cazul in care 2 utilizatori au salvat local un fisier cu acelasi nume, de exmeplu ,,poza.jpg"
                 var uniqueFileName = Guid.NewGuid().ToString() + fileExtension;
                 var storagePath = Path.Combine(_env.WebRootPath, "images", "posts");
                 var databaseFileName = "/images/posts/" + uniqueFileName;
 
+                //daca nu exista directorul in wwwroot, atunci il vom crea
                 if (!Directory.Exists(storagePath))
                 {
                     Directory.CreateDirectory(storagePath);
@@ -113,6 +129,44 @@ namespace LookIT.Controllers
                 ModelState.Remove(nameof(post.ImageUrl));
 
                 post.ImageUrl = databaseFileName;
+            }
+
+            if (hasVideo)
+            {
+                //Verificam extensia pentru videoclip
+                var allowedExtensions = new[] { ".mp4", ".mov", ".webm", ".avi", ".mkv" };
+
+                var fileExtension = Path.GetExtension(Video.FileName).ToLower();
+
+                if (!allowedExtensions.Contains(fileExtension))
+                {
+                    ModelState.AddModelError("Video", "Fisierul trebuie sa fie videclip (mp4, mov, webm, avi, mkv etc).");
+                    return View(post);
+                }
+
+                //Cale stocare
+                //generam un GUID pentru a stoca fisiere sub o denumire unica 
+                //conflicte pot aparea in cazul in care 2 utilizatori au salvat local un fisier cu acelasi nume, de exmeplu ,,video.mp4"
+                var uniqueFileName = Guid.NewGuid().ToString() + fileExtension;
+                var storagePath = Path.Combine(_env.WebRootPath, "videos", "posts");
+                var databaseFileName = "/videos/posts/" + uniqueFileName;
+
+                //daca nu exista directorul in wwwroot, atunci il vom crea
+                if (!Directory.Exists(storagePath))
+                {
+                    Directory.CreateDirectory(storagePath);
+                }
+
+                var filePath = Path.Combine(storagePath, uniqueFileName);
+
+                //Salvare fisier
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await Video.CopyToAsync(fileStream);
+                }
+                ModelState.Remove(nameof(post.VideoUrl));
+
+                post.VideoUrl = databaseFileName;
             }
 
             if (ModelState.IsValid)
@@ -162,37 +216,149 @@ namespace LookIT.Controllers
 
         //Se adauga postarea in baza de date 
         //Se verifica rolul utilizatorului care are dreptul sa editeze
-        
-        [HttpPost]
-        public IActionResult Edit(int Id, Post requestPost)
-        {
-            Post? post = db.Posts.Find(Id);
 
-            if(post is null)
+        [HttpPost]
+        public async Task<IActionResult> Edit(int Id, Post requestPost, IFormFile? Image, IFormFile? Video, bool DeleteImage, bool DeleteVideo)
+        {
+            Post? post = await db.Posts.FindAsync(Id);
+
+            if (post == null)
             {
                 return NotFound();
             }
-            else
+
+            if ((post.AuthorId == _userManager.GetUserId(User)) || User.IsInRole("Administrator"))
             {
                 if (ModelState.IsValid)
                 {
-                    if((post.AuthorId == _userManager.GetUserId(User))
-                        || User.IsInRole("Administrator"))
+                    
+                    string? initialTextContent = post.TextContent;
+                    string? initialImageUrl = post.ImageUrl;
+                    string? initialVideoUrl = post.VideoUrl;
+
+                    post.TextContent = requestPost.TextContent;
+
+                    if (Image != null && Image.Length > 0)
                     {
-                        //mai am de pus aici
-                        return RedirectToAction("Index");
+                        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+                        var fileExtension = Path.GetExtension(Image.FileName).ToLower();
+
+                        if (!allowedExtensions.Contains(fileExtension))
+                        {
+                            ModelState.AddModelError("Image", "Fișierul trebuie să fie imagine.");
+                            return View(post);
+                        }
+
+                        // Ștergem vechea imagine fizic DOAR dacă punem una nouă în loc (asta e ok)
+                        if (!string.IsNullOrEmpty(post.ImageUrl))
+                        {
+                            var oldPath = Path.Combine(_env.WebRootPath, post.ImageUrl.TrimStart('/'));
+                            if (System.IO.File.Exists(oldPath))
+                            {
+                                System.IO.File.Delete(oldPath);
+                            }
+                        }
+
+                        var uniqueFileName = Guid.NewGuid().ToString() + fileExtension;
+                        var storagePath = Path.Combine(_env.WebRootPath, "images", "posts");
+                        if (!Directory.Exists(storagePath)) Directory.CreateDirectory(storagePath);
+                        var filePath = Path.Combine(storagePath, uniqueFileName);
+
+                        using (var fileStream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await Image.CopyToAsync(fileStream);
+                        }
+                        post.ImageUrl = "/images/posts/" + uniqueFileName;
                     }
-                    else
+
+                    else if (DeleteImage == true)
                     {
-                        TempData["message"] = "Nu aveti dreptul sa faceti modificari asupra unui articol care nu va apartine";
-                        TempData["messageType"] = "alert-danger";
-                        return RedirectToAction("Index");
+                        post.ImageUrl = null;
                     }
+
+                    if (Video != null && Video.Length > 0)
+                    {
+                        var allowedExtensions = new[] { ".mp4", ".mov", ".webm", ".avi", ".mkv" };
+                        var fileExtension = Path.GetExtension(Video.FileName).ToLower();
+
+                        if (!allowedExtensions.Contains(fileExtension))
+                        {
+                            ModelState.AddModelError("Video", "Format video neacceptat.");
+                            return View(post);
+                        }
+
+                        if (!string.IsNullOrEmpty(post.VideoUrl))
+                        {
+                            var oldPath = Path.Combine(_env.WebRootPath, post.VideoUrl.TrimStart('/'));
+                            if (System.IO.File.Exists(oldPath))
+                            {
+                                System.IO.File.Delete(oldPath);
+                            }
+                        }
+
+                        var uniqueFileName = Guid.NewGuid().ToString() + fileExtension;
+                        var storagePath = Path.Combine(_env.WebRootPath, "videos", "posts");
+                        if (!Directory.Exists(storagePath)) Directory.CreateDirectory(storagePath);
+                        var filePath = Path.Combine(storagePath, uniqueFileName);
+
+                        using (var fileStream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await Video.CopyToAsync(fileStream);
+                        }
+                        post.VideoUrl = "/videos/posts/" + uniqueFileName;
+                    }
+                    else if (DeleteVideo == true)
+                    {
+                        post.VideoUrl = null;
+                    }
+
+                    if (string.IsNullOrWhiteSpace(post.TextContent) && post.ImageUrl == null && post.VideoUrl == null)
+                    {
+                        post.TextContent = initialTextContent;
+                        post.ImageUrl = initialImageUrl;
+                        post.VideoUrl = initialVideoUrl;
+
+                        ModelState.Clear();
+
+                        ModelState.AddModelError(string.Empty, "Nu poți șterge tot conținutul! Modificările au fost anulate.");
+                        return View(post);
+                    }
+                    // Dacă utilizatorul a vrut să șteargă imaginea (DeleteImage=true) și ea a fost setată pe null în obiect,
+                    // dar exista o imagine inițială -> Acum o ștergem de pe disc.
+                    if (post.ImageUrl == null && !string.IsNullOrEmpty(initialImageUrl) && DeleteImage == true)
+                    {
+                        var oldPath = Path.Combine(_env.WebRootPath, initialImageUrl.TrimStart('/'));
+                        if (System.IO.File.Exists(oldPath))
+                        {
+                            System.IO.File.Delete(oldPath);
+                        }
+                    }
+
+                    // La fel pentru video
+                    if (post.VideoUrl == null && !string.IsNullOrEmpty(initialVideoUrl) && DeleteVideo == true)
+                    {
+                        var oldPath = Path.Combine(_env.WebRootPath, initialVideoUrl.TrimStart('/'));
+                        if (System.IO.File.Exists(oldPath))
+                        {
+                            System.IO.File.Delete(oldPath);
+                        }
+                    }
+                    await db.SaveChangesAsync();
+
+                    TempData["message"] = "Postarea a fost modificată cu succes!";
+                    TempData["messageType"] = "alert-success";
+                    return RedirectToAction("Index");
                 }
                 else
                 {
-                    return View(requestPost);
+                    return View(post);
                 }
+            }
+            else
+            {
+                TempData["message"] = "Nu aveți dreptul să modificați această postare.";
+                TempData["messageType"] = "alert-danger";
+                return RedirectToAction("Index");
             }
         }
 
@@ -230,6 +396,22 @@ namespace LookIT.Controllers
                     return RedirectToAction("Index");
                 }
             }
+        }
+
+        //Conditiile de afisare pentru butoanele de editare si steregere
+        //butoanele sunt aflate in view-uri
+        private void SetAccessRights()
+        {
+            ViewBag.AfisareButoane = false;
+
+            if (User.IsInRole("User"))
+            {
+                ViewBag.AfisareButoane = true;
+            }
+
+            ViewBag.UserCurent = _userManager.GetUserId(User);
+
+            ViewBag.EsteAdministrator = User.IsInRole("Administrator");
         }
         
     } 
