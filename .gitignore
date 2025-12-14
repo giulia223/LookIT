@@ -361,3 +361,7 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Ignora orice fisier din aceste foldere, daca ele exista local
+wwwroot/images/posts/
+wwwroot/videos/posts/
