@@ -34,7 +34,7 @@ namespace LookIT.Controllers
             return View();
         }
 
-        //Se afiseaza o singura postare in functie de ID-ul sau impreuna cu userul care a postat-o
+        //se afiseaza o singura postare in functie de ID-ul sau impreuna cu userul care a postat-o
         //[HttpGet] implicit
 
         //au acces la aceasta metoda atat utilizatorii inregistrati, cat si neinregistrati si administratorii
@@ -62,8 +62,8 @@ namespace LookIT.Controllers
             return View(post);
         }
 
-        //Se afiseaza formularul in care se vor completa datele unei posatri
-        //Doar utilizatorii autentificati (users) si administrtorii pot adauga articole in platforma
+        //se afiseaza formularul in care se vor completa datele unei posatri
+        //doar utilizatorii autentificati (users) si administrtorii pot adauga articole in platforma
         //[HttpsGet] implicit
 
         [Authorize(Roles = "User,Administrator")]
@@ -75,7 +75,7 @@ namespace LookIT.Controllers
         }
 
         //se adauga postarea in baza de date 
-        //Doar utilizatorii autentificati pot face postari in pltaforma sau administratorii
+        //doar utilizatorii autentificati pot face postari in pltaforma sau administratorii
         [HttpPost]
         public async Task<IActionResult> New(Post post, IFormFile? Image, IFormFile? Video)
         {
@@ -95,7 +95,7 @@ namespace LookIT.Controllers
             }
             if (hasImage)
             {
-                //Verificam extensia pentru imagine
+                //verificam extensia pentru imagine
                 var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
 
                 var fileExtension = Path.GetExtension(Image.FileName).ToLower();
@@ -106,7 +106,6 @@ namespace LookIT.Controllers
                     return View(post);
                 }
 
-                //Cale stocare
                 //generam un GUID pentru a stoca fisiere sub o denumire unica 
                 //conflicte pot aparea in cazul in care 2 utilizatori au salvat local un fisier cu acelasi nume, de exmeplu ,,poza.jpg"
                 var uniqueFileName = Guid.NewGuid().ToString() + fileExtension;
@@ -121,7 +120,7 @@ namespace LookIT.Controllers
 
                 var filePath = Path.Combine(storagePath, uniqueFileName);
 
-                //Salvare fisier
+                //salvare fisier
                 using (var fileStream = new FileStream(filePath, FileMode.Create))
                 {
                     await Image.CopyToAsync(fileStream);
@@ -133,7 +132,7 @@ namespace LookIT.Controllers
 
             if (hasVideo)
             {
-                //Verificam extensia pentru videoclip
+                //verificam extensia pentru videoclip
                 var allowedExtensions = new[] { ".mp4", ".mov", ".webm", ".avi", ".mkv" };
 
                 var fileExtension = Path.GetExtension(Video.FileName).ToLower();
@@ -196,6 +195,7 @@ namespace LookIT.Controllers
                 .Where(post => post.PostId == Id)
                 .FirstOrDefault();
 
+            //nu am gasit postarea dupa id
             if (post == null)
             {
                 return NotFound();
@@ -206,6 +206,8 @@ namespace LookIT.Controllers
             {
                 return View(post);
             }
+
+            //nu am acces la editarea postarii
             else
             {
                 TempData["message"] = "Nu aveti dreptul sa faceti modificari asupra unei postari care nu va apartine";
@@ -214,14 +216,15 @@ namespace LookIT.Controllers
             }
         }
 
-        //Se adauga postarea in baza de date 
-        //Se verifica rolul utilizatorului care are dreptul sa editeze
+        //se adauga postarea in baza de date 
+        //se verifica rolul utilizatorului care are dreptul sa editeze
 
         [HttpPost]
         public async Task<IActionResult> Edit(int Id, Post requestPost, IFormFile? Image, IFormFile? Video, bool DeleteImage, bool DeleteVideo)
         {
-            Post? post = await db.Posts.FindAsync(Id);
+            Post? post = db.Posts.Find(Id);
 
+            //nu am gasit postarea dupa id
             if (post == null)
             {
                 return NotFound();
@@ -231,13 +234,14 @@ namespace LookIT.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    
+                    //campurile initiale ale postarii
                     string? initialTextContent = post.TextContent;
                     string? initialImageUrl = post.ImageUrl;
                     string? initialVideoUrl = post.VideoUrl;
 
                     post.TextContent = requestPost.TextContent;
 
+                    //daca am ales o poza, o vom modifica
                     if (Image != null && Image.Length > 0)
                     {
                         var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
@@ -249,7 +253,7 @@ namespace LookIT.Controllers
                             return View(post);
                         }
 
-                        // Ștergem vechea imagine fizic DOAR dacă punem una nouă în loc (asta e ok)
+                        // stergea vechea imagine fizic din wwwroot/images/posts DACA EXISTA 
                         if (!string.IsNullOrEmpty(post.ImageUrl))
                         {
                             var oldPath = Path.Combine(_env.WebRootPath, post.ImageUrl.TrimStart('/'));
@@ -259,9 +263,17 @@ namespace LookIT.Controllers
                             }
                         }
 
+                        //generam un GUID pentru a stoca fisiere sub o denumire unica 
+                        //conflicte pot aparea in cazul in care 2 utilizatori au salvat local un fisier cu acelasi nume, de exmeplu ,,poza.jpg"
                         var uniqueFileName = Guid.NewGuid().ToString() + fileExtension;
                         var storagePath = Path.Combine(_env.WebRootPath, "images", "posts");
-                        if (!Directory.Exists(storagePath)) Directory.CreateDirectory(storagePath);
+
+                        //daca nu exista directorul images in wwwroot, atunci il vom crea
+                        if (!Directory.Exists(storagePath))
+                        {
+                            Directory.CreateDirectory(storagePath);
+                        }
+
                         var filePath = Path.Combine(storagePath, uniqueFileName);
 
                         using (var fileStream = new FileStream(filePath, FileMode.Create))
@@ -271,11 +283,15 @@ namespace LookIT.Controllers
                         post.ImageUrl = "/images/posts/" + uniqueFileName;
                     }
 
+                    //daca am selectat totusi sa stergem imginea curenta, doar vom seta url ul pe null la acest pas
+                    //stergerea fizica a imaginii din wwwroot se va face dupa verificarea finala: sa nu avem o postare goala
+                    //in ruma editarii; in acest caz, vom pastra toate campurile initiale
                     else if (DeleteImage == true)
                     {
                         post.ImageUrl = null;
                     }
 
+                    //daca am ales un video, o vom modifica
                     if (Video != null && Video.Length > 0)
                     {
                         var allowedExtensions = new[] { ".mp4", ".mov", ".webm", ".avi", ".mkv" };
@@ -287,6 +303,7 @@ namespace LookIT.Controllers
                             return View(post);
                         }
 
+                        // stergea vechiul videoclip din wwwroot/videos/posts DACA EXISTA
                         if (!string.IsNullOrEmpty(post.VideoUrl))
                         {
                             var oldPath = Path.Combine(_env.WebRootPath, post.VideoUrl.TrimStart('/'));
@@ -296,9 +313,17 @@ namespace LookIT.Controllers
                             }
                         }
 
+                        //generam un GUID pentru a stoca fisiere sub o denumire unica 
+                        //conflicte pot aparea in cazul in care 2 utilizatori au salvat local un fisier cu acelasi nume, de exmeplu ,,video.mp4"
                         var uniqueFileName = Guid.NewGuid().ToString() + fileExtension;
                         var storagePath = Path.Combine(_env.WebRootPath, "videos", "posts");
-                        if (!Directory.Exists(storagePath)) Directory.CreateDirectory(storagePath);
+
+                        //daca nu exista directorul videos in wwwroot, atunci il vom crea
+                        if (!Directory.Exists(storagePath))
+                        {
+                            Directory.CreateDirectory(storagePath);
+                        }
+
                         var filePath = Path.Combine(storagePath, uniqueFileName);
 
                         using (var fileStream = new FileStream(filePath, FileMode.Create))
@@ -307,11 +332,18 @@ namespace LookIT.Controllers
                         }
                         post.VideoUrl = "/videos/posts/" + uniqueFileName;
                     }
+
+                    //daca am selectat totusi sa stergem videoclipul curent, doar vom seta url ul pe null la acest pas
+                    //stergerea fizica a videoclipului din wwwroot se va face dupa verificarea finala: sa nu avem o postare goala
+                    //in ruma editarii; in acest caz, vom pastra toate campurile initiale
                     else if (DeleteVideo == true)
                     {
                         post.VideoUrl = null;
                     }
 
+                    //daca am editat si am ajuns la o postare goala (toate cele 3 campuri TextContent, ImageUrl si VideoUrl sunt
+                    //nule), nu pot face modiifcarea si voi mentine starea intiiala a postarii
+                    //ne intoarcem in view cu valorile initiale
                     if (string.IsNullOrWhiteSpace(post.TextContent) && post.ImageUrl == null && post.VideoUrl == null)
                     {
                         post.TextContent = initialTextContent;
@@ -323,8 +355,10 @@ namespace LookIT.Controllers
                         ModelState.AddModelError(string.Empty, "Nu poți șterge tot conținutul! Modificările au fost anulate.");
                         return View(post);
                     }
-                    // Dacă utilizatorul a vrut să șteargă imaginea (DeleteImage=true) și ea a fost setată pe null în obiect,
-                    // dar exista o imagine inițială -> Acum o ștergem de pe disc.
+                    //mai jos ajungem in cazul in care cel putin unul din campurile postarii este nenul
+                    
+                    // daca utilizatorul a vrut sa stearga imaginea (DeleteImage=true) și ea a fost setata pe null in obiect,
+                    // dar exista o imagine initiala, atunci acum o stergem
                     if (post.ImageUrl == null && !string.IsNullOrEmpty(initialImageUrl) && DeleteImage == true)
                     {
                         var oldPath = Path.Combine(_env.WebRootPath, initialImageUrl.TrimStart('/'));
@@ -334,7 +368,8 @@ namespace LookIT.Controllers
                         }
                     }
 
-                    // La fel pentru video
+                    // daca utilizatorul a vrut sa stearga videoclipul (DeletevVideo=true) și a fost setat pe null in obiect,
+                    // dar exista un videoclip initial, atunci acum il stergem
                     if (post.VideoUrl == null && !string.IsNullOrEmpty(initialVideoUrl) && DeleteVideo == true)
                     {
                         var oldPath = Path.Combine(_env.WebRootPath, initialVideoUrl.TrimStart('/'));
@@ -343,17 +378,27 @@ namespace LookIT.Controllers
                             System.IO.File.Delete(oldPath);
                         }
                     }
+
+                    //salvam modificarile
                     await db.SaveChangesAsync();
 
                     TempData["message"] = "Postarea a fost modificată cu succes!";
                     TempData["messageType"] = "alert-success";
                     return RedirectToAction("Index");
                 }
+
+                //daca unul din campurle nu trece validarile, pastram ce am editat pana acum (referitor la textContent)
                 else
                 {
-                    return View(post);
+                    //avem nevoie sa reatribuim la requestPost imaginea si videoclipul postarii pentru a nu o pierde
+                    requestPost.ImageUrl = post.ImageUrl;
+                    requestPost.VideoUrl = post.VideoUrl;
+
+                    return View(requestPost);
                 }
             }
+
+            //nu am acces la editarea postarii
             else
             {
                 TempData["message"] = "Nu aveți dreptul să modificați această postare.";
@@ -362,9 +407,8 @@ namespace LookIT.Controllers
             }
         }
 
-        //Se sterge o postare din baza de date 
-        //Doar utilizatorii autentificati care au facut postarea respetiva
-        //o pot sterge
+        //se sterge o postare din baza de date 
+        //doar utilizatorii autentificati care au facut postarea respetiva o pot sterge
 
         [HttpPost]
         [Authorize(Roles = "User,Administrator")]
@@ -374,6 +418,7 @@ namespace LookIT.Controllers
                 .Where(post => post.PostId== Id)
                 .FirstOrDefault();
 
+            //nu am gasit postarea dupa id
             if(post is null)
             {
                 return NotFound();
@@ -383,12 +428,34 @@ namespace LookIT.Controllers
                 if((post.AuthorId == _userManager.GetUserId(User))
                     || User.IsInRole("Administrator"))
                 {
+                    //stergem fizic din wwwroot/images/posts imaginea, daca exista
+                    if (!string.IsNullOrEmpty(post.ImageUrl))
+                    {
+                        var imagePath = Path.Combine(_env.WebRootPath, post.ImageUrl.TrimStart('/'));
+                        if (System.IO.File.Exists(imagePath))
+                        {
+                            System.IO.File.Delete(imagePath);
+                        }
+                    }
+
+                    //stergem fizic din wwwroot/videos/posts videocliupl, daca exista
+                    if (!string.IsNullOrEmpty(post.VideoUrl))
+                    {
+                        var videoPath = Path.Combine(_env.WebRootPath, post.VideoUrl.TrimStart('/'));
+                        if (System.IO.File.Exists(videoPath))
+                        {
+                            System.IO.File.Delete(videoPath);
+                        }
+                    }
+
                     db.Posts.Remove(post);
                     db.SaveChanges();
                     TempData["message"] = "Postarea a fost stearsa cu succes.";
                     TempData["messageType"] = "alert-success";
                     return RedirectToAction("Index");
                 }
+
+                //nu am dreptul sa sterg postarea
                 else
                 {
                     TempData["message"] = "Nu aveti dreptul sa stergeti o postare care nu va apartine";
@@ -398,7 +465,7 @@ namespace LookIT.Controllers
             }
         }
 
-        //Conditiile de afisare pentru butoanele de editare si steregere
+        //conditiile de afisare pentru butoanele de editare si steregere
         //butoanele sunt aflate in view-uri
         private void SetAccessRights()
         {

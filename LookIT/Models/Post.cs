@@ -34,8 +34,5 @@ namespace LookIT.Models
 
         public virtual ICollection<Save> Saves { get; set; } = new List<Save>();
 
-        // NU stoca fișierele (imagini, video) direct în baza de date!
-        // Stochează doar calea (URL-ul) către fișierul urcat pe server 
-        // (de ex., în wwwroot/uploads) sau în cloud (Azure Blob Storage, S3 etc.)
     }
 }

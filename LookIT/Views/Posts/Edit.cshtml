@@ -15,6 +15,7 @@
             <div class="card p-4 shadow-sm">
 
                 <form method="post" asp-action="Edit" asp-route-id="@Model.PostId" asp-controller="Posts" enctype="multipart/form-data">
+                    <input type="hidden" asp-for="PostId" />
 
                     <div asp-validation-summary="All" class="text-danger mb-3"></div>
 

@@ -67,7 +67,6 @@
         const vidContainer = document.getElementById('videoPreviewContainer');
         const vidPreview = document.getElementById('videoPreview');
 
-        // --- PREVIZUALIZARE IMAGINE (Independentă) ---
         imageInput.addEventListener('change', function() {
             const file = this.files[0];
             if (file) {
@@ -75,11 +74,9 @@
                 imgContainer.classList.remove('d-none');
             } else {
                 imgContainer.classList.add('d-none');
-            }
-            
+            }    
         });
 
-        // --- PREVIZUALIZARE VIDEO (Independentă) ---
         videoInput.addEventListener('change', function() {
             const file = this.files[0];
             if (file) {
