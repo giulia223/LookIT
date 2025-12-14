@@ -1,14 +1,10 @@
 {
   "dependencies": {
-    "mssql1": {
-      "type": "mssql.local",
-      "connectionId": "ConnectionStrings:DefaultConnection"
-    },
-    "mssql2": {
+    "mssql3": {
       "secretStore": "LocalSecretsFile",
-      "resourceId": null,
       "type": "mssql.local",
-      "connectionId": "ConnectionStrings:AppDB"
+      "connectionId": "ConnectionStrings:LookIT",
+      "dynamicId": null
     }
   }
 }
