@@ -21,8 +21,8 @@ namespace LookIT.Controllers
         public IActionResult Index()
         {
             var posts = db.Posts
-                .Include(post => post.Author)
-                .OrderByDescending(post => post.Date);
+                          .Include(post => post.Author)
+                          .OrderByDescending(post => post.Date);
 
             ViewBag.Posts = posts;
 
@@ -39,18 +39,26 @@ namespace LookIT.Controllers
 
         //au acces la aceasta metoda atat utilizatorii inregistrati, cat si neinregistrati si administratorii
         [AllowAnonymous]
-        public IActionResult Show(int id)
+        public IActionResult Show(int Id)
         {
             Post? post = db.Posts
-                .Include(post => post.Author)
-                .Where(post => post.PostId == id)
-                .FirstOrDefault();
+                           .Include(post => post.Author)
+                           .Include(post => post.Comments)
+                                 .ThenInclude(comment => comment.User)
+                           .Where(post => post.PostId == Id)
+                           .FirstOrDefault();
 
             if (post is null)
             {
                 return NotFound();
             }
 
+            //ordonam comentariile descrescator dupa data postarii
+            post.Comments = post.Comments
+                                .OrderByDescending(comment => comment.Date)
+                                .ToList();
+
+            //setam conditiile pentru afisarea butoanelor in viewul asociat postarii
             SetAccessRights();
 
             if (TempData.ContainsKey("message"))
@@ -60,6 +68,47 @@ namespace LookIT.Controllers
             }
 
             return View(post);
+        }
+
+        //adaugarea unui comentariu asociat unei postari din baza de date
+        //doar utilizatorii inregistrati si administratorii pot adauga comentarii
+
+        [Authorize(Roles ="User,Administrator")]
+        [HttpPost]
+        public IActionResult Show([FromForm] Comment comment)
+        {
+            //data la care a fost postat comentariul
+            comment.Date = DateTime.Now;
+
+            //userul care a postat comentariul
+            comment.UserId = _userManager.GetUserId(User);
+
+            //daca comentariul trece validarile din model (dimenisunea continutului unui comentariu sa nu depaseasca un
+            //anumit numar de caractere)
+            if (ModelState.IsValid)
+            {
+                db.Comments.Add(comment);
+                db.SaveChanges();
+                return Redirect("/Posts/Show/" + comment.PostId);
+            }
+            else
+            {
+                Post? post = db.Posts
+                               .Include(post => post.Author)
+                               .Include(post => post.Comments)
+                                       .ThenInclude(comment => comment.User)
+                               .Where(post => post.PostId == comment.PostId)
+                               .FirstOrDefault();
+
+                if(post is null)
+                {
+                    return NotFound();
+                }
+
+                SetAccessRights();
+
+                return View(post);
+            }
         }
 
         //se afiseaza formularul in care se vor completa datele unei posatri
@@ -76,6 +125,7 @@ namespace LookIT.Controllers
 
         //se adauga postarea in baza de date 
         //doar utilizatorii autentificati pot face postari in pltaforma sau administratorii
+        
         [HttpPost]
         public async Task<IActionResult> New(Post post, IFormFile? Image, IFormFile? Video)
         {
@@ -414,9 +464,11 @@ namespace LookIT.Controllers
         [Authorize(Roles = "User,Administrator")]
         public IActionResult Delete(int Id)
         {
+            //nu trebuie sa stergem manual comentariile pentru ca am setat OnDeleteCascade, ceea ce inseamna ca daca sterg o postare, atunci comentariile 
+            //asociate acesteia vor fi sterse automat
             Post? post = db.Posts
-                .Where(post => post.PostId== Id)
-                .FirstOrDefault();
+                           .Where(post => post.PostId== Id)
+                           .FirstOrDefault();
 
             //nu am gasit postarea dupa id
             if(post is null)

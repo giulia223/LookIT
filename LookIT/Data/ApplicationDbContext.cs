@@ -41,7 +41,7 @@ namespace LookIT.Data
                 .HasForeignKey(comment => comment.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            //daca sterg o postare, vor fi sterse si comentariile asociate
+            //daca sterg o postare, vor fi sterse si comentariile asociate in cascada
             modelBuilder.Entity<Comment>()
                 .HasOne<Post>(comment => comment.Post)
                 .WithMany(post => post.Comments)
