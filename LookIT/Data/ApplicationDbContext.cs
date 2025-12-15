@@ -48,7 +48,9 @@ namespace LookIT.Data
                 .HasForeignKey(comment => comment.PostId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            //daca sterg un user, NU vor fi sterse si grupurile pe care le modereaza
+            //am fost nevoita sa pun restrict pentru ca s-ar fi format ciclu 
+            //daca un user este moderatorul cel putin unui grup, nu il pot sterge
+            //se face manual in controller : sterg grupurile, iar mai apoi userul
             modelBuilder.Entity<Group>()
                 .HasOne<ApplicationUser>(group => group.Moderator)
                 .WithMany(moderator => moderator.ModeratedGroups)
@@ -88,7 +90,7 @@ namespace LookIT.Data
                 .HasForeignKey(like => like.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            //daca sterg o postare, vor fi sterse si like-urile asociate
+            //daca sterg o postare, vor fi sterse si like-urile asociate in cascada
             modelBuilder.Entity<Like>()
                 .HasOne<Post>(like => like.Post)
                 .WithMany(post => post.Likes)
@@ -98,14 +100,14 @@ namespace LookIT.Data
             modelBuilder.Entity<GroupMember>()
                 .HasKey(groupMember => new { groupMember.GroupId, groupMember.MemberId });
 
-            //daca sterg un grup, vor fi sterse si inregistrarile din GroupMember corespunzatoare
+            //daca sterg un grup, vor fi sterse si inregistrarile din GroupMember corespunzatoare in cascada
             modelBuilder.Entity<GroupMember>()
                 .HasOne<Group>(member => member.Group)
                 .WithMany(groupMember => groupMember.Members)
                 .HasForeignKey(member => member.GroupId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            //daca sterg un user, va fi sters si din grupurile din care facea parte
+            //daca sterg un user, va fi sters si din grupurile din care facea parte ca si membru
             modelBuilder.Entity<GroupMember>()
                 .HasOne<ApplicationUser>(member => member.Member)
                 .WithMany(groupMember => groupMember.Groups)
@@ -120,7 +122,7 @@ namespace LookIT.Data
                 .HasForeignKey(message => message.UserId)
                 .OnDelete(DeleteBehavior.SetNull);
 
-            //daca sterg un grup, mesajele vor fi sterse automat
+            //daca sterg un grup, mesajele vor fi sterse automat in cascada
             modelBuilder.Entity<Message>()
                 .HasOne<Group>(message => message.Group)
                 .WithMany(group => group.Messages)
@@ -139,7 +141,7 @@ namespace LookIT.Data
                 .HasForeignKey(save => save.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            //daca sterg o postare, vor fi sterse si salvarile asociate
+            //daca sterg o postare, vor fi sterse si salvarile asociate in cascada
             modelBuilder.Entity<Save>()
                 .HasOne<Post>(save => save.Post)
                 .WithMany(post => post.Saves)

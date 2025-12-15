@@ -521,11 +521,11 @@ namespace LookIT.Controllers
         //butoanele sunt aflate in view-uri
         private void SetAccessRights()
         {
-            ViewBag.AfisareButoane = false;
+            ViewBag.EsteUser = false;
 
             if (User.IsInRole("User"))
             {
-                ViewBag.AfisareButoane = true;
+                ViewBag.EsteUser = true;
             }
 
             ViewBag.UserCurent = _userManager.GetUserId(User);
