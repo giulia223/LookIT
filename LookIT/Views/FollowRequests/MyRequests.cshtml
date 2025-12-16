@@ -1,0 +1,41 @@
+﻿@model List<LookIT.Models.FollowRequest>
+@{
+    ViewData["Title"] = "Cereri de Urmărire";
+}
+
+<div class="container mt-4" style="max-width: 600px;">
+    <h3 class="mb-4">Cereri de Urmărire</h3>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-light text-center border">Nu ai nicio cerere nouă.</div>
+    }
+    else
+    {
+        <ul class="list-group list-group-flush">
+            @foreach (var req in Model)
+            {
+                <li class="list-group-item d-flex align-items-center justify-content-between py-3">
+                    <div class="d-flex align-items-center">
+                        <img src="@req.Follower.ProfilePictureUrl" class="rounded-circle me-3" style="width: 40px; height: 40px; object-fit: cover;">
+                        <a asp-action="Details" asp-route-userId="@req.FollowerId" class="text-decoration-none text-dark fw-bold">
+                            @req.Follower.FullName
+                        </a>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <form asp-action="HandleRequest" method="post">
+                            <input type="hidden" name="requestId" value="@req.Id" />
+                            <input type="hidden" name="decision" value="accept" />
+                            <button type="submit" class="btn btn-primary btn-sm">Confirmă</button>
+                        </form>
+                        <form asp-action="HandleRequest" method="post">
+                            <input type="hidden" name="requestId" value="@req.Id" />
+                            <input type="hidden" name="decision" value="decline" />
+                            <button type="submit" class="btn btn-secondary btn-sm">Șterge</button>
+                        </form>
+                    </div>
+                </li>
+            }
+        </ul>
+    }
+</div>v>

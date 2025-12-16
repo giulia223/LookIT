@@ -55,9 +55,11 @@ namespace LookIT.Data
                 .HasForeignKey(group => group.ModeratorId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            //modelBuilder.Entity<FollowRequest>()
+            //    .HasKey(followRequest => new { followRequest.FollowerId, followRequest.FollowingId});
             modelBuilder.Entity<FollowRequest>()
-                .HasKey(followRequest => new { followRequest.FollowerId, followRequest.FollowingId});
-
+        .HasIndex(f => new { f.FollowerId, f.FollowingId })
+        .IsUnique();
             //am fost nevoita sa pun restrict pentru ca s-ar fi format ciclu 
             //daca un user a dat follow altor useri, nu il pot sterge
             //se face manual in controller : sterg sentRequests si apoi userul

@@ -1,0 +1,31 @@
+﻿@model LookIT.Models.ViewModels.SearchViewModel
+
+<div class="container mt-4">
+    <h2>Rezultate pentru: "@Model.SearchTerm"</h2>
+    <hr />
+
+    @if (Model.Users.Any())
+    {
+        <h4 class="mb-3">Persoane</h4>
+        <div class="row mb-5">
+            @foreach (var user in Model.Users)
+            {
+                <div class="col-md-4 mb-3">
+                    <div class="card">
+                        <div class="card-body d-flex align-items-center">
+                            <img src="@user.ProfilePictureUrl" class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit:cover">
+                            <div>
+                                <h5 class="card-title mb-0">@user.FullName</h5>
+                                <a asp-controller="Profile" asp-action="Details" asp-route-userId="@user.Id" class="btn btn-sm btn-outline-primary mt-1">Vezi Profil</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(Model.SearchTerm))
+    {
+        <p>Nu am găsit persoane cu acest nume.</p>
+    }
+</div>div>
