@@ -1,12 +1,9 @@
 {
   "dependencies": {
-    "mssql1": {
+    "mssql3": {
       "type": "mssql",
-      "connectionId": "ConnectionStrings:DefaultConnection"
-    },
-    "mssql2": {
-      "type": "mssql",
-      "connectionId": "ConnectionStrings:AppDB"
+      "connectionId": "ConnectionStrings:LookIT",
+      "dynamicId": null
     }
   }
 }
