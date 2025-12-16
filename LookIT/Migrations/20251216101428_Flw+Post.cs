@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace LookIT.Migrations
 {
     /// <inheritdoc />
-    public partial class m1 : Migration
+    public partial class FlwPost : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

@@ -12,13 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LookIT.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-<<<<<<<< HEAD:LookIT/Migrations/20251215150059_m1.Designer.cs
-    [Migration("20251215150059_m1")]
-    partial class m1
-========
-    [Migration("20251209130752_InitialMigration")]
-    partial class InitialMigration
->>>>>>>> f862e1d2e2784eed7e22eb78776c3dc8b0607b1b:LookIT/Migrations/20251209130752_InitialMigration.Designer.cs
+    [Migration("20251216101428_Flw+Post")]
+    partial class FlwPost
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
