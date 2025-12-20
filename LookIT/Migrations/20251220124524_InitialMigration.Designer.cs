@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LookIT.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251220123113_SetDefaultProfilePicture")]
-    partial class SetDefaultProfilePicture
+    [Migration("20251220124524_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
