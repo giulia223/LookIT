@@ -2,10 +2,17 @@
 
 namespace LookIT.Models
 {
+    public enum FollowStatus
+    {
+        Pending,
+        Accepted,
+        Declined
+    }
     public class FollowRequest
     {
-        public string Status { get; set; } = "Pending";
+        public FollowStatus Status { get; set; } = FollowStatus.Pending;
 
+        public int Id { get; set; }
         public DateTime Date {  get; set; }
 
         // am pus UserId nvarchar(50) 

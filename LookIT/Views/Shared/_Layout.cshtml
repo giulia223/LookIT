@@ -25,7 +25,10 @@
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-
+                <form asp-controller="Search" asp-action="Index" method="get" class="d-flex mx-auto">
+                    <input class="form-control me-2" type="search" name="query" placeholder="Caută persoane sau grupuri..." aria-label="Search">
+                    <button class="btn btn-outline-success" type="submit">Caută</button>
+                </form>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
 
                     <ul class="navbar-nav mx-auto">

@@ -1,0 +1,153 @@
+﻿@model LookIT.Models.ApplicationUser
+
+@{
+    ViewData["Title"] = "Profil - " + Model.FullName;
+    bool showFullProfile = ViewBag.ShowFullProfile;
+}
+
+<div class="container mt-4">
+
+    <div class="card mb-4 text-center border-0 shadow-sm">
+        <div class="card-body">
+            <img src="@Model.ProfilePictureUrl"
+                 alt="Profile Picture"
+                 class="rounded-circle mb-3"
+                 style="width: 150px; height: 150px; object-fit: cover; border: 3px solid #eee;" />
+
+            <h3>@Model.FullName</h3>
+            <div class="d-flex justify-content-center gap-5 my-3 text-center">
+
+                <div>
+                    <span class="fw-bold d-block fs-5">@ViewBag.PostsCount</span>
+                    <small class="text-muted">Postări</small>
+                </div>
+
+                @if (showFullProfile)
+                {
+                    <a asp-action="Followers" asp-route-userId="@Model.Id" class="text-decoration-none text-dark">
+                        <span class="fw-bold d-block fs-5">@ViewBag.FollowersCount</span>
+                        <small class="text-muted">Urmăritori</small>
+                    </a>
+                }
+                else
+                {
+                    <div>
+                        <span class="fw-bold d-block fs-5">@ViewBag.FollowersCount</span>
+                        <small class="text-muted">Urmăritori</small>
+                    </div>
+                }
+
+                @if (showFullProfile)
+                {
+                    <a asp-action="Following" asp-route-userId="@Model.Id" class="text-decoration-none text-dark">
+                        <span class="fw-bold d-block fs-5">@ViewBag.FollowingCount</span>
+                        <small class="text-muted">Urmăriri</small>
+                    </a>
+                }
+                else
+                {
+                    <div>
+                        <span class="fw-bold d-block fs-5">@ViewBag.FollowingCount</span>
+                        <small class="text-muted">Urmăriri</small>
+                    </div>
+                }
+            </div>
+
+            <p class="text-muted">
+                @if (!string.IsNullOrEmpty(Model.Description))
+                {
+                    @Model.Description
+                }
+                else
+                {
+                    <em>Fără descriere.</em>
+                }
+            </p>
+
+            @if (!Model.Public)
+            {
+                <span class="badge bg-secondary"><i class="bi bi-lock-fill"></i> Cont Privat</span>
+            }
+
+            <div class="mt-3 d-flex gap-2 justify-content-center">
+                @if (ViewBag.IsOwner)
+                {
+                    <a asp-action="Edit" class="btn btn-outline-secondary btn-sm fw-bold">Editează Profil</a>
+
+                    <a asp-controller="FollowRequests"  asp-action="MyRequests" class="btn btn-outline-danger btn-sm fw-bold position-relative ms-2">
+                        <i class="bi bi-heart"></i> Cereri
+                    </a>
+                }
+                else
+                {
+                    <form asp-action="FollowToggle" asp-route-userId="@Model.Id" method="post">
+
+                        @if (ViewBag.IsFollowing)
+                        {
+                            <button type="submit" class="btn btn-outline-secondary btn-sm fw-bold px-4">
+                                Unfollow
+                            </button>
+                        }
+                        else if (ViewBag.IsPending)
+                        {
+                            <button type="submit" class="btn btn-secondary btn-sm fw-bold px-4 text-white">
+                                Requested
+                            </button>
+                        }
+                        else
+                        {
+                            <button type="submit" class="btn btn-primary btn-sm fw-bold px-4">
+                                Follow
+                            </button>
+                        }
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
+
+    <hr />
+
+    @if (showFullProfile)
+    {
+        <div class="row">
+            @* <h4 class="mb-3">Postări (@(Model.Articles?.Count ?? 0))</h4> *@
+
+            @* @if (Model.Articles != null && Model.Articles.Any())
+            {
+                @foreach (var article in Model.Articles)
+                {
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            @if (!string.IsNullOrEmpty(article.Image))
+                            {
+                                <img src="@article.Image" class="card-img-top" style="height: 200px; object-fit: cover;" alt="Post image">
+                            }
+
+                            <div class="card-body">
+                                <p class="card-text">@article.Content</p>
+                            </div>
+                            <div class="card-footer bg-white border-top-0">
+                                <small class="text-muted">Postat la: @article.Timestamp</small>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="alert alert-light text-center">
+                    Acest utilizator nu a postat nimic încă.
+                </div>
+            } *@
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5 bg-light rounded">
+            <h2 class="text-muted"><i class="bi bi-lock"></i></h2>
+            <h4>Acest cont este privat</h4>
+            <p class="text-muted">Urmărește acest cont pentru a-i vedea fotografiile și videoclipurile.</p>
+        </div>
+    }
+</div>>
