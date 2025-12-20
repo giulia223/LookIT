@@ -19,6 +19,29 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\images\profile\15554acb-bda1-4df4-850f-6db31f7c6b7f.jpg" />
+    <Content Remove="wwwroot\images\profile\36fc16be-61c8-4ae3-a0f6-fa6b8fba4755.jpg" />
+    <Content Remove="wwwroot\images\profile\4048d366-02b8-46a1-9a4e-2d42f5d30578.jpg" />
+    <Content Remove="wwwroot\images\profile\4f51111c-4695-4480-80d6-945869f805b6.png" />
+    <Content Remove="wwwroot\images\profile\5e47b5e5-dec3-4cfa-9d5f-3b7ff119239a.jpeg" />
+    <Content Remove="wwwroot\images\profile\65dfca97-ed7a-418a-baa2-26639b300ebf.jpg" />
+    <Content Remove="wwwroot\images\profile\6b95e290-b5f9-4bd8-a46d-d1cc25d327c2.jpg" />
+    <Content Remove="wwwroot\images\profile\76749ed1-4de6-4666-a3c1-8863188ca4ed.png" />
+    <Content Remove="wwwroot\images\profile\782d3fd6-dad2-4efd-82bf-30e12a3acf46.png" />
+    <Content Remove="wwwroot\images\profile\83984007-5eeb-440c-bf73-9ef5b3a116c1.jpeg" />
+    <Content Remove="wwwroot\images\profile\907d85ff-293a-45b6-b711-99c6c729183a.jpg" />
+    <Content Remove="wwwroot\images\profile\9fff0ed6-cc4f-4d41-b705-99980186f7a9.jpg" />
+    <Content Remove="wwwroot\images\profile\ac9ec0de-4243-414f-8300-345657494a3b.png" />
+    <Content Remove="wwwroot\images\profile\b2be1edc-a494-4204-a368-826cb9d4e7b5.jpg" />
+    <Content Remove="wwwroot\images\profile\b9a268b8-a1bd-44ad-8c8f-5843e8120c33.jpg" />
+    <Content Remove="wwwroot\images\profile\c5971fb9-9339-44f0-957e-98faaaa77179.png" />
+    <Content Remove="wwwroot\images\profile\c73a8557-2046-4d4d-89b4-1ee2c86283b5.jpeg" />
+    <Content Remove="wwwroot\images\profile\cb1d49d6-f888-4ace-86f6-9bab147dc06d.jpg" />
+    <Content Remove="wwwroot\images\profile\da963056-920f-4bcd-9e98-5b0cc7a47bec.png" />
+    <Content Remove="wwwroot\images\profile\fe4e4878-30f4-4a1a-b998-9a8ae1f60a21.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.0.11" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.11" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="9.0.11" />

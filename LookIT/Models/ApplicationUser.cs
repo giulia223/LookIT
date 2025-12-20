@@ -15,7 +15,7 @@ namespace LookIT.Models
         public string? Description { get; set; }
 
         [StringLength(500)]
-        public string? ProfilePictureUrl { get; set; }
+        public string? ProfilePictureUrl { get; set; } = "/images/profile/default_user.jpg";
 
         public bool Public { get; set; } = true;
 
