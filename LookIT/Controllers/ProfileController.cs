@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 namespace LookIT.Controllers
 {
     [Authorize]
-    public class ProfileController(ApplicationDbContext context, IWebHostEnvironment env, UserManager<ApplicationUser> userManager) : Controller
+    public class ProfileController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IWebHostEnvironment _env;
@@ -30,7 +30,7 @@ namespace LookIT.Controllers
 
             //facem o interrogare pentru a lua toate postarile unui utilizator si a le afisa
             //in profilulu sau
-            var user = await db.ApplicationUsers
+            var user = await _context.ApplicationUsers
                          .Include(user => user.Posts)
                          .FirstOrDefaultAsync( user => user.Id == userId);
 
