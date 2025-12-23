@@ -29,15 +29,13 @@
                asp-action="Show">
                 Your Groups
             </a>
-
-            <a class="nav-link text-danger fw-bold"
-               asp-area=""
-               asp-controller="Profile"
-               asp-action="Index">
-                <img src="@currentUser.ProfilePictureUrl" class="rounded-circle border" style="width:30px;height:30px;object-fit:cover;" />
-            </a>
-
         }
+        <a class="nav-link text-danger fw-bold"
+           asp-area=""
+           asp-controller="Profile"
+           asp-action="Index">
+            <img src="@currentUser.ProfilePictureUrl" class="rounded-circle border" style="width:30px;height:30px;object-fit:cover;" />
+        </a>
      
     <li class="nav-item">
         <a  class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @currentUser.FullName!</a>
