@@ -5,11 +5,13 @@
 <div class="card-body">
     <div class="d-flex align-items-center mb-2">
         <div class="rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
-            <img src="@Model.User.ProfilePictureUrl" class="rounded-circle border" style="width:40px;height:40px;object-fit:cover;" />
+            <a asp-controller="Profile" asp-action="Details" asp-route-userId="@Model.User.Id" class="text-dark">
+                <img src="@Model.User.ProfilePictureUrl" class="rounded-circle border" style="width:40px;height:40px;object-fit:cover;" />
+            </a>
         </div>
         <div>
             <h6 class="mb-0 fw-bold" style="color: #050505;">@Model.User.FullName</h6>
-            <small class="text-muted">@Model.Date.ToString("dd MMM, HH:mm")</small>
+            <small class="text-muted">@Model.Date.ToString("dd MMM HH:mm")</small>
         </div>
     </div>
 

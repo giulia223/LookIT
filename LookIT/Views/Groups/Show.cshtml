@@ -2,6 +2,7 @@
 @using Microsoft.AspNetCore.Identity
 @using LookIT.Models
 @inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
 @model LookIT.Models.Group
 
 @{
@@ -94,10 +95,8 @@
                 </div>
 
                 @* SECTIUNE MESAJE (FEED) *@
-                @{
-                    var currentUser = await UserManager.GetUserAsync(User);
-                }
-                @if (ViewBag.UserGroupStatus == "Accepted" || ViewBag.UserGroupStatus == "moderator" || await UserManager.IsInRoleAsync(currentUser, "Administrator"))
+                
+                @if (SignInManager.IsSignedIn(User) && (ViewBag.UserGroupStatus == "Accepted" || ViewBag.UserGroupStatus == "moderator" || await UserManager.IsInRoleAsync(await UserManager.GetUserAsync(User), "Administrator")))
                 {
                     <h5 class="mb-3 fw-bold" style="color: #65676b;">Discuții </h5>
 
@@ -151,7 +150,11 @@
                                                 
                                                 <img src="@member.Member.ProfilePictureUrl" class="rounded-circle border" style="width:32px;height:32px;object-fit:cover;" />
                                             </div>
-                                            <span style="font-size: 0.9rem; font-weight: 500;">@member.Member.FullName</span>
+                                            <span style="font-size: 0.9rem; font-weight: 500;">
+                                                <a asp-controller="Profile" asp-action="Details" asp-route-userId="@member.Member.Id" class="text-dark">
+                                                    @member.Member.FullName
+                                                </a>
+                                            </span>
                                         </div>
 
                                         @if (ViewBag.GroupDetails.ModeratorId == UserManager.GetUserId(User) && member.Member.Id != ViewBag.GroupDetails.ModeratorId)
@@ -185,7 +188,11 @@
                                 @foreach (var member in pendingRequests)
                                 {
                                     <div class="p-2 mb-2 bg-light rounded border">
-                                        <p class="mb-2 small fw-bold">@member.Member.FullName</p>
+                                        <p class="mb-2 small fw-bold">
+                                            <a asp-controller="Profile" asp-action="Details" asp-route-userId="@member.Member.Id" class="text-dark">
+                                                @member.Member.FullName
+                                            </a>
+                                        </p>
                                         <form method="post" asp-controller="GroupMembers" asp-action="AcceptMember">
                                             @Html.AntiForgeryToken()
                                             <input type="hidden" name="MemberId" value="@member.Member.Id" />

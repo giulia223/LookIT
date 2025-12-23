@@ -2,8 +2,7 @@
   "dependencies": {
     "mssql3": {
       "type": "mssql",
-      "connectionId": "ConnectionStrings:LookIT",
-      "dynamicId": null
+      "connectionId": "ConnectionStrings:DefaultConnection"
     }
   }
 }

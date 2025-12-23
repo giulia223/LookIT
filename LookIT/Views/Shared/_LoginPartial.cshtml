@@ -23,18 +23,12 @@
         }
         if (currentUser != null && await UserManager.IsInRoleAsync(currentUser, "User"))
         {
-            <a class="nav-link text-danger fw-bold"
-               asp-area=""
-               asp-controller="GroupMembers"
-               asp-action="Show">
-                Your Groups
-            </a>
-
+            
             <a class="nav-link text-danger fw-bold"
                asp-area=""
                asp-controller="Profile"
                asp-action="Index">
-                <img src="@currentUser.ProfilePictureUrl" class="rounded-circle border" style="width:30px;height:30px;object-fit:cover;" />
+                <img src="@currentUser.ProfilePictureUrl" class="rounded-circle border ma-2" style="width:35px;height:35px;object-fit:cover;" />
             </a>
 
         }

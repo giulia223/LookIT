@@ -1,4 +1,4 @@
-﻿@using Microsoft.AspNetCore.Identity
+﻿@* @using Microsoft.AspNetCore.Identity
 @using LookIT.Models
 @inject UserManager<ApplicationUser> UserManager
 
@@ -20,4 +20,46 @@
         </div>
     </div>
     <br />
+} *@
+
+@using Microsoft.AspNetCore.Identity
+@using LookIT.Models
+@inject UserManager<ApplicationUser> UserManager
+
+@if (ViewBag.message != null)
+{
+    <h4 class="alert rounded-3 text-center mb-5"
+        style="background-color: #90C67F; color: #845763; border: 1px solid #92E4BA; padding: 1rem;">
+        @ViewBag.message
+    </h4>
 }
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-9">
+            @foreach (var group in ViewBag.Groups)
+            {
+                <div class="card mb-3" style="background-color: #F8F6F7; border-left: 5px solid #92E4BA; box-shadow: 0 2px 4px rgba(132, 87, 99, 0.1); border-radius: 0.5rem;">
+                    <div class="card-body">
+                        <partial name="GroupInfo" model="group"></partial>
+                        <a class="btn btn-success" asp-controller="Groups" asp-action="Show" asp-route-id="@group.GroupId">See details group</a>
+                    </div>
+                </div>
+                <br />
+            }
+        </div>
+
+        <div class="col-md-3">
+            <div class="sticky-top" style="top: 20px;">
+                <a class="btn w-100 mb-3 shadow-sm"
+                   asp-controller="GroupMembers"
+                   asp-action="Show"
+                   style="background-color: #845763; color: white; border-radius: 0.5rem; font-weight: bold;">
+                    <i class="bi bi-people-fill"></i> Your Groups
+                </a>
+
+                <p class="small text-muted text-center">Manage the communities you belong to.</p>
+            </div>
+        </div>
+    </div>
+</div>
