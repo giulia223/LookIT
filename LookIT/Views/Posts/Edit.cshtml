@@ -1,0 +1,147 @@
+﻿@model LookIT.Models.Post
+
+@if (ViewBag.Message != null)
+{
+    <h2 class="p-3 rounded-3 text-center mb-5 alert @ViewBag.Alert">@ViewBag.Message</h2>
+}
+<br />
+
+<div class="container mt-5">
+
+    <div class="row">
+
+        <div class="col-md-6 offset-md-3">
+
+            <div class="card p-4 shadow-sm">
+
+                <form method="post" asp-action="Edit" asp-route-id="@Model.PostId" asp-controller="Posts" enctype="multipart/form-data">
+                    <input type="hidden" asp-for="PostId" />
+
+                    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+                    <div class="form-group mb-3">
+
+                        <label class="form-label fw-bold">Imagine</label>
+                        <input type="file" name="Image" id="imageInput" class="form-control" accept="image/*" />
+                        <small class="text-muted">Formate acceptate: jpg, jpeg, png, gif.</small>
+
+                        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                        {
+                            <div id="currentImageContainer" class="mt-3 p-2 border rounded bg-light position-relative text-center">
+                                <p class="mb-1 text-muted small">Imagine curentă</p>
+                                <img src="@Model.ImageUrl" alt="Current Image" class="img-fluid rounded border mx-auto d-block" style="max-height: 300px;" />
+                            </div>
+
+                            <div class="form-check mt-2 d-inline-block text-start" id="deleteImage">
+                                <input class="form-check-input border-danger" type="checkbox" name="DeleteImage" value="true" id="deleteImageCheck">
+                                <label class="form-check-label text-danger fw-bold" for="deleteImageCheck">Sterge imaginea</label>
+                            </div>
+                        }
+
+                        <div id="newImageContainer" class="mt-3 d-none p-2 border rounded bg-light position-relative text-center">
+                            <p class="mb-1 text-muted small">Imagine nouă</p>
+                            <img id="newImagePreview" src="#" class="img-fluid rounded mx-auto d-block" style="max-height: 300px;" />
+                        </div>
+
+                    </div>
+
+                    <div class="form-group mb-3">
+
+                        <label class="form-label fw-bold">Video</label>
+                        <input type="file" name="Video" id="videoInput" class="form-control" accept="video/*" />
+                        <small class="text-muted">Formate acceptate: MP4, WebM, etc.</small>
+
+                        @if (!string.IsNullOrEmpty(Model.VideoUrl))
+                        {
+                            <div id="currentVideoContainer" class="mt-3 p-2 border rounded bg-light position-relative text-center">
+                                
+                                <p class="mb-1 text-muted small">Video curent</p>
+                                <video controls class="w-100 rounded border mx-auto d-block" style="max-height: 300px;">
+                                    <source src="@Model.VideoUrl" type="video/mp4">
+                                </video>
+                            </div>
+
+                            <div class="form-check mt-2 d-inline-block text-start" id="deleteVideo"">
+                                <input class="form-check-input border-danger" type="checkbox" name="DeleteVideo" value="true" id="deleteVideoCheck">
+                                <label class="form-check-label text-danger fw-bold" for="deleteVideoCheck">Sterge videoclip</label>
+                            </div>
+                        }
+
+                        <div id="newVideoContainer" class="mt-3 d-none p-2 border rounded bg-light position-relative text-center">
+                            <p class="mb-1 text-muted small">Video nou</p>
+                            <video id="newVideoPreview" controls class="w-100 rounded mx-auto d-block" style="max-height: 300px;">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="TextContent" class="form-label">Conținut text</label>
+                        <textarea asp-for="TextContent" class="form-control" rows="5"></textarea>
+                        <span asp-validation-for="TextContent" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-primary" type="submit">Salvează Modificările</button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">Anulează modificari</a>
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    <script>
+        
+        const imageInput = document.getElementById('imageInput');
+        const currentImgContainer = document.getElementById('currentImageContainer');
+        const newImgContainer = document.getElementById('newImageContainer');
+        const newImgPreview = document.getElementById('newImagePreview');
+        const deleteImg = document.getElementById('deleteImage');
+
+        if(imageInput){
+            imageInput.addEventListener('change', function() {
+                const file = this.files[0];
+
+                if (file) {
+                    newImgPreview.src = URL.createObjectURL(file);
+                    newImgContainer.classList.remove('d-none');
+                    if (currentImgContainer) currentImgContainer.classList.add('d-none');
+                    if (deleteImg) deleteImg.classList.add('d-none');
+                } else {
+                    newImgContainer.classList.add('d-none');
+                    if (currentImgContainer) currentImgContainer.classList.remove('d-none');
+                }
+            });
+        }
+
+        const videoInput = document.getElementById('videoInput');
+        const currentVidContainer = document.getElementById('currentVideoContainer');
+        const newVidContainer = document.getElementById('newVideoContainer');
+        const newVidPreview = document.getElementById('newVideoPreview');
+        const deleteVid = document.getElementById('deleteVideo');
+
+        if(videoInput){
+            videoInput.addEventListener('change', function() {
+                const file = this.files[0];
+
+                if (file) {
+                    newVidPreview.src = URL.createObjectURL(file);
+                    newVidContainer.classList.remove('d-none');
+                    if (currentVidContainer) currentVidContainer.classList.add('d-none');
+                    if (deleteVid) deleteVid.classList.add('d-none');
+                } else {
+                    newVidContainer.classList.add('d-none');
+                    if (currentVidContainer) currentVidContainer.classList.remove('d-none');
+                }
+            });
+        }
+    </script>
+}

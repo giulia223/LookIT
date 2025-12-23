@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace LookIT.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class FlwPost : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -164,14 +164,16 @@ namespace LookIT.Migrations
                 name: "FollowRequests",
                 columns: table => new
                 {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
                     FollowerId = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    FollowingId = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    FollowingId = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_FollowRequests", x => new { x.FollowerId, x.FollowingId });
+                    table.PrimaryKey("PK_FollowRequests", x => x.Id);
                     table.ForeignKey(
                         name: "FK_FollowRequests_AspNetUsers_FollowerId",
                         column: x => x.FollowerId,
@@ -218,7 +220,7 @@ namespace LookIT.Migrations
                     TextContent = table.Column<string>(type: "nvarchar(max)", maxLength: 5000, nullable: true),
                     ImageUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     VideoUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    AuthorId = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
+                    AuthorId = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -409,6 +411,12 @@ namespace LookIT.Migrations
                 name: "IX_Comments_UserId",
                 table: "Comments",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FollowRequests_FollowerId_FollowingId",
+                table: "FollowRequests",
+                columns: new[] { "FollowerId", "FollowingId" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_FollowRequests_FollowingId",

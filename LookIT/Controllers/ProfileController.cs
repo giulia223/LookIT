@@ -1,8 +1,10 @@
-﻿using LookIT.Models;
+﻿using LookIT.Data;
+using LookIT.Models;
 using LookIT.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace LookIT.Controllers
 {
@@ -11,11 +13,13 @@ namespace LookIT.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IWebHostEnvironment _env;
+        private readonly ApplicationDbContext _context;
 
-        public ProfileController(UserManager<ApplicationUser> userManager, IWebHostEnvironment env)
+        public ProfileController(UserManager<ApplicationUser> userManager, IWebHostEnvironment env, ApplicationDbContext context)
         {
             _userManager = userManager;
             _env = env;
+            _context = context;
         }
 
         //afisare profil user
@@ -23,7 +27,7 @@ namespace LookIT.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
 
-            return View(user);
+            return RedirectToAction("Details", new { userId = user.Id });
         }
 
         [AllowAnonymous]
@@ -126,6 +130,134 @@ namespace LookIT.Controllers
 
             return RedirectToAction("Index");
 
+        }
+
+
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> Details(string userId)
+        {
+            if (string.IsNullOrEmpty(userId)) return NotFound();
+
+            var targetUser = await _context.Users
+                //.Include(u => u.Articles) 
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (targetUser == null) return NotFound();
+
+            var currentUser = await _userManager.GetUserAsync(User);
+
+            
+
+            bool isOwner = currentUser != null && currentUser.Id == targetUser.Id;
+
+            
+            var followRelationship = currentUser != null
+                ? await _context.FollowRequests.FirstOrDefaultAsync(f => f.FollowerId == currentUser.Id && f.FollowingId == targetUser.Id)
+                : null;
+
+            bool isFollowing = followRelationship != null && followRelationship.Status == FollowStatus.Accepted;
+            bool isPending = followRelationship != null && followRelationship.Status == FollowStatus.Pending;
+
+            
+            bool showFullProfile = targetUser.Public || isOwner || isFollowing;
+
+          
+            var followersCount = await _context.FollowRequests.CountAsync(f => f.FollowingId == targetUser.Id && f.Status == FollowStatus.Accepted);
+            var followingCount = await _context.FollowRequests.CountAsync(f => f.FollowerId == targetUser.Id && f.Status == FollowStatus.Accepted);
+            var userPosts = await _context.Posts
+                                  .Where(p => p.AuthorId == userId)
+                                  .OrderByDescending(p => p.Date)
+                                  .ToListAsync();
+
+            
+            
+
+
+            ViewBag.IsOwner = isOwner;
+            ViewBag.ShowFullProfile = showFullProfile;
+            ViewBag.IsFollowing = isFollowing;
+            ViewBag.IsPending = isPending;
+            ViewBag.FollowersCount = followersCount;
+            ViewBag.FollowingCount = followingCount;
+            ViewBag.UserPosts = userPosts;
+
+            return View(targetUser);
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> FollowToggle(string userId)
+        {
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null) return Challenge(); // Te trimite la login  ???
+
+            // Verificam daca exista deja o relatie
+            var existingFollow = await _context.FollowRequests
+                .FirstOrDefaultAsync(f => f.FollowerId == currentUser.Id && f.FollowingId == userId);
+
+            if (existingFollow != null)
+            {
+                // Daca exista, inseamna ca dam UNFOLLOW (stergem relatia)
+                _context.FollowRequests.Remove(existingFollow);
+            }
+            else
+            {
+                // Daca nu exista, cream cererea
+                var targetUser = await _context.Users.FindAsync(userId);
+                if (targetUser == null) return NotFound();
+
+                var newFollow = new FollowRequest
+                {
+                    FollowerId = currentUser.Id,
+                    FollowingId = userId,
+                    // Daca e public -> Accepted direct. Daca e privat -> Pending.
+                    Status = targetUser.Public ? FollowStatus.Accepted : FollowStatus.Pending
+                };
+                _context.FollowRequests.Add(newFollow);
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Details", new { userId = userId });
+        }
+
+        // LISTA DE URMĂRITORI (Cine mă urmărește pe mine)
+        [HttpGet]
+        public async Task<IActionResult> Followers(string userId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null) return NotFound();
+
+            ViewData["Title"] = $"Urmăritori - {user.FullName}";
+
+            // Căutăm relațiile unde 'userId' este DESTINATARUL (FollowingId) și statusul e Accepted
+            var followers = await _context.FollowRequests
+                .Include(f => f.Follower) // Avem nevoie de datele celui care dă follow
+                .Where(f => f.FollowingId == userId && f.Status == FollowStatus.Accepted)
+                .Select(f => f.Follower) // Selectăm doar userii, nu obiectul cererii
+                .ToListAsync();
+
+            return View("UserList", followers); // Refolosim un View comun "UserList"
+        }
+
+        // LISTA DE URMĂRIRI (Pe cine urmăresc eu)
+        [HttpGet]
+        public async Task<IActionResult> Following(string userId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null) return NotFound();
+
+            ViewData["Title"] = $"Urmăriri - {user.FullName}";
+
+            // Căutăm relațiile unde 'userId' este EXPEDITORUL (FollowerId) și statusul e Accepted
+            var following = await _context.FollowRequests
+                .Include(f => f.Following) // Avem nevoie de datele celui urmărit
+                .Where(f => f.FollowerId == userId && f.Status == FollowStatus.Accepted)
+                .Select(f => f.Following)
+                .ToListAsync();
+
+            return View("UserList", following);
         }
     }
 }
