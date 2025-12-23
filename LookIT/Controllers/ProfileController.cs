@@ -25,7 +25,25 @@ namespace LookIT.Controllers
         //afisare profil user
         public async Task<IActionResult> Index()
         {
-            var user = await _userManager.GetUserAsync(User);
+            //luam Id-ul utilizatorului logal
+            var userId = _userManager.GetUserId(User);
+
+            //facem o interrogare pentru a lua toate postarile unui utilizator si a le afisa
+            //in profilulu sau
+            var user = await _context.ApplicationUsers
+                         .Include(user => user.Posts)
+                         .FirstOrDefaultAsync( user => user.Id == userId);
+
+            //daca userul nu exista
+            if(user == null)
+            {
+                return NotFound();
+            }
+
+            //ordonam postarile utilizatorului descrescator dupa data adaugarii acestora
+            user.Posts = user.Posts
+                             .OrderByDescending(Post => Post.Date)
+                             .ToList();
 
             return RedirectToAction("Details", new { userId = user.Id });
         }
@@ -41,7 +59,6 @@ namespace LookIT.Controllers
             return View();
         }
 
-        [HttpPost]
         [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> CreateProfile(CreateProfileViewModel model)

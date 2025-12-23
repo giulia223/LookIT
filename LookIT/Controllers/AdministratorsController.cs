@@ -167,14 +167,33 @@ namespace LookIT.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> DeleteUser(string id)
+        public async Task<IActionResult> DeleteUser(string Id)
         {
-            var user = await _userManager.FindByIdAsync(id);
+            var user = await _userManager.FindByIdAsync(Id);
+
+            //utilizatorul nu a fost gasit
             if (user == null)
             {
                 return NotFound();
             }
+
+            //nu trebuie sa sterg postarile manual pentru ca am setat OnDeleteCascade la relatia dintre "un user poate avea mai multe postari"
+            //totusi, trebuie sa sterg mai intai comentariile asociate unui utilizator pentru a putea sterge userul
+            //caci am setat OnDeleteRestrict pentru evitarea ciclurilor
+
+            var comments = _context.Comments
+                                    .Where(comment => comment.UserId == Id)
+                                    .ToList();
+
+            //daca avem comentarii, le vom sterge manual
+            if(comments.Count > 0)
+            {
+                _context.Comments.RemoveRange(comments);
+                await _context.SaveChangesAsync();
+            }
+
             var result = await _userManager.DeleteAsync(user);
+
             if (result.Succeeded)
             {
                 TempData["message"] = "Utilizator sters.\n";

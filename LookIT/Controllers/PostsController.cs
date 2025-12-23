@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 
+
 namespace LookIT.Controllers
 {
     public class PostsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IWebHostEnvironment env) : Controller
@@ -19,10 +20,32 @@ namespace LookIT.Controllers
         //au acces la aceasta metoda atat utilizatorii inregistrati, cat si neinregistrati si administratorii
         [AllowAnonymous]
         public IActionResult Index()
-        {
+        { 
+            
+            var userId = _userManager.GetUserId(User);
+            List<string> followingUserIds = new List<string>();
+
+
+            //daca utilizatorul este logat, preluam id-urile utilizatorului pe care ii urmareste
+            if (userId is not null)
+            {
+                followingUserIds = db.FollowRequests
+                                     .Where(follow => follow.FollowerId == userId && follow.Status == FollowStatus.Accepted)
+                                     .Select(follow => follow.FollowingId)
+                                     .ToList();
+
+                //il adauagam si pe el insusi pentru a-si vedea postarile in homepage
+                followingUserIds.Add(userId);
+            }
+
+            //luam postarile utilizatorilor publici sau pe care ii urmarim (chiar daca ar avea cont privat)
+            //in cazul in care utilizatorul nu este logat, cum followingUsersIds este o lista vida, va avea doar de verificat daca autorul postarii resptive
+            //are contul public
             var posts = db.Posts
-                .Include(post => post.Author)
-                .OrderByDescending(post => post.Date);
+                          .Include(post => post.Author)
+                          .Where(post => followingUserIds.Contains(post.AuthorId) || post.Author.Public)
+                          .OrderByDescending(post => post.Date)
+                          .ToList();
 
             ViewBag.Posts = posts;
 
@@ -34,23 +57,60 @@ namespace LookIT.Controllers
             return View();
         }
 
+        //feed-ul personalizat al utilizatorilor inregistrati sau administratori
+        //contine postarile utilizatorlior pe care ii urmareste
+        [Authorize(Roles="User,Administrator")]
+        public IActionResult Feed()
+        {
+            var userId = _userManager.GetUserId(User);
+
+            //luam persoanele pe care utilizatorul ii urmareste, mai exact verificam daca statusul cererii de urmarire este Accepted
+            var followingUserIds = db.FollowRequests
+                                     .Where(follow => follow.FollowerId == userId && follow.Status == FollowStatus.Accepted)
+                                     .Select(follow => follow.FollowingId)
+                                     .ToList();
+
+            var posts = db.Posts
+                          .Include(post => post.Author)
+                          .Where(post => followingUserIds.Contains(post.AuthorId))
+                          .OrderByDescending(post => post.Date)
+                          .ToList();
+
+            ViewBag.Posts = posts;
+
+            if (TempData.ContainsKey("message"))
+            {
+                ViewBag.Message = TempData["message"];
+                ViewBag.Alert = TempData["messageType"];
+            }
+            return View("Index");
+        }
+
         //se afiseaza o singura postare in functie de ID-ul sau impreuna cu userul care a postat-o
         //[HttpGet] implicit
 
         //au acces la aceasta metoda atat utilizatorii inregistrati, cat si neinregistrati si administratorii
         [AllowAnonymous]
-        public IActionResult Show(int id)
+        public IActionResult Show(int Id)
         {
             Post? post = db.Posts
-                .Include(post => post.Author)
-                .Where(post => post.PostId == id)
-                .FirstOrDefault();
+                           .Include(post => post.Author)
+                           .Include(post => post.Comments)
+                                 .ThenInclude(comment => comment.User)
+                           .Where(post => post.PostId == Id)
+                           .FirstOrDefault();
 
             if (post is null)
             {
                 return NotFound();
             }
 
+            //ordonam comentariile descrescator dupa data postarii
+            post.Comments = post.Comments
+                                .OrderByDescending(comment => comment.Date)
+                                .ToList();
+
+            //setam conditiile pentru afisarea butoanelor in viewul asociat postarii
             SetAccessRights();
 
             if (TempData.ContainsKey("message"))
@@ -60,6 +120,47 @@ namespace LookIT.Controllers
             }
 
             return View(post);
+        }
+
+        //adaugarea unui comentariu asociat unei postari din baza de date
+        //doar utilizatorii inregistrati si administratorii pot adauga comentarii
+
+        [Authorize(Roles ="User,Administrator")]
+        [HttpPost]
+        public IActionResult Show([FromForm] Comment comment)
+        {
+            //data la care a fost postat comentariul
+            comment.Date = DateTime.Now;
+
+            //userul care a postat comentariul
+            comment.UserId = _userManager.GetUserId(User);
+
+            //daca comentariul trece validarile din model (dimenisunea continutului unui comentariu sa nu depaseasca un
+            //anumit numar de caractere)
+            if (ModelState.IsValid)
+            {
+                db.Comments.Add(comment);
+                db.SaveChanges();
+                return Redirect("/Posts/Show/" + comment.PostId);
+            }
+            else
+            {
+                Post? post = db.Posts
+                               .Include(post => post.Author)
+                               .Include(post => post.Comments)
+                                       .ThenInclude(comment => comment.User)
+                               .Where(post => post.PostId == comment.PostId)
+                               .FirstOrDefault();
+
+                if(post is null)
+                {
+                    return NotFound();
+                }
+
+                SetAccessRights();
+
+                return View(post);
+            }
         }
 
         //se afiseaza formularul in care se vor completa datele unei posatri
@@ -76,6 +177,7 @@ namespace LookIT.Controllers
 
         //se adauga postarea in baza de date 
         //doar utilizatorii autentificati pot face postari in pltaforma sau administratorii
+        
         [HttpPost]
         public async Task<IActionResult> New(Post post, IFormFile? Image, IFormFile? Video)
         {
@@ -414,9 +516,11 @@ namespace LookIT.Controllers
         [Authorize(Roles = "User,Administrator")]
         public IActionResult Delete(int Id)
         {
+            //nu trebuie sa stergem manual comentariile pentru ca am setat OnDeleteCascade, ceea ce inseamna ca daca sterg o postare, atunci comentariile 
+            //asociate acesteia vor fi sterse automat
             Post? post = db.Posts
-                .Where(post => post.PostId== Id)
-                .FirstOrDefault();
+                           .Where(post => post.PostId== Id)
+                           .FirstOrDefault();
 
             //nu am gasit postarea dupa id
             if(post is null)
@@ -469,11 +573,11 @@ namespace LookIT.Controllers
         //butoanele sunt aflate in view-uri
         private void SetAccessRights()
         {
-            ViewBag.AfisareButoane = false;
+            ViewBag.EsteUser = false;
 
             if (User.IsInRole("User"))
             {
-                ViewBag.AfisareButoane = true;
+                ViewBag.EsteUser = true;
             }
 
             ViewBag.UserCurent = _userManager.GetUserId(User);

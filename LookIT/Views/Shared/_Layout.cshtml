@@ -22,41 +22,58 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3 py-2">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Posts" asp-action="Index">LookIT</a>
+                <a class="navbar-brand fw-bold text-primary" asp-area="" asp-controller="Posts" asp-action="Index" style="font-size: 1.5rem;">LookIT</a>
 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <form asp-controller="Search" asp-action="Index" method="get" class="d-flex mx-auto">
-                    <input class="form-control me-2" type="search" name="query" placeholder="Caută persoane sau grupuri..." aria-label="Search">
-                    <button class="btn btn-outline-success" type="submit">Caută</button>
-                </form>
+
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
 
-                    <ul class="navbar-nav mx-auto">
-                        <li class="nav-item mx-3">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Posts" asp-action="Index"
-                               data-bs-toggle="tooltip" data-bs-placement="bottom" title="Feed">
-                                <i class="bi bi-house fs-4"></i>
+                    <form asp-controller="Search" asp-action="Index" method="get" class="d-flex mx-auto mt-2 mt-sm-0" style="width: 100%; max-width: 400px;">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0 rounded-start-pill">
+                                <i class="bi bi-search text-muted"></i>
+                            </span>
+                            <input class="form-control bg-light border-start-0 rounded-end-pill ps-0"
+                                   type="search"
+                                   name="query"
+                                   placeholder="Caută utilizator sau grup..."
+                                   aria-label="Search">
+                        </div>
+                    </form>
+
+                    <ul class="navbar-nav align-items-center">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark px-3" asp-area="" asp-controller="Posts" asp-action="Index"
+                               data-bs-toggle="tooltip" title="For you">
+                                <i class="bi bi-house-door fs-4"></i>
                             </a>
                         </li>
-
                         @if (User.IsInRole("User") || User.IsInRole("Administrator"))
                         {
-                            <li class="nav-item mx-3">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Posts" asp-action="New"
-                                   data-bs-toggle="tooltip" data-bs-placement="bottom" title="Adauga postare">
-                                    <i class="bi bi-plus-square fs-4"></i>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark px-3" asp-area="" asp-controller="Posts" asp-action="Feed"
+                                   data-bs-toggle="tooltip" title="Feed">
+                                    Following
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link text-dark px-3" asp-area="" asp-controller="Posts" asp-action="New"
+                                   data-bs-toggle="tooltip" title="Adaugă postare">
+                                    <i class="bi bi-plus-circle fs-4"></i>
                                 </a>
                             </li>
                         }
-                        
-                    </ul>
 
-                    <partial name="_LoginPartial" />
+                        <li class="nav-item ms-lg-2">
+                            <partial name="_LoginPartial" />
+                        </li>
+                    </ul>
                 </div>
             </div>
         </nav>

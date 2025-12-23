@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "mssql3": {
+    "mssql1": {
       "secretStore": "LocalSecretsFile",
       "type": "mssql.local",
       "connectionId": "ConnectionStrings:LookIT",
