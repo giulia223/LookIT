@@ -1,7 +1,9 @@
-﻿using LookIT.Models;
+﻿using LookIT.Data;
+using LookIT.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 
 namespace LookIT.Controllers
 {
@@ -9,16 +11,15 @@ namespace LookIT.Controllers
     {
 
         private readonly UserManager<ApplicationUser> _userManager;
-        public UserController(UserManager<ApplicationUser> userManager)
+        private readonly ApplicationDbContext _context;
+        public UserController(UserManager<ApplicationUser> userManager, ApplicationDbContext context)
         {
             _userManager = userManager;
+            _context = context;
         }
         //public IActionResult Index()
         //{
         //    return View();
         //}
-
-       // [Authorize]
-       
     }
 }

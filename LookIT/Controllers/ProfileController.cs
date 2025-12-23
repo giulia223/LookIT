@@ -26,7 +26,6 @@ namespace LookIT.Controllers
             return View(user);
         }
 
-
         [AllowAnonymous]
         //creare profil user
         public IActionResult CreateProfile()
