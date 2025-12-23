@@ -1,64 +1,97 @@
-﻿@if (ViewBag.Message != null)
+﻿@inject UserManager<ApplicationUser> UserManager
+@using Microsoft.AspNetCore.Identity
+@using LookIT.Models
+
+@if (ViewBag.Message != null)
 {
     <h2 class="p-3 rounded-3 text-center mb-5 alert @ViewBag.Alert">@ViewBag.Message</h2>
 }
 <br />
 
-@foreach (var post in ViewBag.Posts)
+@{
+    var loggedUser = await UserManager.GetUserAsync(User);
+}
+
+@if(ViewBag.Posts.Count > 0)
 {
-    <div class="card mb-4 mx-auto border-0 shadow-sm" style="max-width: 600px;">
-        <div class="card-body p-3">
+    @foreach (var post in ViewBag.Posts)
+    {
+        <div class="card mb-4 mx-auto border-0 shadow-sm" style="max-width: 600px;">
+            <div class="card-body p-3">
 
-            <div class="d-flex align-items-center mb-3">
-                <img src="@post.Author.ProfilePictureUrl"
-                     alt="Profile Picture"
-                     class="rounded-circle border"
-                     style="width: 40px; height: 40px; object-fit: cover;" />
-
-                <div class="d-flex flex-column ms-2">
-                    <span class="fw-bold text-dark" style="font-size: 0.95rem; line-height: 1.2;">
-                        @post.Author.FullName
-                    </span>
-                    <small class="text-muted" style="font-size: 0.8rem;">
-                        @post.Date.ToString(post.Date.Year == DateTime.Now.Year ? "d MMMM HH:mm" : "d MMMM yyyy HH:mm") <i class="bi bi-globe"></i>
-                    </small>
+                <div class="d-flex align-items-center mb-3">
+                    <a asp-controller="Profile" asp-action="Details" asp-area="" asp-route-userId="@post.AuthorId" class="text-decoration-none">
+                        <img src="@post.Author.ProfilePictureUrl"
+                             alt="Profile Picture"
+                             class="rounded-circle border"
+                             style="width: 40px; height: 40px; object-fit: cover;" />
+                    </a>
+                    <div class="d-flex flex-column ms-2">
+                        <a asp-controller="Profile" asp-action="Details" asp-area="" asp-route-userId="@post.AuthorId" class="text-decoration-none">
+                            <span class="fw-bold text-dark" style="font-size: 0.95rem; line-height: 1.2;">
+                                @post.Author.FullName
+                            </span>
+                        </a>
+                        <small class="text-muted" style="font-size: 0.8rem;">
+                            @post.Date.ToString(post.Date.Year == DateTime.Now.Year ? "d MMMM HH:mm" : "d MMMM yyyy HH:mm") <i class="bi bi-globe"></i>
+                        </small>
+                    </div>
                 </div>
-            </div>
 
-            <div>
-                @if (!string.IsNullOrEmpty(post.TextContent))
+                <div>
+                    @if (!string.IsNullOrEmpty(post.TextContent))
+                    {
+                        <div class="mb-2">
+                            @post.TextContent
+                        </div>
+                    }
+
+                    @if (post.ImageUrl != null)
+                    {
+                        <img src="@post.ImageUrl"
+                             alt="Post Image"
+                             class="rounded-2 w-100 border"
+                             style="height: auto; max-height: 600px; object-fit: contain;" />
+                    }
+                </div>
+
+                @if (post.VideoUrl != null)
                 {
-                    <div class="mb-2">
-                        @post.TextContent
+                    <div class="mt-2">
+                        <video controls preload="metadata" class="w-100 rounded-2 border" style="max-height: 600px; background-color: #000;">
+                            <source src="@post.VideoUrl" type="video/mp4">
+                            Browserul tău nu suportă redarea acestui videoclip.
+                        </video>
                     </div>
                 }
 
-                @if (post.ImageUrl != null)
-                {
-                    <img src="@post.ImageUrl"
-                         alt="Post Image"
-                         class="rounded-2 w-100 border"
-                         style="height: auto; max-height: 600px; object-fit: contain;" />
-                }
-            </div>
-
-            @if (post.VideoUrl != null)
-            {
-                <div class="mt-2">
-                    <video controls preload="metadata" class="w-100 rounded-2 border" style="max-height: 600px; background-color: #000;">
-                        <source src="@post.VideoUrl" type="video/mp4">
-                        Browserul tău nu suportă redarea acestui videoclip.
-                    </video>
+                <div class="mt-3">
+                    <a asp-controller="Posts" asp-action="Show" asp-route-id="@post.PostId"
+                       class="btn btn-sm btn-primary">
+                        Vezi postarea >>
+                    </a>
                 </div>
-            }
 
-            <div class="mt-3">
-                <a asp-controller="Posts" asp-action="Show" asp-route-id="@post.PostId"
-                   class="btn btn-sm btn-primary">
-                    Vezi postarea >>
-                </a>
             </div>
-
         </div>
+
+    }
+}
+else
+{
+    <div class="text-center mt-5">
+        <div class="mb-3">
+            <i class="bi bi-postcard text-muted" style="font-size: 4rem;"></i>
+        </div>
+        <h3 class="text-muted">Momentan nu există postări de afișat.</h3>
+        <p class="text-secondary">Urmărește mai mulți utilizatori pentru a-ți popula fluxul de noutăți!</p>
+
+        @if (loggedUser is not null)
+        {
+            <a asp-controller="Posts" asp-action="New" class="btn btn-primary mt-3">
+                <i class="bi bi-plus-circle"></i> Creează o postare
+            </a>
+        }
     </div>
 }
+

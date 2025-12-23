@@ -44,13 +44,19 @@
                     <ul class="navbar-nav align-items-center">
                         <li class="nav-item">
                             <a class="nav-link text-dark px-3" asp-area="" asp-controller="Posts" asp-action="Index"
-                               data-bs-toggle="tooltip" title="Feed">
+                               data-bs-toggle="tooltip" title="For you">
                                 <i class="bi bi-house-door fs-4"></i>
                             </a>
                         </li>
-
                         @if (User.IsInRole("User") || User.IsInRole("Administrator"))
                         {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark px-3" asp-area="" asp-controller="Posts" asp-action="Feed"
+                                   data-bs-toggle="tooltip" title="Feed">
+                                    Following
+                                </a>
+                            </li>
+
                             <li class="nav-item">
                                 <a class="nav-link text-dark px-3" asp-area="" asp-controller="Posts" asp-action="New"
                                    data-bs-toggle="tooltip" title="Adaugă postare">

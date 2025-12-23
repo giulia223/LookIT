@@ -10,6 +10,8 @@ namespace LookIT.Models
         //nu punem Required pentru ca atunci va esua la validarile din model in momentul adaugarii comentariului
         public DateTime Date {  get; set; }
 
+        public DateTime? DateModified { get; set; }
+
         [Required(ErrorMessage ="Continutul comentariului nu poate fi gol.")]
         [StringLength(1000, ErrorMessage ="Continutul comentariului nu poate depasi {1} de caractere.")]
         public string? Content { get; set; }

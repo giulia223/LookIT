@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LookIT.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251220124524_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20251223163448_AddEditTime")]
+    partial class AddEditTime
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -120,6 +120,9 @@ namespace LookIT.Migrations
                         .HasColumnType("nvarchar(1000)");
 
                     b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateModified")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("PostId")

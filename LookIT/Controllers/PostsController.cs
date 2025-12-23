@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 
+
 namespace LookIT.Controllers
 {
     public class PostsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IWebHostEnvironment env) : Controller
@@ -19,10 +20,32 @@ namespace LookIT.Controllers
         //au acces la aceasta metoda atat utilizatorii inregistrati, cat si neinregistrati si administratorii
         [AllowAnonymous]
         public IActionResult Index()
-        {
+        { 
+            
+            var userId = _userManager.GetUserId(User);
+            List<string> followingUserIds = new List<string>();
+
+
+            //daca utilizatorul este logat, preluam id-urile utilizatorului pe care ii urmareste
+            if (userId is not null)
+            {
+                followingUserIds = db.FollowRequests
+                                     .Where(follow => follow.FollowerId == userId && follow.Status == FollowStatus.Accepted)
+                                     .Select(follow => follow.FollowingId)
+                                     .ToList();
+
+                //il adauagam si pe el insusi pentru a-si vedea postarile in homepage
+                followingUserIds.Add(userId);
+            }
+
+            //luam postarile utilizatorilor publici sau pe care ii urmarim (chiar daca ar avea cont privat)
+            //in cazul in care utilizatorul nu este logat, cum followingUsersIds este o lista vida, va avea doar de verificat daca autorul postarii resptive
+            //are contul public
             var posts = db.Posts
                           .Include(post => post.Author)
-                          .OrderByDescending(post => post.Date);
+                          .Where(post => followingUserIds.Contains(post.AuthorId) || post.Author.Public)
+                          .OrderByDescending(post => post.Date)
+                          .ToList();
 
             ViewBag.Posts = posts;
 
@@ -32,6 +55,35 @@ namespace LookIT.Controllers
                 ViewBag.Alert = TempData["messageType"];
             }
             return View();
+        }
+
+        //feed-ul personalizat al utilizatorilor inregistrati sau administratori
+        //contine postarile utilizatorlior pe care ii urmareste
+        [Authorize(Roles="User,Administrator")]
+        public IActionResult Feed()
+        {
+            var userId = _userManager.GetUserId(User);
+
+            //luam persoanele pe care utilizatorul ii urmareste, mai exact verificam daca statusul cererii de urmarire este Accepted
+            var followingUserIds = db.FollowRequests
+                                     .Where(follow => follow.FollowerId == userId && follow.Status == FollowStatus.Accepted)
+                                     .Select(follow => follow.FollowingId)
+                                     .ToList();
+
+            var posts = db.Posts
+                          .Include(post => post.Author)
+                          .Where(post => followingUserIds.Contains(post.AuthorId))
+                          .OrderByDescending(post => post.Date)
+                          .ToList();
+
+            ViewBag.Posts = posts;
+
+            if (TempData.ContainsKey("message"))
+            {
+                ViewBag.Message = TempData["message"];
+                ViewBag.Alert = TempData["messageType"];
+            }
+            return View("Index");
         }
 
         //se afiseaza o singura postare in functie de ID-ul sau impreuna cu userul care a postat-o

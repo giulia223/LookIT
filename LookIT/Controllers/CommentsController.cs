@@ -51,6 +51,7 @@ namespace LookIT.Controllers
         //se poate edita un comentariu doar de catre utilizatorul care a postat comentariul respectiv  sau de catre administratori,
         //chiar daca nu acestia sunt autorii comentariului
 
+        [Authorize(Roles ="User,Administrator")]
         public IActionResult Edit(int Id)
         {
             Comment? comment = db.Comments.Find(Id);
@@ -75,6 +76,46 @@ namespace LookIT.Controllers
             }
         }
 
+        [HttpPost]
+        [Authorize(Roles="User,Administrator")]
+        public IActionResult Edit(int Id, Comment requestComment)
+        {
+            Comment? comment = db.Comments.Find(Id);
+
+            if(comment is null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                if (comment.UserId == _userManager.GetUserId(User)
+                    || User.IsInRole("Administrator"))
+                {
+                    if (ModelState.IsValid)
+                    {
+                        comment.Content = requestComment.Content;
+
+                        comment.DateModified = DateTime.Now;
+
+                        db.SaveChanges();
+
+                        return Redirect("/Posts/Show/" + comment.PostId);
+                    }
+                    else
+                    {
+                        return View(requestComment);
+                    }
+                }
+                else
+                {
+                    TempData["message"] = "Nu aveti dreptul sa editati comentariul.";
+                    TempData["messageType"] = "alert-danger";
+                    return RedirectToAction("Index", "Posts");
+                }
+            }
+        }
+
+        
         
     }
 }

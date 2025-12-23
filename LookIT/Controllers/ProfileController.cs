@@ -184,16 +184,22 @@ namespace LookIT.Controllers
           
             var followersCount = await _context.FollowRequests.CountAsync(f => f.FollowingId == targetUser.Id && f.Status == FollowStatus.Accepted);
             var followingCount = await _context.FollowRequests.CountAsync(f => f.FollowerId == targetUser.Id && f.Status == FollowStatus.Accepted);
-            //var postsCount = targetUser.Articles?.Count ?? 0;
+            var userPosts = await _context.Posts
+                                  .Where(p => p.AuthorId == userId)
+                                  .OrderByDescending(p => p.Date)
+                                  .ToListAsync();
 
             
+            
+
+
             ViewBag.IsOwner = isOwner;
             ViewBag.ShowFullProfile = showFullProfile;
             ViewBag.IsFollowing = isFollowing;
             ViewBag.IsPending = isPending;
             ViewBag.FollowersCount = followersCount;
             ViewBag.FollowingCount = followingCount;
-            //ViewBag.PostsCount = postsCount;
+            ViewBag.UserPosts = userPosts;
 
             return View(targetUser);
         }
