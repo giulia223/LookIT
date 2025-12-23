@@ -4,10 +4,18 @@
 
 @if (ViewBag.Message != null)
 {
-    <h2 class="p-3 rounded-3 text-center mb-5 alert @ViewBag.Alert">@ViewBag.Message</h2>
+    <div class="container mt-3">
+        <div class="row justify-content-center">
+            <div class="col-md-6">  
+                <div class="alert @ViewBag.Alert alert-dismissible fade show border-0 shadow-sm rounded-pill text-center py-2 px-4" role="alert">
+                    <i class="bi bi-info-circle me-2"></i>
+                    <span style="font-size: 0.95rem; font-weight: 500;">@ViewBag.Message</span>
+                    <button type="button" class="btn-close small" data-bs-dismiss="alert" aria-label="Close" style="padding: 1rem;"></button>
+                </div>
+            </div>
+        </div>
+    </div>
 }
-<br />
-
 @{
     var loggedUser = await UserManager.GetUserAsync(User);
 }
@@ -42,7 +50,7 @@
                     @if (!string.IsNullOrEmpty(post.TextContent))
                     {
                         <div class="mb-2">
-                            @post.TextContent
+                            @Html.Raw(post.TextContent)
                         </div>
                     }
 
@@ -79,19 +87,23 @@
 }
 else
 {
-    <div class="text-center mt-5">
-        <div class="mb-3">
-            <i class="bi bi-postcard text-muted" style="font-size: 4rem;"></i>
-        </div>
-        <h3 class="text-muted">Momentan nu există postări de afișat.</h3>
-        <p class="text-secondary">Urmărește mai mulți utilizatori pentru a-ți popula fluxul de noutăți!</p>
+    <div class="d-flex align-items-center justify-content-center" style="min-height: 60vh;">
+        <div class="text-center">
+            <div class="mb-3">
+                <i class="bi bi-postcard text-muted" style="font-size: 5rem; opacity: 0.5;"></i>
+            </div>
+            <h3 class="text-muted fw-bold">Momentan nu există postări</h3>
+            <p class="text-secondary mx-auto" style="max-width: 400px;">
+                Fluxul tău este gol. Urmărește mai mulți utilizatori sau începe tu conversația!
+            </p>
 
-        @if (loggedUser is not null)
-        {
-            <a asp-controller="Posts" asp-action="New" class="btn btn-primary mt-3">
-                <i class="bi bi-plus-circle"></i> Creează o postare
-            </a>
-        }
+            @if (loggedUser is not null)
+            {
+                <a asp-controller="Posts" asp-action="New" class="btn btn-primary rounded-pill px-4 mt-3 shadow-sm">
+                    <i class="bi bi-plus-circle me-1"></i> Creează o postare
+                </a>
+            }
+        </div>
     </div>
 }
 

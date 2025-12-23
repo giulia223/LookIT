@@ -42,7 +42,7 @@
 
         @if (!string.IsNullOrEmpty(@Model.TextContent))
         {
-            <div class="mb-2">@Model.TextContent</div>
+            <div class="mb-2">@Html.Raw(Model.TextContent)</div>
         }
 
         @if (@Model.ImageUrl != null)

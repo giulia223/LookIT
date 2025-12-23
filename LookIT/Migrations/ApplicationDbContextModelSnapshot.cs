@@ -194,7 +194,6 @@ namespace LookIT.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("ModeratorId")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
@@ -508,8 +507,7 @@ namespace LookIT.Migrations
                     b.HasOne("LookIT.Models.ApplicationUser", "Moderator")
                         .WithMany("ModeratedGroups")
                         .HasForeignKey("ModeratorId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Moderator");
                 });

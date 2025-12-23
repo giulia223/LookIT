@@ -48,7 +48,6 @@ namespace LookIT.Controllers
             return RedirectToAction("Details", new { userId = user.Id });
         }
 
-
         [AllowAnonymous]
         //creare profil user
         public IActionResult CreateProfile()

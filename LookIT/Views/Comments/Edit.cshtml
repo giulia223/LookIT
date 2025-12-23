@@ -6,15 +6,30 @@
             <div class="card border-0 shadow-sm rounded-4">
 
                 <div class="card-header bg-primary text-white p-4 rounded-top-4">
-                    <div class="d-flex align-items-center">
-                        <i class="bi bi-pencil-square fs-4 me-2"></i>
-                        <h4 class="mb-0 fw-bold">Editare comentariu</h4>
+                    <div class="d-flex flex-column">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-pencil-square fs-4 me-2"></i>
+                            <h4 class="mb-0 fw-bold">Editare comentariu</h4>
+                        </div>
+                        @* Afișarea datei inițiale sub titlu *@
+                        <small class="mt-2 opacity-75">
+                            <i class="bi bi-clock me-1"></i>
+                            Creat la: @Model.Date.ToString("d MMMM yyyy HH:mm")
+                        </small>
                     </div>
                 </div>
 
                 <div class="card-body p-4">
+                    @* Opțional: Poți afișa și o mică previzualizare a autorului dacă dorești *@
+                    <div class="d-flex align-items-center mb-4 text-muted">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <span style="font-size: 0.9rem;">Modifici conținutul mesajului tău original.</span>
+                    </div>
+
                     <form asp-action="Edit" asp-controller="Comments" asp-route-id="@Model.CommentId" method="post">
                         <input type="hidden" asp-for="PostId" />
+                        @* Asigură-te că transmiți și data originală pentru a nu o pierde la Save dacă nu e setată automat în DB *@
+                        <input type="hidden" asp-for="Date" />
 
                         <div class="form-floating mb-4">
                             <textarea asp-for="Content"
@@ -26,7 +41,6 @@
                         </div>
 
                         <div class="d-flex justify-content-between align-items-center mt-4">
-
                             <a asp-controller="Posts" asp-action="Show" asp-route-id="@Model.PostId"
                                class="btn btn-outline-secondary px-4 rounded-pill"
                                style="min-width: 140px;">

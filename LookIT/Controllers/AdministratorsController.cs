@@ -14,28 +14,42 @@ namespace LookIT.Controllers
         private readonly RoleManager<IdentityRole> _roleManager;
         public AdministratorsController(UserManager<ApplicationUser> userManager, ApplicationDbContext context, RoleManager<IdentityRole> roleManager)
         {
-            _userManager = userManager;
+            _userManager = userManager; 
             _context = context;
             _roleManager = roleManager;
         }
-
+        [Authorize (Roles = "Administrator")]
         public IActionResult Page()
         {
+            SetAccessRights();
+
+            if (ViewBag.Afisare == false)
+            {
+                return RedirectToAction("Index", "Home");
+            }
             return View();
         }
 
         // AFISARI PENTRU USERS
 
         //afisare toti useri
+        [Authorize(Roles = "Administrator")]
         public IActionResult Index()
         {
             if (TempData.ContainsKey("message"))
             {
                 ViewBag.message = TempData["message"].ToString();
             }
+            SetAccessRights();
+
+            if (ViewBag.Afisare == false)
+            {
+                return RedirectToAction("Index", "Home");
+            }
 
             var users = _userManager.Users.ToList();
             ViewBag.Users = users;
+
             return View();
         }
 
@@ -312,6 +326,20 @@ namespace LookIT.Controllers
             //    // TempData["ErrorMessage"] = $"Eroare la promovare: {string.Join(", ", result.Errors.Select(e => e.Description))}";
             //    return RedirectToAction("Index");
             //}
+        }
+
+        private void SetAccessRights()
+        {
+            ViewBag.Afisare = false;
+
+            if (User.IsInRole("Administrator"))
+            {
+                ViewBag.Afisare = true;
+            }
+
+            ViewBag.UserCurent = _userManager.GetUserId(User);
+
+            ViewBag.EsteAdmin = User.IsInRole("Administrator");
         }
 
 
