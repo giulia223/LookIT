@@ -1,0 +1,81 @@
+﻿
+
+@using Microsoft.AspNetCore.Identity
+@using LookIT.Models
+@inject UserManager<ApplicationUser> UserManager
+@model LookIT.Models.Message
+
+<div style="background-color: #f0f2f5; min-height: 100vh; padding-top: 50px; padding-bottom: 50px;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+
+                @* Mesaj de alertă *@
+                @if (ViewBag.message != null)
+                {
+                    <div class="alert rounded-3 text-center mb-4 shadow-sm"
+                         style="background-color: #90C67F; color: white; border: none; padding: 1rem;">
+                        @ViewBag.message
+                    </div>
+                }
+
+                @* Cardul Formularului *@
+                <div class="card border-0 shadow-sm" style="border-radius: 12px; overflow: hidden;">
+
+                    @* Header Card *@
+                    <div class="card-header border-0 bg-white pt-4 pb-0 px-4 text-center">
+                        <h3 class="fw-bold" style="color: #845763;">Create New Message</h3>
+                        <p class="text-muted small">Scrie un mesaj</p>
+                        <hr style="color: #ddd;" />
+                    </div>
+
+                    <div class="card-body p-4">
+                        <form asp-controller="Messages" asp-action="New" method="post">
+                            <input type="hidden" asp-for="GroupId" />
+                            @* Input Content Mesaj *@
+                            <div class="form-group mb-3">
+                                <label asp-for="Content" class="form-label fw-bold" style="color: #4b4f56;">Continut mesaj</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0" style="border-radius: 8px 0 0 8px;">
+                                       
+                                    </span>
+                                    <textarea asp-for="Content" class="form-control summernote"></textarea>
+                                    
+                                </div>
+                                <span asp-validation-for="Content" class="text-danger small"></span>
+                            </div>
+                           
+                            @* Butoane Acțiune *@
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-lg shadow-sm"
+                                        style="background-color: #E491A6; border: none; color: white; font-weight: 600; border-radius: 8px;">
+                                    Send Message
+                                </button>
+
+                                <a href="/Groups/Show/@Model.GroupId" class="btn btn-link text-decoration-none text-muted small">
+                                    Cancel and go back
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+              
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Efect de focus pentru input-uri */
+    .form-control:focus {
+        background-color: #fff !important;
+        border-color: #E491A6;
+        box-shadow: 0 0 0 0.25rem rgba(228, 145, 166, 0.25);
+    }
+
+    .input-group-text {
+        border-color: #dee2e6;
+    }
+</style>

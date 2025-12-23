@@ -1,0 +1,90 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using LookIT.Models
+@inject UserManager<ApplicationUser> UserManager
+@model LookIT.Models.Message
+
+@{
+    ViewBag.Title = "Edit Message";
+}
+
+<div style="background-color: #f0f2f5; min-height: 100vh; padding-top: 50px; padding-bottom: 50px;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-7">
+
+                @* Mesaj de alertă din TempData sau ViewBag *@
+                @if (TempData["message"] != null)
+                {
+                    <div class="alert rounded-3 text-center mb-4 shadow-sm alert-danger" style="border: none; padding: 1rem;">
+                        @TempData["message"]
+                    </div>
+                }
+
+                @* Cardul Formularului *@
+                <div class="card border-0 shadow-sm" style="border-radius: 12px; overflow: hidden;">
+
+                    @* Header Card *@
+                    <div class="card-header border-0 bg-white pt-4 pb-0 px-4 text-center">
+                        <h3 class="fw-bold" style="color: #845763;">Edit Your Message</h3>
+                        <p class="text-muted small">Modifică conținutul mesajului tău</p>
+                        <hr style="color: #ddd;" />
+                    </div>
+
+                    <div class="card-body p-4">
+                        @* Atenție: asp-route-id trebuie să fie ID-ul mesajului pentru ruterul de editare *@
+                        <form asp-controller="Messages" asp-action="Edit" asp-route-id="@Model.MessageId" method="post">
+
+                            @* Câmpuri ascunse necesare pentru Model Binding *@
+                            <input type="hidden" asp-for="MessageId" />
+                            <input type="hidden" asp-for="GroupId" />
+
+                            @* Input Content Mesaj *@
+                            <div class="form-group mb-3">
+                                <label asp-for="Content" class="form-label fw-bold" style="color: #4b4f56;">Conținut mesaj</label>
+                                <div class="bg-white">
+                                    <textarea asp-for="Content" class="form-control summernote"></textarea>
+                                </div>
+                                <span asp-validation-for="Content" class="text-danger small"></span>
+                            </div>
+
+                            @* Butoane Acțiune *@
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-lg shadow-sm"
+                                        style="background-color: #845763; border: none; color: white; font-weight: 600; border-radius: 8px;">
+                                    Save Changes
+                                </button>
+
+                                <a href="/Groups/Show/@Model.GroupId" class="btn btn-link text-decoration-none text-muted small">
+                                    Discard changes and go back
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="text-center mt-3">
+                    <small class="text-muted">Postat la: @Model.Date.ToString("dd/MM/yyyy HH:mm")</small>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Stil pentru a integra Summernote mai bine în card */
+    .note-editor.note-frame {
+        border: 1px solid #dee2e6 !important;
+        border-radius: 8px !important;
+    }
+
+    .note-toolbar {
+        background-color: #f8f9fa !important;
+        border-bottom: 1px solid #dee2e6 !important;
+    }
+
+    .btn-lg:hover {
+        filter: brightness(0.9);
+        transition: 0.2s;
+    }
+</style>

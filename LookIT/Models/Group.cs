@@ -17,10 +17,9 @@ namespace LookIT.Models
 
         public DateTime Date {  get; set; }
 
-        [Required(ErrorMessage ="Moderaturul trebuie sa existe")]
-        public string ModeratorId { get; set; }
+        public string? ModeratorId { get; set; }
 
-        public virtual ApplicationUser Moderator {get; set;}
+        public virtual ApplicationUser? Moderator {get; set;}
 
         public virtual ICollection<GroupMember> Members { get; set; } = new List<GroupMember>();
 

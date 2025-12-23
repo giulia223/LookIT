@@ -79,3 +79,14 @@ body {
         .footer a:hover {
             color: #E491A6 !important;
         }
+
+
+.truncate {
+    /* Required declarations: */
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -moz-box-orient: vertical;
+    /* Limit the text block to x lines */
+    -webkit-line-clamp: 5;
+}
