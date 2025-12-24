@@ -31,6 +31,7 @@ namespace LookIT.Controllers
                 var collections = db.Collections
                                     .Include(collection => collection.User)
                                     .Where(collection => collection.UserId == _userManager.GetUserId(User))
+                                    .OrderByDescending(collection => collection.Name == "All Posts")
                                     .ToList();
 
 
@@ -44,6 +45,7 @@ namespace LookIT.Controllers
                     //daca sunt administrator, voi putea vedea toate colectiile din platforma
                     var collections = db.Collections
                                         .Include(collection => collection.User)
+                                        .OrderByDescending(collection => collection.Name == "All Posts")
                                         .ToList();
 
                     ViewBag.Collections = collections;
