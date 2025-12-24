@@ -1,0 +1,12 @@
+﻿@model LookIT.Models.Collection
+
+<form asp-action="New" asp-controller="Collections" method="post">
+    <label asp-for="Name">Denumire colectie</label>
+    <br />
+    <input asp-for="Name" class="form-control" />
+    <span asp-validation-for="Name" class="text-danger"></span>
+    <br />
+    <br />
+
+    <button type="submit" class="btn btn-success">Adauga colectie</button>
+</form>

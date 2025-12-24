@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.Json;
 using System.Threading.Tasks;
 
 
@@ -39,7 +40,7 @@ namespace LookIT.Controllers
             }
 
             //luam postarile utilizatorilor publici sau pe care ii urmarim (chiar daca ar avea cont privat)
-            //in cazul in care utilizatorul nu este logat, cum followingUsersIds este o lista vida, va avea doar de verificat daca autorul postarii resptive
+            //in cazul in care utilizatorul nu este logat, cum followingUsersIds este o lista vida, va avea doar de verificat daca autorul postarii respective
             //are contul public
             var posts = db.Posts
                           .Include(post => post.Author)
@@ -112,6 +113,13 @@ namespace LookIT.Controllers
 
             //setam conditiile pentru afisarea butoanelor in viewul asociat postarii
             SetAccessRights();
+
+            ViewBag.UserCollections = db.Collections
+                                        .Where(collection => collection.UserId == _userManager.GetUserId(User))
+                                        .ToList();
+
+            ViewBag.IsSaved = db.PostCollections
+                                .Any(postCollection => postCollection.PostId == Id && postCollection.Collection.UserId == _userManager.GetUserId(User));
 
             if (TempData.ContainsKey("message"))
             {
@@ -567,6 +575,48 @@ namespace LookIT.Controllers
                     return RedirectToAction("Index");
                 }
             }
+        }
+
+        [HttpPost]
+        [Authorize(Roles ="User,Administrator")]
+        public IActionResult AddToCollection([FromForm] PostCollection postCollection)
+        {
+            //daca trecem de validarile din model
+            if (ModelState.IsValid)
+            {
+                //verificam daca avem deja postarea respectiva in colectie
+                if(db.PostCollections
+                    .Where(pc => pc.PostId == postCollection.PostId)
+                    .Where(pc => pc.CollectionId == postCollection.CollectionId)
+                    .Count() > 0)
+                {
+                    TempData["message"] = "Acesta postare este deja adaugata in colectie";
+                    TempData["messageType"] = "alert-danger";
+                }
+
+                else
+                {
+                    //adaugam asociarea intre postare si colectie
+                    db.PostCollections.Add(postCollection);
+
+                    //salvam modificarile in baza de date
+                    db.SaveChanges();
+
+                    //adaugam un mesaj de succes
+                    TempData["message"] = "Postarea a fost adaugata in colectia selectata";
+                    TempData["messageType"] = "alert-success";
+
+
+                }
+            }
+            else
+            {
+                TempData["message"] = "Nu s-a putut adauga postarea in colectie";
+                TempData["messageType"] = "alert-danger";
+            }
+
+            //ne intoarcem la pagina postarii
+            return Redirect("/Posts/Show/" + postCollection.PostId);
         }
 
         //conditiile de afisare pentru butoanele de editare si steregere

@@ -1,0 +1,27 @@
+﻿@model LookIT.Models.Collection
+
+
+@{
+    ViewBag.Title = "Editare categorie";
+}
+
+<h2>@ViewBag.Title</h2>
+
+
+<form asp-action="Edit" asp-controller="Collections" asp-route-id="@Model.CollectionId" method="post">
+
+    <div class="form-group">
+        <label asp-for="Name" class="form-label">Nume colectie</label>
+        <br />
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <br />
+
+    <button class="btn btn-success" type="submit">Modifică categoria</button>
+
+</form>
+
+
+

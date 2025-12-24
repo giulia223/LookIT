@@ -1,0 +1,59 @@
+﻿@model LookIT.Models.Collection
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+            <h1 class="fw-bold mb-0">@Model.Name</h1>
+            <p class="text-muted">@Model.PostCollections.Count postări salvate</p>
+        </div>
+        @if (Model.UserId == ViewBag.UserCurent || ViewBag.EsteAdministrator)
+        {
+            <div class="d-flex gap-2">
+                <a asp-action="Edit" asp-controller="Collections" asp-area="" asp-route-Id="@Model.CollectionId" class="btn btn-outline-secondary rounded-pill">
+                    Editeaza
+                    </a>
+                <form method="post" asp-controller="Collections" asp-action="Delete" asp-route-Id="@Model.CollectionId">
+                    <button type="submit" class="btn btn-outline-danger rounded-pill">Șterge</button>
+                </form>
+            </div>
+        }
+    </div>
+
+    <hr />
+
+    @if (Model.PostCollections.Any())
+    {
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            @foreach (var pc in Model.PostCollections)
+            {
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0 position-relative">
+                        @if (!string.IsNullOrEmpty(pc.Post.ImageUrl))
+                        {
+                            <img src="@pc.Post.ImageUrl" class="card-img-top" style="aspect-ratio: 1/1; object-fit: cover;" alt="Post Image">
+                        }
+                        else
+                        {
+                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="aspect-ratio: 1/1;">
+                                <p class="p-3 text-muted">@pc.Post.TextContent?.Substring(0, Math.Min(50, pc.Post.TextContent.Length))...</p>
+                            </div>
+                        }
+
+                        <div class="card-body">
+                            <p class="small text-muted mb-1">Adăugat la @pc.AddedDate.ToString("dd.MM.yyyy")</p>
+                            <a href="/Posts/Show/@pc.PostId" class="stretched-link"></a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <i class="bi bi-grid-3x3" style="font-size: 3rem; color: #dee2e6;"></i>
+            <p class="mt-3 text-muted">Această colecție este goală.</p>
+        </div>
+    }
+</div>

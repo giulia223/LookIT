@@ -137,12 +137,16 @@ namespace LookIT.Data
                 .HasIndex(postCollection => new { postCollection.PostId, postCollection.CollectionId })
                 .IsUnique();
 
+
+            //daca sterg o postare, se va sterge automat din colectiile utilizatorilor
             modelBuilder.Entity<PostCollection>()
                 .HasOne(postCollection => postCollection.Post)
                 .WithMany(post => post.PostCollections)
                 .HasForeignKey(postCollection => postCollection.PostId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            //dacs sterg o colectie, toate legaturile din PostCollections asociate acelei colectii
+            //sunt si ele la randul lor sterse
             modelBuilder.Entity<PostCollection>()
                 .HasOne(postCollection => postCollection.Collection)
                 .WithMany(collection => collection.PostCollections)
