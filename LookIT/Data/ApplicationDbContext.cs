@@ -19,7 +19,8 @@ namespace LookIT.Data
         public DbSet<FollowRequest> FollowRequests { get; set; }
         public DbSet<GroupMember> GroupMembers { get; set; }
         public DbSet<Message> Messages { get; set; }
-        public DbSet<Save> Saves { get; set; }
+        public DbSet<Collection> Collections { get; set; }
+        public DbSet<PostCollection> PostCollections { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -131,23 +132,21 @@ namespace LookIT.Data
                 .HasForeignKey(message => message.GroupId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<Save>()
-                .HasKey(save => new { save.UserId, save.PostId });
+            //sa nu avem aceeasi postare de mai multe ori in aceeasi colectie
+            modelBuilder.Entity<PostCollection>()
+                .HasIndex(postCollection => new { postCollection.PostId, postCollection.CollectionId })
+                .IsUnique();
 
-            //am fost nevoita sa pun restrict pentru ca s-ar fi format ciclu 
-            //daca un user a dat save la postarile altor useri, nu il pot sterge
-            //se face manual in controller : sterg salvarile si apoi userul
-            modelBuilder.Entity<Save>()
-                .HasOne<ApplicationUser>(save => save.User)
-                .WithMany(user => user.SavedPosts)
-                .HasForeignKey(save => save.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<PostCollection>()
+                .HasOne(postCollection => postCollection.Post)
+                .WithMany(post => post.PostCollections)
+                .HasForeignKey(postCollection => postCollection.PostId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            //daca sterg o postare, vor fi sterse si salvarile asociate in cascada
-            modelBuilder.Entity<Save>()
-                .HasOne<Post>(save => save.Post)
-                .WithMany(post => post.Saves)
-                .HasForeignKey(save => save.PostId)
+            modelBuilder.Entity<PostCollection>()
+                .HasOne(postCollection => postCollection.Collection)
+                .WithMany(collection => collection.PostCollections)
+                .HasForeignKey(postCollection => postCollection.CollectionId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<ApplicationUser>()

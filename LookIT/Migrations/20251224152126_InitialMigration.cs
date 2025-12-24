@@ -161,6 +161,26 @@ namespace LookIT.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Collections",
+                columns: table => new
+                {
+                    CollectionId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Collections", x => x.CollectionId);
+                    table.ForeignKey(
+                        name: "FK_Collections_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "FollowRequests",
                 columns: table => new
                 {
@@ -197,7 +217,7 @@ namespace LookIT.Migrations
                     GroupName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModeratorId = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
+                    ModeratorId = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -294,6 +314,7 @@ namespace LookIT.Migrations
                     CommentId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DateModified = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Content = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     PostId = table.Column<int>(type: "int", nullable: false)
@@ -340,23 +361,26 @@ namespace LookIT.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Saves",
+                name: "PostCollections",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    PostId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PostId = table.Column<int>(type: "int", nullable: true),
+                    CollectionId = table.Column<int>(type: "int", nullable: true),
+                    AddedDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Saves", x => new { x.UserId, x.PostId });
+                    table.PrimaryKey("PK_PostCollections", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Saves_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        name: "FK_PostCollections_Collections_CollectionId",
+                        column: x => x.CollectionId,
+                        principalTable: "Collections",
+                        principalColumn: "CollectionId",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Saves_Posts_PostId",
+                        name: "FK_PostCollections_Posts_PostId",
                         column: x => x.PostId,
                         principalTable: "Posts",
                         principalColumn: "PostId",
@@ -401,6 +425,11 @@ namespace LookIT.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Collections_UserId",
+                table: "Collections",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Comments_PostId",
@@ -449,14 +478,21 @@ namespace LookIT.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_PostCollections_CollectionId",
+                table: "PostCollections",
+                column: "CollectionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PostCollections_PostId_CollectionId",
+                table: "PostCollections",
+                columns: new[] { "PostId", "CollectionId" },
+                unique: true,
+                filter: "[PostId] IS NOT NULL AND [CollectionId] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Posts_AuthorId",
                 table: "Posts",
                 column: "AuthorId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Saves_PostId",
-                table: "Saves",
-                column: "PostId");
         }
 
         /// <inheritdoc />
@@ -493,13 +529,16 @@ namespace LookIT.Migrations
                 name: "Messages");
 
             migrationBuilder.DropTable(
-                name: "Saves");
+                name: "PostCollections");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "Groups");
+
+            migrationBuilder.DropTable(
+                name: "Collections");
 
             migrationBuilder.DropTable(
                 name: "Posts");
