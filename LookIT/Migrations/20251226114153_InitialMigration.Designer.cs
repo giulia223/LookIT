@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LookIT.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251224184111_InitialMigration")]
+    [Migration("20251226114153_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -119,7 +119,8 @@ namespace LookIT.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
 
                     b.Property<string>("UserId")
                         .HasMaxLength(50)
@@ -128,6 +129,10 @@ namespace LookIT.Migrations
                     b.HasKey("CollectionId");
 
                     b.HasIndex("UserId");
+
+                    b.HasIndex("Name", "UserId")
+                        .IsUnique()
+                        .HasFilter("[UserId] IS NOT NULL");
 
                     b.ToTable("Collections");
                 });

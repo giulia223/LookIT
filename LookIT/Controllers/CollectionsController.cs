@@ -31,7 +31,10 @@ namespace LookIT.Controllers
                 var collections = db.Collections
                                     .Include(collection => collection.User)
                                     .Where(collection => collection.UserId == _userManager.GetUserId(User))
+                                    //punem colectia default "All Posts" pe prima pozitie
                                     .OrderByDescending(collection => collection.Name == "All Posts")
+                                    //iar pe restul le vom ordona descrescator dupa data crearii 
+                                    .ThenByDescending(collection => collection.CreationDate)
                                     .ToList();
 
 
@@ -111,6 +114,13 @@ namespace LookIT.Controllers
             collection.UserId = _userManager.GetUserId(User);
             collection.CreationDate = DateTime.Now;
 
+            
+            if(db.Collections
+                .Any(c=> c.UserId == collection.UserId && c.Name == collection.Name))
+            {
+                ModelState.AddModelError("Name", "Exista deja o colectie cu acest nume.");
+            }
+            //daca trece din validarile din model
             if (ModelState.IsValid)
             {
                 db.Collections.Add(collection);
@@ -220,6 +230,21 @@ namespace LookIT.Controllers
             ViewBag.UserCurent = _userManager.GetUserId(User);
 
             ViewBag.EsteAdministrator = User.IsInRole("Administrator");
+        }
+
+        //metoda care verifica baza de date si returneaza sub forma unui json daca userul are deja colectia cu numele respectiv
+        [AcceptVerbs("GET", "POST")]
+        public IActionResult VerifyUniqueName(string name)
+        {
+            var userId = _userManager.GetUserId(User);
+
+            if(db.Collections
+                .Any(collection => collection.Name == name && collection.UserId == userId))
+            {
+                return Json($"Există deja o colecție cu acest nume.");
+            }
+
+            return Json(true);
         }
 
 

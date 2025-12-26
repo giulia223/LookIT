@@ -116,7 +116,8 @@ namespace LookIT.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
 
                     b.Property<string>("UserId")
                         .HasMaxLength(50)
@@ -125,6 +126,10 @@ namespace LookIT.Migrations
                     b.HasKey("CollectionId");
 
                     b.HasIndex("UserId");
+
+                    b.HasIndex("Name", "UserId")
+                        .IsUnique()
+                        .HasFilter("[UserId] IS NOT NULL");
 
                     b.ToTable("Collections");
                 });

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace LookIT.Models
 {
@@ -7,10 +8,9 @@ namespace LookIT.Models
         [Key]
         public int CollectionId { get; set; }
 
-        //nu punem Required pentru ca atunci va esua la validarile din model in momentul adaugarii postarii la salvate
-        //cheie externa (FK): o salvare este efectyata de un user
-
-        [Required(ErrorMessage ="Numele colectiei este obligatoriu.")]
+        [Required(ErrorMessage ="Numele colecției este obligatoriu.")]
+        [StringLength(30, ErrorMessage ="Numele colecției nu poate depăși {1} caractere.")]
+        [Remote(action: "VerifyUniqueName", controller: "Collections")]
         public string Name { get; set; }
 
         //data la care a fost creata o anumita colectie

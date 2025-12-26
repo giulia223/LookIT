@@ -596,6 +596,7 @@ namespace LookIT.Controllers
 
                 else
                 {
+                    postCollection.AddedDate = DateTime.Now;
                     //adaugam asociarea intre postare si colectie
                     db.PostCollections.Add(postCollection);
 

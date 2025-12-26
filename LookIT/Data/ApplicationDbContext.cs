@@ -60,9 +60,14 @@ namespace LookIT.Data
 
             //modelBuilder.Entity<FollowRequest>()
             //    .HasKey(followRequest => new { followRequest.FollowerId, followRequest.FollowingId});
+
+
+            //constangere la nivel de baze de date: sa nu avem posibilitatea de a avea duplicate de tipul followerId, followngId
             modelBuilder.Entity<FollowRequest>()
-        .HasIndex(f => new { f.FollowerId, f.FollowingId })
-        .IsUnique();
+                .HasIndex(f => new { f.FollowerId, f.FollowingId })
+                .IsUnique();
+
+
             //am fost nevoita sa pun restrict pentru ca s-ar fi format ciclu 
             //daca un user a dat follow altor useri, nu il pot sterge
             //se face manual in controller : sterg sentRequests si apoi userul
@@ -85,7 +90,7 @@ namespace LookIT.Data
                 .HasKey(like => new { like.UserId, like.PostId });
 
             //am fost nevoita sa pun restrict pentru ca s-ar fi format ciclu 
-            //daca un user are a dat like la postarile altor useri, nu il pot sterge
+            //daca un user dat like la postarile altor useri, nu il pot sterge
             //se face manual in controller : sterg like urile date si apoi userul
             modelBuilder.Entity<Like>()
                 .HasOne<ApplicationUser>(like => like.User)
@@ -132,9 +137,14 @@ namespace LookIT.Data
                 .HasForeignKey(message => message.GroupId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            //sa nu avem aceeasi postare de mai multe ori in aceeasi colectie
+            //constrangere la nivel de baze de date: sa nu avem aceesi postare de mai multe ori in aceeasi colectie
             modelBuilder.Entity<PostCollection>()
                 .HasIndex(postCollection => new { postCollection.PostId, postCollection.CollectionId })
+                .IsUnique();
+
+            //cnstrangere la nivel de baze de date: sa nu avem 2 colectii cu acelasi nume ale aceluiasi utilizator
+            modelBuilder.Entity<Collection>()
+                .HasIndex(collection => new { collection.Name, collection.UserId })
                 .IsUnique();
 
 
