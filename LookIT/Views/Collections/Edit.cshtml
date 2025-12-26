@@ -1,27 +1,97 @@
 ﻿@model LookIT.Models.Collection
 
-
 @{
-    ViewBag.Title = "Editare categorie";
+    ViewData["Title"] = "Editare colecție";
 }
 
-<h2>@ViewBag.Title</h2>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
 
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
 
-<form asp-action="Edit" asp-controller="Collections" asp-route-id="@Model.CollectionId" method="post">
+                <div class="card-header bg-white border-0 pt-4 pb-0 text-center">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-light rounded-circle mb-3" style="width: 64px; height: 64px;">
+                        <i class="bi bi-pencil-square fs-2 text-warning"></i>
+                    </div>
+                    <h4 class="fw-bold mb-1">Editează colecția</h4>
+                    <p class="text-muted small">Schimbă denumirea acestui folder.</p>
+                </div>
 
-    <div class="form-group">
-        <label asp-for="Name" class="form-label">Nume colectie</label>
-        <br />
-        <input asp-for="Name" class="form-control" />
-        <span asp-validation-for="Name" class="text-danger"></span>
+                <div class="card-body p-4">
+                    <form asp-action="Edit" asp-controller="Collections" method="post">
+
+                        <input type="hidden" asp-for="CollectionId" />
+
+                        <div class="mb-4">
+                            <label asp-for="Name" class="form-label fw-semibold text-secondary small text-uppercase ls-1">Nume colecție</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 rounded-start-pill ps-3 text-muted">
+                                    <i class="bi bi-fonts"></i>
+                                </span>
+                                <input asp-for="Name" class="form-control bg-light border-start-0 rounded-end-pill py-2" placeholder="Nume nou..." autocomplete="off" />
+                            </div>
+                            <span asp-validation-for="Name" class="text-danger small mt-1 d-block"></span>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-warning text-white rounded-pill py-2 fw-bold shadow-sm transition-btn">
+                                <i class="bi bi-check-lg me-1"></i> Salvează modificările
+                            </button>
+
+                            <a asp-action="Index" class="btn btn-light rounded-pill py-2 text-muted fw-semibold transition-btn">
+                                Anulează
+                            </a>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+            <div class="text-center mt-3">
+                <p class="text-muted small">
+                    <i class="bi bi-info-circle me-1"></i> Postările salvate în această colecție nu vor fi afectate.
+                </p>
+            </div>
+
+        </div>
     </div>
+</div>
 
-    <br />
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
 
-    <button class="btn btn-success" type="submit">Modifică categoria</button>
+<style>
+    /* Același CSS ca la pagina New, pentru consistență */
 
-</form>
+    .form-control:focus {
+        box-shadow: none;
+        background-color: #fff !important;
+        border-color: #dee2e6;
+    }
 
+        .form-control:focus + .input-group-text,
+        .input-group:focus-within .input-group-text,
+        .input-group:focus-within .form-control {
+            border-color: #ffc107; /* Culoare Warning (Galben) la focus, sau poți pune #0d6efd (Albastru) */
+            background-color: #fff !important;
+        }
 
+    .ls-1 {
+        letter-spacing: 1px;
+        font-size: 0.75rem;
+    }
 
+    /* Tranziția fină cerută anterior */
+    .transition-btn {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .transition-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08) !important;
+        }
+</style>

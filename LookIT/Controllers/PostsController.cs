@@ -114,12 +114,30 @@ namespace LookIT.Controllers
             //setam conditiile pentru afisarea butoanelor in viewul asociat postarii
             SetAccessRights();
 
-            ViewBag.UserCollections = db.Collections
-                                        .Where(collection => collection.UserId == _userManager.GetUserId(User))
-                                        .ToList();
+            if(User.IsInRole("User") || User.IsInRole("Administrator"))
+            {
 
-            ViewBag.IsSaved = db.PostCollections
-                                .Any(postCollection => postCollection.PostId == Id && postCollection.Collection.UserId == _userManager.GetUserId(User));
+                //preluam colectiile utilizatorului logat
+                var myCollections = db.Collections
+                                      .Where(collection => collection.UserId == _userManager.GetUserId(User))
+                                      .ToList();
+
+                ViewBag.UserCollections = myCollections;
+
+                //extragem doar id-urile colectiilor pentru a verifica mai apoi colectiile in care este salvata posarea
+                var myCollectionIds = myCollections
+                                          .Select(collection => collection.CollectionId)
+                                          .ToList();
+
+                //pentru ca CollectionId este proprietate nullable in model, trebuie sa verificam daca exista si in caz afirmativ, ii vom prelua valoarea
+                ViewBag.SavedCollectionIds = db.PostCollections
+                                               .Where(postCollection => postCollection.PostId == Id 
+                                                      && postCollection.CollectionId.HasValue 
+                                                      && myCollectionIds.Contains(postCollection.CollectionId.Value))
+                                               .Select(postCollection => postCollection.CollectionId.Value)
+                                               .ToList();
+
+            }
 
             if (TempData.ContainsKey("message"))
             {
@@ -577,6 +595,10 @@ namespace LookIT.Controllers
             }
         }
 
+
+        //metoda aceasta se va ocupa atat de adaugarea unei postari intr-o colectie, cat si de eliminarea acesteia dintr-una
+        //daca postarea deja exista in colectie, prin incercarea de a o adauga iar, o vom sterge din colectie
+        //daca postarea nu exista in colectie, o vom aduaga
         [HttpPost]
         [Authorize(Roles ="User,Administrator")]
         public IActionResult AddToCollection([FromForm] PostCollection postCollection)
@@ -584,19 +606,28 @@ namespace LookIT.Controllers
             //daca trecem de validarile din model
             if (ModelState.IsValid)
             {
-                //verificam daca avem deja postarea respectiva in colectie
-                if(db.PostCollections
-                    .Where(pc => pc.PostId == postCollection.PostId)
-                    .Where(pc => pc.CollectionId == postCollection.CollectionId)
-                    .Count() > 0)
+
+                //verificam daca avem deja postarea respectiva in colectie, adica daca exista o relatie intre postare si colectie in PostCollection
+                var existingRelation = db.PostCollections
+                                         .Where(pc => pc.PostId == postCollection.PostId)
+                                         .Where(pc => pc.CollectionId == postCollection.CollectionId)
+                                         .FirstOrDefault();
+
+                //daca relatia exista, o vom sterge 
+                if( existingRelation is not null)
                 {
-                    TempData["message"] = "Acesta postare este deja adaugata in colectie";
-                    TempData["messageType"] = "alert-danger";
+                    db.PostCollections.Remove(existingRelation);
+                    db.SaveChanges();
+
+                    TempData["message"] = "Postarea a fost eliminată din colecție";
+                    TempData["messageType"] = "alert-warning";
                 }
 
+                //daca nu exista, o vom adauga
                 else
                 {
                     postCollection.AddedDate = DateTime.Now;
+
                     //adaugam asociarea intre postare si colectie
                     db.PostCollections.Add(postCollection);
 
@@ -619,6 +650,7 @@ namespace LookIT.Controllers
             //ne intoarcem la pagina postarii
             return Redirect("/Posts/Show/" + postCollection.PostId);
         }
+
 
         //conditiile de afisare pentru butoanele de editare si steregere
         //butoanele sunt aflate in view-uri
