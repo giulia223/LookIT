@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LookIT.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251226114153_InitialMigration")]
+    [Migration("20251227130909_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -515,7 +515,8 @@ namespace LookIT.Migrations
                 {
                     b.HasOne("LookIT.Models.ApplicationUser", "User")
                         .WithMany("Collections")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("User");
                 });
@@ -638,12 +639,12 @@ namespace LookIT.Migrations
                     b.HasOne("LookIT.Models.Collection", "Collection")
                         .WithMany("PostCollections")
                         .HasForeignKey("CollectionId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("LookIT.Models.Post", "Post")
                         .WithMany("PostCollections")
                         .HasForeignKey("PostId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Collection");
 

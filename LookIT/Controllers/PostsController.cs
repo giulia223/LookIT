@@ -545,6 +545,7 @@ namespace LookIT.Controllers
             //nu trebuie sa stergem manual comentariile pentru ca am setat OnDeleteCascade, ceea ce inseamna ca daca sterg o postare, atunci comentariile 
             //asociate acesteia vor fi sterse automat
             Post? post = db.Posts
+                           .Include(post => post.PostCollections)
                            .Where(post => post.PostId== Id)
                            .FirstOrDefault();
 
@@ -576,6 +577,11 @@ namespace LookIT.Controllers
                         {
                             System.IO.File.Delete(videoPath);
                         }
+                    }
+
+                    if (post.PostCollections != null && post.PostCollections.Any())
+                    {
+                        db.PostCollections.RemoveRange(post.PostCollections);
                     }
 
                     db.Posts.Remove(post);

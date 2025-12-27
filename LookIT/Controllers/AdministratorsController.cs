@@ -189,8 +189,55 @@ namespace LookIT.Controllers
             if(comments.Count > 0)
             {
                 _context.Comments.RemoveRange(comments);
-                await _context.SaveChangesAsync();
             }
+
+            //stergem colectiile asociate unui utilizator manual pentru a putea sterge userul pentru ca am setet OnDeleteRestrict
+            //preluam colectiile utilizatorului
+            var userCollections = _context.Collections
+                                          .Where(collection => collection.UserId == Id)
+                                          .ToList();
+
+            //pentru ca am restrictionat ca daca stergem colectia, sa nu se sterga si legaturile dintre colectii si postari,
+            //com sterge manual legaturile dintre colectiile utilizatorului si postarile din ele
+            foreach (var collection in userCollections)
+            {
+                var postCols = _context.PostCollections
+                                       .Where(postCollection => postCollection.CollectionId == collection.CollectionId)
+                                       .ToList();
+                if (postCols.Any())
+                {
+                    _context.PostCollections.RemoveRange(postCols);
+                }
+            }
+
+            //dupa care, vom sterge colectiile
+            if (userCollections.Any())
+            {
+                _context.Collections.RemoveRange(userCollections);
+            }
+
+            //de asemenea, am restrictionat si daca un utilizator are postari salvate in colectiile altor utilizatori, nu il putem sterge'
+            //vom prelua id-urile postarilor sale 
+            var userPostIds = _context.Posts
+                                      .Where(post => post.AuthorId == Id)
+                                      .Select(post => post.PostId)
+                                      .ToList();
+
+            //vom cauta in PostCollections legaturile intre postarea utilizatorului pe care vreau sa o sterg, si colectiile altor
+            //utilizatori
+            var dependentPostCollections = _context.PostCollections
+                                                   .Where(pc => pc.PostId != null && userPostIds.Contains(pc.PostId.Value))
+                                                   .ToList();
+
+            //stergem dependentele
+            if (dependentPostCollections.Any())
+            {
+                _context.PostCollections.RemoveRange(dependentPostCollections);
+            }
+
+
+            //salvam toate modiifcarile
+            await _context.SaveChangesAsync();
 
             var result = await _userManager.DeleteAsync(user);
 

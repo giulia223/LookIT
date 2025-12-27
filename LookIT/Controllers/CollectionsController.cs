@@ -196,6 +196,26 @@ namespace LookIT.Controllers
                 if (User.IsInRole("Administrator")
                     || collection.UserId == _userManager.GetUserId(User))
                 {
+
+                    //verificam daca este colectia predefinita, All Posts, caz in care nu avem permisiunea de a o sterge
+                    if (collection.Name == "All Posts")
+                    {
+                        TempData["message"] = "Nu puteți șterge colecția implicită 'All Posts'.";
+                        TempData["messageType"] = "alert-warning";
+                        return RedirectToAction("Index");
+                    }
+
+                    //pentru ca am pus restrict intre relatia dintre colectii si postari, trebuie sa stergem manual legaturile
+                    //dintre acestea
+                    var postCollections = db.PostCollections
+                                            .Where(pc => pc.CollectionId == Id)
+                                            .ToList();
+
+                    if (postCollections.Any())
+                    {
+                        db.PostCollections.RemoveRange(postCollections);
+                    }
+
                     db.Collections.Remove(collection);
                     db.SaveChanges();
                     TempData["message"] = "Colectia a fost stearsa cu succes.";
