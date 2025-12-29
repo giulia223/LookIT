@@ -50,6 +50,7 @@ namespace LookIT.Models
                     {
                         Id = "8e445865-a24d-4543-a6c6-9443d048cdb0", // primary key
                         UserName = "administrator@test.com",
+                        FullName = "Administrator LookIT",
                         EmailConfirmed = true,
                         NormalizedEmail = "ADMINISTRATOR@TEST.COM",
                         Email = "administrator@test.com",
@@ -61,6 +62,7 @@ namespace LookIT.Models
                     {
                         Id = "ca57146f-4211-4b21-8a2d-2c3e9611f50c", // primary key
                         UserName = "user@test.com",
+                        FullName = "User LookIT",
                         EmailConfirmed = true,
                         NormalizedEmail = "USER@TEST.COM",
                         Email = "user@test.com",

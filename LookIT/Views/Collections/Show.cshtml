@@ -7,7 +7,7 @@
             <h1 class="fw-bold mb-0">@Model.Name</h1>
             <p class="text-muted">@Model.PostCollections.Count postări salvate</p>
         </div>
-        @if (Model.UserId == ViewBag.UserCurent || ViewBag.EsteAdministrator)
+        @if ((Model.UserId == ViewBag.UserCurent || ViewBag.EsteAdministrator) && Model.Name != "All Posts")
         {
             <div class="d-flex gap-2">
                 <a asp-action="Edit" asp-controller="Collections" asp-area="" asp-route-Id="@Model.CollectionId" class="btn btn-outline-secondary rounded-pill">
@@ -22,30 +22,101 @@
 
     <hr />
 
-    @if (Model.PostCollections.Any())
+    @if (Model.PostCollections.Count > 0)
     {
-        <div class="row row-cols-1 row-cols-md-3 g-4">
+        <div class="row">
             @foreach (var pc in Model.PostCollections)
             {
-                <div class="col">
-                    <div class="card h-100 shadow-sm border-0 position-relative">
-                        @if (!string.IsNullOrEmpty(pc.Post.ImageUrl))
-                        {
-                            <img src="@pc.Post.ImageUrl" class="card-img-top" style="aspect-ratio: 1/1; object-fit: cover;" alt="Post Image">
-                        }
-                        else
-                        {
-                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="aspect-ratio: 1/1;">
-                                <p class="p-3 text-muted">@pc.Post.TextContent?.Substring(0, Math.Min(50, pc.Post.TextContent.Length))...</p>
-                            </div>
-                        }
+                @if (pc.Post != null) // Verificare de siguranță
+                {
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 border-0 shadow-sm position-relative overflow-hidden">
 
-                        <div class="card-body">
-                            <p class="small text-muted mb-1">Adăugat la @pc.AddedDate.ToString("dd.MM.yyyy")</p>
-                            <a href="/Posts/Show/@pc.PostId" class="stretched-link"></a>
+                            <div class="position-absolute top-0 end-0 m-2" style="z-index: 10;">
+                                <form method="post" asp-controller="Posts" asp-action="RemoveFromCollection">
+                                    <input type="hidden" name="postId" value="@pc.PostId" />
+                                    <input type="hidden" name="collectionId" value="@Model.CollectionId" />
+
+                                    <button type="submit" class="btn btn-sm btn-light rounded-circle shadow text-danger d-flex align-items-center justify-content-center"
+                                            style="width: 30px; height: 30px; opacity: 0.9;"
+                                            title="Elimină din colecție"
+                                            onclick="return confirm('Elimini postarea din colecție?');">
+                                        <i class="bi bi-x-lg" style="font-size: 0.8rem;"></i>
+                                    </button>
+                                </form>
+                            </div>
+
+                            @* --- 2. ZONA DE CONȚINUT (Link către postare) --- *@
+                            <a href="/Posts/Show/@pc.PostId" class="text-decoration-none text-dark h-100 d-flex flex-column">
+
+                                @* LOGICA PRIORITARĂ: IMAGINE -> VIDEO -> TEXT *@
+
+                                @if (!string.IsNullOrEmpty(pc.Post.ImageUrl))
+                                {
+                                    @* CAZUL 1: Are Imagine *@
+                                    <div class="w-100 bg-light" style="height: 250px;">
+                                        <img src="@pc.Post.ImageUrl"
+                                             class="w-100 h-100"
+                                             alt="Post image"
+                                             style="object-fit: cover;">
+                                    </div>
+                                }
+                                else if (!string.IsNullOrEmpty(pc.Post.VideoUrl))
+                                {
+                                    @* CAZUL 2: Nu are Imagine, dar are Video *@
+                                    <div class="w-100 bg-black d-flex align-items-center justify-content-center" style="height: 250px;">
+                                        <video class="w-100 h-100" style="object-fit: cover;">
+                                            <source src="@pc.Post.VideoUrl">
+                                        </video>
+                                        @* Iconiță de Play peste video ca să știe userul că e video *@
+                                        <div class="position-absolute text-white">
+                                            <i class="bi bi-play-circle-fill fs-1 opacity-75"></i>
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    @* CAZUL 3: Doar Text *@
+                                    <div class="card-body bg-light d-flex align-items-center justify-content-center p-4" style="height: 250px; overflow: hidden;">
+                                        <div class="text-center">
+                                            @* Afișăm un rezumat scurt al textului *@
+                                            <p class="card-text text-muted small">
+                                                @if (!string.IsNullOrEmpty(pc.Post.TextContent))
+                                                {
+                                                    @* Curățăm tag-urile HTML pentru preview și limităm lungimea *@
+                                                    var textSimplu = System.Text.RegularExpressions.Regex.Replace(pc.Post.TextContent, "<.*?>", String.Empty);
+                                                    @(textSimplu.Length > 150 ? textSimplu.Substring(0, 150) + "..." : textSimplu)
+                                                }
+                                                else
+                                                {
+                                                    <span class="fst-italic">Fără conținut</span>
+                                                }
+                                            </p>
+                                        </div>
+                                    </div>
+                                }
+
+                                <div class="card-footer bg-white border-top-0 py-2 d-flex justify-content-between align-items-center">
+
+                                    <div class="d-flex align-items-center" style="max-width: 60%;">
+                                        <img src="@(pc.Post.Author?.ProfilePictureUrl)" class="rounded-circle border me-2" style="width: 25px; height: 25px; object-fit: cover;">
+                                        <small class="text-truncate fw-bold text-muted">
+                                            @(pc.Post.Author?.FullName)
+                                        </small>
+                                    </div>
+
+                                    <div class="text-end" style="max-width: 40%;">
+                                        <small class="text-muted" style="font-size: 0.7rem;" title="Data salvării în colecție">
+                                            <i class="bi bi-calendar3 me-1"></i>@pc.AddedDate.ToString("dd MMM yyyy")
+                                        </small>
+                                    </div>
+
+                                </div>
+                            </a>
+
                         </div>
                     </div>
-                </div>
+                }
             }
         </div>
     }

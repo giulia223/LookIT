@@ -14,6 +14,9 @@ namespace LookIT.Controllers
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly RoleManager<IdentityRole> _roleManager = roleManager;
         private readonly IWebHostEnvironment _env = env;
+
+        //afisarea tuturor colectiilor unui utilizator
+        [Authorize(Roles ="User,Administrator")]
         public IActionResult Index()
         {
 
@@ -145,7 +148,24 @@ namespace LookIT.Controllers
             {
                 return NotFound();
             }
-            return View(collection);
+
+            if(User.IsInRole("Administrator") || _userManager.GetUserId(User) == collection.UserId)
+            {
+                if(collection.Name == "All Posts")
+                {
+                    TempData["message"] = "Nu puteți edita colecția implicită 'All Posts'.";
+                    TempData["messageType"] = "alert-warning";
+                    return RedirectToAction("Index");
+                }
+                return View(collection);
+
+            }
+            else
+            {
+                TempData["message"] = "Nu aveti dreptul sa editati o colectie care nu va apartine";
+                TempData["messageType"] = "alert-danger";
+                return RedirectToAction("Index");
+            }
         }
 
         [HttpPost]
@@ -159,18 +179,36 @@ namespace LookIT.Controllers
                 return NotFound();
             }
 
-            //daca trece de validarile din model, adica obligativitatea titlului
-            if (ModelState.IsValid)
+            if(User.IsInRole("Administrator") || _userManager.GetUserId(User) == collection.UserId)
             {
-                collection.Name = requestCollection.Name;
-                db.SaveChanges();
-                TempData["message"] = "Colectia a fost editata!";
-                return RedirectToAction("Index");
+                if(collection.Name == "All Posts")
+                {
+                    TempData["message"] = "Nu puteți edita colecția implicită 'All Posts'.";
+                    TempData["messageType"] = "alert-warning";
+                    return RedirectToAction("Index");
+                }
+
+                //daca trece de validarile din model, adica obligativitatea titlului
+                if (ModelState.IsValid)
+                {
+                    collection.Name = requestCollection.Name;
+                    db.SaveChanges();
+                    TempData["message"] = "Colectia a fost editata!";
+                    return RedirectToAction("Index");
+                }
+                else
+                {
+                    return View(requestCollection);
+                }
             }
+            //nu am dreptul sa editez colectia
             else
             {
-                return View(requestCollection);
+                TempData["message"] = "Nu aveti dreptul sa editati o colectie care nu va apartine";
+                TempData["messageType"] = "alert-danger";
+                return RedirectToAction("Index");
             }
+
         }
 
 

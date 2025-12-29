@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LookIT.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251229125619_InitialMigration")]
+    [Migration("20251229135532_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />

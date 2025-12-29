@@ -659,6 +659,38 @@ namespace LookIT.Controllers
         }
 
 
+        [HttpPost]
+        [Authorize(Roles ="User,Administrator")]
+        public IActionResult RemoveFromCollection(int postId, int collectionId)
+        {
+            var postCollection = db.PostCollections
+                                    .FirstOrDefault(pc => pc.PostId == postId && pc.CollectionId == collectionId);
+
+            //daca exista relatia, o vom sterge
+            if(postCollection is not null)
+            {
+                var collection = db.Collections.Find(collectionId);
+                var currentUserId = _userManager.GetUserId(User);
+
+                if((collection.UserId == currentUserId || User.IsInRole("Administrator")) && collection is not null)
+                {
+                    db.PostCollections.Remove(postCollection);
+                    db.SaveChanges();
+
+                    TempData["message"] = "Postarea a fost eliminată din colecție.";
+                    TempData["messageType"] = "alert-success";
+                }
+                else
+                {
+                    TempData["message"] = "Nu aveți dreptul să modificați această colecție.";
+                    TempData["messageType"] = "alert-danger";
+                }
+            }
+
+            return RedirectToAction("Show", "Collections", new { id = collectionId });
+        }
+
+
         //aceasta metoda se va ocupa atat de aprecierea unei postari, cat si de scoaterea acesteia de la apreciere
         //daca postarea este deja apreciata, prin incercarea de a o aprecia iar, vom scoate like-ul asociat
         //daca postarea nu este apeciata, atunci se va aduga o relatie intre Post si User in tabela asociativa Likes
