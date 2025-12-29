@@ -226,7 +226,7 @@ namespace LookIT.Controllers
             //vom cauta in PostCollections legaturile intre postarea utilizatorului pe care vreau sa o sterg, si colectiile altor
             //utilizatori
             var dependentPostCollections = _context.PostCollections
-                                                   .Where(pc => pc.PostId != null && userPostIds.Contains(pc.PostId.Value))
+                                                   .Where(pc => userPostIds.Contains(pc.PostId))
                                                    .ToList();
 
             //stergem dependentele

@@ -84,7 +84,8 @@ namespace LookIT.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Like>()
-                .HasKey(like => new { like.UserId, like.PostId });
+                .HasIndex(like => new { like.UserId, like.PostId })
+                .IsUnique();
 
             //am fost nevoita sa pun restrict pentru ca s-ar fi format ciclu 
             //daca un user dat like la postarile altor useri, nu il pot sterge

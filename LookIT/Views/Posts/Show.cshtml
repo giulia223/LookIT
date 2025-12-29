@@ -5,6 +5,10 @@
 
 @{
     var loggedUser = await UserManager.GetUserAsync(User);
+
+    var currentUserId = UserManager.GetUserId(User);
+    bool isLiked = Model.Likes.Any(l => l.UserId == currentUserId);
+    int likeCount = Model.Likes.Count;
 }
 
 @if (TempData["message"] != null)
@@ -71,6 +75,21 @@
         {
             <div class="d-flex justify-content-between align-items-center mt-3 px-1">
                 <div class="d-flex gap-2">
+
+                    <button type="button"
+                            onclick="toggleLike(@Model.PostId)"
+                            class="btn p-0 border-0 d-flex align-items-center gap-1"
+                            style="background: none; outline: none;">
+
+                        <i id="like-icon-@Model.PostId"
+                           class="bi @(isLiked ? "bi-heart-fill text-danger" : "bi-heart text-dark") fs-4">
+                        </i>
+                    </button>
+
+                    <span id="like-count-@Model.PostId" class="ms-1 fw-bold text-muted" style="font-size: 0.9rem;">
+                        @likeCount
+                    </span>
+
                     @if ((ViewBag.EsteUser == true && Model.AuthorId == ViewBag.UserCurent) || ViewBag.EsteAdministrator == true)
                     {
                         <a class="btn btn-sm btn-outline-secondary border-0" asp-controller="Posts" asp-action="Edit" asp-route-id="@Model.PostId">
@@ -108,15 +127,15 @@
                                     <button type="submit" class="dropdown-item small rounded-2 d-flex justify-content-between align-items-center @(isInCollection ? "bg-light" : "")">
 
                                         <span>
+                                            @*daca este salvata, vom pune ocnita plina*@
                                             @if (isInCollection)
                                             {
-                                                @* Iconiță PLINĂ dacă e salvat *@
                                                 <i class="bi bi-folder-fill text-primary me-2"></i>
                                                 <span class="fw-bold text-primary">@collection.Name</span>
                                             }
+                                            @*daca nu este salvata, vom pune iconita goala*@
                                             else
                                             {
-                                                @* Iconiță GOALĂ dacă nu e salvat *@
                                                 <i class="bi bi-folder me-2"></i>
                                                 <span>@collection.Name</span>
                                             }
@@ -124,7 +143,6 @@
 
                                         @if (isInCollection)
                                         {
-                                            @* Bifa din dreapta pentru confirmare vizuală *@
                                             <i class="bi bi-check-lg text-primary"></i>
                                         }
 
@@ -206,7 +224,6 @@
                                         </span>
                                     </a>
 
-                                    @* Indicator discret pentru editare *@
                                     @if (comment.DateModified.HasValue)
                                     {
                                         <small class="text-muted ms-4" style="font-size: 0.7rem;"
@@ -321,3 +338,38 @@
         display: block;
     }
 </style>
+
+<script>
+    function toggleLike(postId) {
+        let formData = new FormData();
+        formData.append("Id", postId);
+
+        //facem cerere catre server
+        fetch('/Posts/LikePost', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                //gasim div urile corespunzatoare iconitei si a afisarii numaului de like uri prin id-uri sugestive ale
+                //elementelor
+                let icon = document.getElementById("like-icon-" + postId);
+                let countSpan = document.getElementById("like-count-" + postId);
+
+                //actualizam iconita (inima plina sau goala, dupa caz)
+                if (data.isLiked) {
+                    icon.classList.remove("bi-heart", "text-dark");
+                    icon.classList.add("bi-heart-fill", "text-danger");
+                } else {
+                    icon.classList.remove("bi-heart-fill", "text-danger");
+                    icon.classList.add("bi-heart", "text-dark");
+                }
+
+               //actualizam numarul de like uri
+                countSpan.innerText = data.count;
+            }
+        })
+        .catch(error => console.error('Eroare:', error));
+    }
+</script>

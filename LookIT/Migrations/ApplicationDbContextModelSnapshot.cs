@@ -260,16 +260,26 @@ namespace LookIT.Migrations
 
             modelBuilder.Entity("LookIT.Models.Like", b =>
                 {
-                    b.Property<string>("UserId")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<int>("LikeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LikeId"));
 
                     b.Property<int>("PostId")
                         .HasColumnType("int");
 
-                    b.HasKey("UserId", "PostId");
+                    b.Property<string>("UserId")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("LikeId");
 
                     b.HasIndex("PostId");
+
+                    b.HasIndex("UserId", "PostId")
+                        .IsUnique()
+                        .HasFilter("[UserId] IS NOT NULL");
 
                     b.ToTable("Likes");
                 });
@@ -350,10 +360,10 @@ namespace LookIT.Migrations
                     b.Property<DateTime>("AddedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("CollectionId")
+                    b.Property<int>("CollectionId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("PostId")
+                    b.Property<int>("PostId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -361,8 +371,7 @@ namespace LookIT.Migrations
                     b.HasIndex("CollectionId");
 
                     b.HasIndex("PostId", "CollectionId")
-                        .IsUnique()
-                        .HasFilter("[PostId] IS NOT NULL AND [CollectionId] IS NOT NULL");
+                        .IsUnique();
 
                     b.ToTable("PostCollections");
                 });
@@ -595,8 +604,7 @@ namespace LookIT.Migrations
                     b.HasOne("LookIT.Models.ApplicationUser", "User")
                         .WithMany("LikedPosts")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Post");
 
@@ -636,12 +644,14 @@ namespace LookIT.Migrations
                     b.HasOne("LookIT.Models.Collection", "Collection")
                         .WithMany("PostCollections")
                         .HasForeignKey("CollectionId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("LookIT.Models.Post", "Post")
                         .WithMany("PostCollections")
                         .HasForeignKey("PostId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Collection");
 

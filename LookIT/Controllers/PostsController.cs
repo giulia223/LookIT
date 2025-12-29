@@ -19,6 +19,7 @@ namespace LookIT.Controllers
 
 
         //au acces la aceasta metoda atat utilizatorii inregistrati, cat si neinregistrati si administratorii
+        //afisarea postarilor apartinand conturilor publice sau urmaritorilor (daca sunt conturi private)
         [AllowAnonymous]
         public IActionResult Index()
         { 
@@ -96,6 +97,7 @@ namespace LookIT.Controllers
         {
             Post? post = db.Posts
                            .Include(post => post.Author)
+                           .Include(post => post.Likes)
                            .Include(post => post.Comments)
                                  .ThenInclude(comment => comment.User)
                            .Where(post => post.PostId == Id)
@@ -129,12 +131,11 @@ namespace LookIT.Controllers
                                           .Select(collection => collection.CollectionId)
                                           .ToList();
 
-                //pentru ca CollectionId este proprietate nullable in model, trebuie sa verificam daca exista si in caz afirmativ, ii vom prelua valoarea
+                //preluam id-urile colectiilor utilizatorului in care se afla postarea
                 ViewBag.SavedCollectionIds = db.PostCollections
-                                               .Where(postCollection => postCollection.PostId == Id 
-                                                      && postCollection.CollectionId.HasValue 
-                                                      && myCollectionIds.Contains(postCollection.CollectionId.Value))
-                                               .Select(postCollection => postCollection.CollectionId.Value)
+                                               .Where(postCollection => postCollection.PostId == Id
+                                                      && myCollectionIds.Contains(postCollection.CollectionId))
+                                               .Select(postCollection => postCollection.CollectionId)
                                                .ToList();
 
             }
@@ -655,6 +656,54 @@ namespace LookIT.Controllers
 
             //ne intoarcem la pagina postarii
             return Redirect("/Posts/Show/" + postCollection.PostId);
+        }
+
+
+        //aceasta metoda se va ocupa atat de aprecierea unei postari, cat si de scoaterea acesteia de la apreciere
+        //daca postarea este deja apreciata, prin incercarea de a o aprecia iar, vom scoate like-ul asociat
+        //daca postarea nu este apeciata, atunci se va aduga o relatie intre Post si User in tabela asociativa Likes
+        [HttpPost]
+        [Authorize(Roles ="User, Administrator")]
+        public IActionResult LikePost([FromForm] int Id)
+        {
+            //verificam daca exista deja o relatie de apreciere intre utilizatorul logal si postare
+            var existingRelation = db.Likes
+                                     .FirstOrDefault(like => like.PostId == Id
+                                                             && like.UserId == _userManager.GetUserId(User));
+
+            //variabila pentru a determina daca am dat like postarii sau nu
+            bool isLikedNow;
+
+            //daca exista relatia, vom sterge like ul
+            if (existingRelation is not null)
+            {
+                db.Likes.Remove(existingRelation);
+                isLikedNow = false;
+
+                TempData["message"] = "Postarea a fost eliminata din apreeri";
+                TempData["messageType"] = "alert-warning";
+            }
+
+            //daca relatia nu exista, o vom adauga
+            else
+            {
+                var newLike = new Like
+                {
+                    PostId = Id,
+                    UserId = _userManager.GetUserId(User)
+                };
+                isLikedNow = true;
+
+                db.Likes.Add(newLike);
+
+                TempData["message"] = "Postarea a fost apreciata";
+                TempData["messageType"] = "alert-success";
+            }
+            db.SaveChanges();
+            int newCount = db.Likes
+                             .Count(like => like.PostId == Id);
+
+            return Json(new { success = true, isLiked = isLikedNow, count = newCount });
         }
 
 

@@ -341,12 +341,14 @@ namespace LookIT.Migrations
                 name: "Likes",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    LikeId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     PostId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Likes", x => new { x.UserId, x.PostId });
+                    table.PrimaryKey("PK_Likes", x => x.LikeId);
                     table.ForeignKey(
                         name: "FK_Likes_AspNetUsers_UserId",
                         column: x => x.UserId,
@@ -367,8 +369,8 @@ namespace LookIT.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    PostId = table.Column<int>(type: "int", nullable: true),
-                    CollectionId = table.Column<int>(type: "int", nullable: true),
+                    PostId = table.Column<int>(type: "int", nullable: false),
+                    CollectionId = table.Column<int>(type: "int", nullable: false),
                     AddedDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
@@ -476,6 +478,13 @@ namespace LookIT.Migrations
                 column: "PostId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Likes_UserId_PostId",
+                table: "Likes",
+                columns: new[] { "UserId", "PostId" },
+                unique: true,
+                filter: "[UserId] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Messages_GroupId",
                 table: "Messages",
                 column: "GroupId");
@@ -494,8 +503,7 @@ namespace LookIT.Migrations
                 name: "IX_PostCollections_PostId_CollectionId",
                 table: "PostCollections",
                 columns: new[] { "PostId", "CollectionId" },
-                unique: true,
-                filter: "[PostId] IS NOT NULL AND [CollectionId] IS NOT NULL");
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Posts_AuthorId",
