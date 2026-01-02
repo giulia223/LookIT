@@ -22,7 +22,9 @@ namespace LookIT.Controllers
         //afisarea postarilor apartinand conturilor publice sau urmaritorilor (daca sunt conturi private)
         [AllowAnonymous]
         public IActionResult Index()
-        { 
+        {
+            //afisam cate 4 postarii in pagina
+            int _perPage = 4;
             
             var userId = _userManager.GetUserId(User);
             List<string> followingUserIds = new List<string>();
@@ -49,13 +51,45 @@ namespace LookIT.Controllers
                           .OrderByDescending(post => post.Date)
                           .ToList();
 
-            ViewBag.Posts = posts;
-
             if (TempData.ContainsKey("message"))
             {
                 ViewBag.Message = TempData["message"];
                 ViewBag.Alert = TempData["messageType"];
             }
+
+            //verificam de fiecare data numarul postarilor totale
+            int totalItems = posts.Count();
+
+            //se preia pagina curenta din View-ul asociat, numarul paginii este valoarea parametrului page din ruta
+            var currentPage = Convert.ToInt32(HttpContext.Request.Query["page"]);
+
+            //trebuie sa fortam ca pagina curenta sa fie 1, altfel cand dam next pentru prima data, ne vom intoarce tot pe rprima pagina
+            if (currentPage == 0)
+            {
+                currentPage = 1;
+            }
+
+            //pentru prima pagina offsetul o sa fie 0, pentru pagina a doua va fi 4
+            //asadar, offsetul este egal cu numarul de posari care au fost deja afisate pe paginile anterioarw
+            var offset = 0;
+
+            //se calculeaza offsetul in functie de numarul paginii la care suntem
+            if (!currentPage.Equals(0))
+            {
+                offset = (currentPage - 1) * _perPage;
+            }
+
+            //se preiau postarile corespunzatoare pentru feicare pagina la care ne aflam in functie de offset
+            var paginatedPosts = posts.Skip(offset).Take(_perPage).ToList();
+
+            //preluam numarul ultimei pagini
+            ViewBag.lastPage = (int)Math.Ceiling((float)totalItems / (float)_perPage);
+            ViewBag.CurrentPage = currentPage;
+
+            //trimitem postarile cu ajutorul unui ViwBag  catre View0ul corespunzator
+            ViewBag.PaginationBaseUrl = "/Posts/Index/?page=";
+            ViewBag.Posts = paginatedPosts;
+
             return View();
         }
 
@@ -64,6 +98,9 @@ namespace LookIT.Controllers
         [Authorize(Roles="User,Administrator")]
         public IActionResult Feed()
         {
+            //afisam cate 4 postarii in pagina
+            int _perPage = 4;
+
             var userId = _userManager.GetUserId(User);
 
             //luam persoanele pe care utilizatorul ii urmareste, mai exact verificam daca statusul cererii de urmarire este Accepted
@@ -85,6 +122,41 @@ namespace LookIT.Controllers
                 ViewBag.Message = TempData["message"];
                 ViewBag.Alert = TempData["messageType"];
             }
+
+            //verificam de fiecare data numarul postarilor totale
+            int totalItems = posts.Count();
+
+            //se preia pagina curenta din View-ul asociat, numarul paginii este valoarea parametrului page din ruta
+            var currentPage = Convert.ToInt32(HttpContext.Request.Query["page"]);
+
+            //trebuie sa fortam ca pagina curenta sa fie 1, altfel cand dam next pentru prima data, ne vom intoarce tot pe rprima pagina
+            if (currentPage == 0)
+            {
+                currentPage = 1;
+            }
+
+            //pentru prima pagina offsetul o sa fie 0, pentru pagina a doua va fi 4
+            //asadar, offsetul este egal cu numarul de posari care au fost deja afisate pe paginile anterioarw
+            var offset = 0;
+
+            //se calculeaza offsetul in functie de numarul paginii la care suntem
+            if (!currentPage.Equals(0))
+            {
+                offset = (currentPage - 1) * _perPage;
+            }
+
+            //se preiau postarile corespunzatoare pentru feicare pagina la care ne aflam in functie de offset
+            var paginatedPosts = posts.Skip(offset).Take(_perPage).ToList();
+
+            //preluam numarul ultimei pagini
+            ViewBag.lastPage = (int)Math.Ceiling((float)totalItems / (float)_perPage);
+            ViewBag.CurrentPage = currentPage;
+
+            //trimitem postarile cu ajutorul unui ViwBag  catre View0ul corespunzator
+            ViewBag.PaginationBaseUrl = "/Posts/Feed/?page=";
+            ViewBag.Posts = paginatedPosts;
+
+
             return View("Index");
         }
 
