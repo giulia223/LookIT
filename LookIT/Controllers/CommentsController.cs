@@ -113,9 +113,6 @@ namespace LookIT.Controllers
                     return RedirectToAction("Index", "Posts");
                 }
             }
-        }
-
-        
-        
+        } 
     }
 }

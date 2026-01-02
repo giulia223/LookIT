@@ -5,10 +5,12 @@
 
 @{
     var loggedUser = await UserManager.GetUserAsync(User);
-
     var currentUserId = UserManager.GetUserId(User);
     bool isLiked = Model.Likes.Any(l => l.UserId == currentUserId);
     int likeCount = Model.Likes.Count;
+
+    // Verificăm drepturile
+    bool hasRights = (ViewBag.EsteUser == true && Model.AuthorId == ViewBag.UserCurent) || ViewBag.EsteAdministrator == true;
 }
 
 @if (TempData["message"] != null)
@@ -31,27 +33,63 @@
 <div class="card mb-3 mx-auto border-0 shadow-sm" style="max-width: 600px;">
     <div class="card-body p-3">
 
-        <div class="d-flex align-items-center mb-3">
-            <a asp-controller="Profile" asp-action="Details" asp-route-userId="@Model.AuthorId" asp-area="" class="text-decoration-none">
-                <img src="@Model.Author.ProfilePictureUrl"
-                     alt="Profile Picture"
-                     class="rounded-circle border"
-                     style="width: 40px; height: 40px; object-fit: cover;" />
-            </a>
+        @* HEADER POSTARE *@
+        <div class="d-flex justify-content-between align-items-start mb-3">
 
-            <div class="d-flex flex-column ms-2">
+            @* 1. Autor *@
+            <div class="d-flex align-items-center">
                 <a asp-controller="Profile" asp-action="Details" asp-route-userId="@Model.AuthorId" asp-area="" class="text-decoration-none">
-                    <span class="fw-bold text-dark" style="font-size: 0.95rem; line-height: 1.2;">
-                        @Model.Author.FullName
-                    </span>
+                    <img src="@Model.Author.ProfilePictureUrl"
+                         alt="Profile Picture"
+                         class="rounded-circle border"
+                         style="width: 40px; height: 40px; object-fit: cover;" />
                 </a>
-                <small class="text-muted" style="font-size: 0.8rem;">
-                    @Model.Date.ToString("d MMMM HH:mm") 
-                    <i class="bi bi-globe"></i>
-                </small>
+
+                <div class="d-flex flex-column ms-2">
+                    <a asp-controller="Profile" asp-action="Details" asp-route-userId="@Model.AuthorId" asp-area="" class="text-decoration-none">
+                        <span class="fw-bold text-dark" style="font-size: 0.95rem; line-height: 1.2;">
+                            @Model.Author.FullName
+                        </span>
+                    </a>
+                    <small class="text-muted" style="font-size: 0.8rem;">
+                        @Model.Date.ToString("d MMMM HH:mm")
+                        <i class="bi bi-globe"></i>
+                    </small>
+                </div>
             </div>
+
+            @* 2. Meniu Optiuni (Stilizat identic cu Bookmark) *@
+            @if (hasRights)
+            {
+                <div class="dropdown">
+                    <button class="btn btn-link text-dark text-decoration-none p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-three-dots-vertical fs-5"></i>
+                    </button>
+
+                    @* Adaugat clasa custom-dropdown-menu *@
+                    <ul class="dropdown-menu dropdown-menu-end border-0 shadow custom-dropdown-menu p-2 rounded-3">
+                        <li>
+                            <a class="dropdown-item custom-dropdown-item d-flex align-items-center gap-2 rounded-2"
+                               asp-controller="Posts" asp-action="Edit" asp-route-id="@Model.PostId">
+                                <i class="bi bi-pencil"></i>
+                                <span class="fw-bold small">Editează postarea</span>
+                            </a>
+                        </li>
+                        <li>
+                            <form method="post" asp-controller="Posts" asp-action="Delete" asp-route-id="@Model.PostId">
+                                @* Adaugat clasa delete-item pentru rosu la hover *@
+                                <button class="dropdown-item custom-dropdown-item delete-item d-flex align-items-center gap-2 rounded-2" type="submit">
+                                    <i class="bi bi-trash"></i>
+                                    <span class="fw-bold small">Șterge postarea</span>
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            }
         </div>
 
+        @* CONTINUT *@
         @if (!string.IsNullOrEmpty(@Model.TextContent))
         {
             <div class="mb-2">@Html.Raw(Model.TextContent)</div>
@@ -71,11 +109,13 @@
             </div>
         }
 
+        @* BARA DE ACTIUNI *@
         @if (ViewBag.EsteUser == true || ViewBag.EsteAdministrator == true)
         {
             <div class="d-flex justify-content-between align-items-center mt-3 px-1">
-                <div class="d-flex gap-2">
 
+                @* LIKE *@
+                <div class="d-flex align-items-center">
                     <button type="button"
                             onclick="toggleLike(@Model.PostId)"
                             class="btn p-0 border-0 d-flex align-items-center gap-1"
@@ -85,30 +125,15 @@
                            class="bi @(isLiked ? "bi-heart-fill text-danger" : "bi-heart text-dark") fs-4">
                         </i>
                     </button>
-
                     <span id="like-count-@Model.PostId" class="ms-1 fw-bold text-muted" style="font-size: 0.9rem;">
                         @likeCount
                     </span>
-
-                    @if ((ViewBag.EsteUser == true && Model.AuthorId == ViewBag.UserCurent) || ViewBag.EsteAdministrator == true)
-                    {
-                        <a class="btn btn-sm btn-outline-secondary border-0" asp-controller="Posts" asp-action="Edit" asp-route-id="@Model.PostId">
-                            <i class="bi bi-pencil"></i>
-                        </a>
-                        <form method="post" asp-controller="Posts" asp-action="Delete" asp-route-id="@Model.PostId" class="d-inline">
-                            <button class="btn btn-sm btn-outline-danger border-0" type="submit">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </form>
-                    }
                 </div>
 
+                @* BOOKMARK (SAVE) *@
                 <div class="bookmark-container">
-                    
                     <div class="bookmark-trigger">
-                        
-                         <i class="bi bi-bookmark fs-4 cursor-pointer"></i>
-                        
+                        <i class="bi bi-bookmark fs-4 cursor-pointer text-dark"></i>
                     </div>
 
                     <div class="bookmark-dropdown shadow border rounded-3 p-2">
@@ -124,16 +149,15 @@
                                 <form method="post" asp-controller="Posts" asp-action="AddToCollection">
                                     <input type="hidden" name="PostId" value="@Model.PostId" />
                                     <input type="hidden" name="CollectionId" value="@collection.CollectionId" />
-                                    <button type="submit" class="dropdown-item small rounded-2 d-flex justify-content-between align-items-center @(isInCollection ? "bg-light" : "")">
 
+                                    @* Aici am folosit aceleași clase custom *@
+                                    <button type="submit" class="dropdown-item custom-dropdown-item rounded-2 d-flex justify-content-between align-items-center @(isInCollection ? "bg-light" : "")">
                                         <span>
-                                            @*daca este salvata, vom pune ocnita plina*@
                                             @if (isInCollection)
                                             {
                                                 <i class="bi bi-folder-fill text-primary me-2"></i>
                                                 <span class="fw-bold text-primary">@collection.Name</span>
                                             }
-                                            @*daca nu este salvata, vom pune iconita goala*@
                                             else
                                             {
                                                 <i class="bi bi-folder me-2"></i>
@@ -145,7 +169,6 @@
                                         {
                                             <i class="bi bi-check-lg text-primary"></i>
                                         }
-
                                     </button>
                                 </form>
                             }
@@ -162,9 +185,9 @@
     </div>
 </div>
 
+@* RESTUL PAGINII (Comentarii) - nu s-a modificat *@
 <div class="card mb-4 mx-auto border-0 shadow-sm" style="max-width: 600px;">
     <div class="card-body p-3">
-
         <h6 class="text-muted mb-3 ps-1">Comentarii</h6>
 
         @if (ViewBag.EsteUser || ViewBag.EsteAdministrator)
@@ -182,11 +205,8 @@
                         <div class="flex-grow-1">
                             <div class="d-flex align-items-center bg-light rounded-4 px-3 py-2 border">
                                 <textarea class="form-control bg-transparent border-0 shadow-none p-0 me-2"
-                                      name="Content"
-                                      rows="1"
-                                      placeholder="Scrie un comentariu..."
+                                      name="Content" rows="1" placeholder="Scrie un comentariu..."
                                       style="resize: none; overflow-y: hidden; font-size: 0.9rem;"></textarea>
-
                                 <button class="btn btn-link text-primary p-0 text-decoration-none" type="submit">
                                     <i class="bi bi-send-fill"></i>
                                 </button>
@@ -200,7 +220,7 @@
             </div>
         }
 
-        @if(Model.Comments.Count > 0)
+        @if (Model.Comments.Count > 0)
         {
             <div class="comments-list">
                 @foreach (var comment in Model.Comments)
@@ -208,10 +228,8 @@
                     <div class="d-flex gap-2 mb-3">
                         <div class="flex-shrink-0">
                             <a asp-controller="Profile" asp-action="Details" asp-route-userId="@comment.UserId" asp-area="" class="text-decoration-none">
-                                <img src="@comment.User.ProfilePictureUrl"
-                                     alt="Profile"
-                                     class="rounded-circle border"
-                                     style="width: 32px; height: 32px; object-fit: cover;" />
+                                <img src="@comment.User.ProfilePictureUrl" alt="Profile"
+                                     class="rounded-circle border" style="width: 32px; height: 32px; object-fit: cover;" />
                             </a>
                         </div>
 
@@ -223,36 +241,23 @@
                                             @(comment.User.FullName ?? "Utilizator necunoscut")
                                         </span>
                                     </a>
-
                                     @if (comment.DateModified.HasValue)
                                     {
-                                        <small class="text-muted ms-4" style="font-size: 0.7rem;"
-                                               title="Data exactă: @comment.DateModified.Value.ToString("g")">
-                                            Editat la @(comment.DateModified.Value.Year == DateTime.Now.Year
-                                                                            ? comment.DateModified.Value.ToString("d MMM HH:mm")
-                                                                            : comment.DateModified.Value.ToString("d MMM yyyy HH:mm"))
-                                        </small>
-                                     }
+                                        <small class="text-muted ms-4" style="font-size: 0.7rem;">Editat ( 
+                                            @comment.DateModified.Value.ToString(comment.DateModified.Value.Year == DateTime.Now.Year ? "d MMM HH:mm" : "d MMM yyyy HH:mm") )</small>
+                                    }
                                 </div>
-
-                                <div class="text-break" style="font-size: 0.9rem;">
-                                    @comment.Content
-                                </div>
+                                <div class="text-break" style="font-size: 0.9rem;">@comment.Content</div>
                             </div>
 
-                            @* Bara de acțiuni de sub comentariu *@
                             <div class="d-flex align-items-center gap-3 ms-2 mt-1">
                                 <small class="text-muted" style="font-size: 0.75rem;">
                                     @comment.Date.ToString(comment.Date.Year == DateTime.Now.Year ? "d MMM HH:mm" : "d MMM yyyy HH:mm")
                                 </small>
-
                                 @if (comment.UserId == ViewBag.UserCurent || ViewBag.EsteAdministrator == true)
                                 {
                                     <a class="text-decoration-none text-secondary fw-bold" style="font-size: 0.75rem;"
-                                       asp-controller="Comments" asp-action="Edit" asp-route-id="@comment.CommentId">
-                                        Editează
-                                    </a>
-
+                                       asp-controller="Comments" asp-action="Edit" asp-route-id="@comment.CommentId">Editează</a>
                                     <form method="post" asp-controller="Comments" asp-action="Delete" asp-route-id="@comment.CommentId" class="d-inline">
                                         <button class="btn btn-link text-danger text-decoration-none fw-bold p-0 border-0"
                                                 style="font-size: 0.75rem; line-height: 1;" type="submit">
@@ -262,42 +267,46 @@
                                 }
                             </div>
                         </div>
-                        
                     </div>
                 }
             </div>
         }
         else
         {
-            <div class="text-center text-muted small my-3">
-                Inca nu există comentarii.
-            </div>
+            <div class="text-center text-muted small my-3">Inca nu există comentarii.</div>
         }
-        
     </div>
 </div>
 
 <style>
-    .bookmark-dropdown .dropdown-item {
+    /* STILURI COMUNE PENTRU DROPDOWNS (Edit/Delete si Bookmark) */
+    .custom-dropdown-item {
         background: none;
         border: none;
         width: 100%;
         text-align: left;
-        /* Mărim padding-ul vertical de la 8px la 12px sau mai mult pentru spațiu */
-        padding: 10px 16px;
+        padding: 10px 16px; /* Spatiere generoasa */
         color: #212529;
         display: flex;
         align-items: center;
         text-decoration: none;
-        transition: background-color 0.2s;
+        transition: background-color 0.2s, color 0.2s;
     }
 
-        .bookmark-dropdown .dropdown-item:hover {
+        /* Hover standard: Albastru */
+        .custom-dropdown-item:hover {
             background-color: #f8f9fa;
-            color: #0d6efd;
+            color: #0d6efd; /* Albastru Bootstrap */
         }
 
-    /* Adăugăm spațiu între formularele care conțin butoanele */
+        /* Hover specific pentru Delete: Rosu (pentru a arata ca e periculos) */
+        /* Daca vrei si asta albastru, sterge blocul de mai jos */
+        .custom-dropdown-item.delete-item:hover {
+            background-color: #fff5f5; /* Un rosu foarte pal */
+            color: #dc3545; /* Rosu Bootstrap */
+        }
+
+    /* Ajustari pentru meniul de Bookmark ca sa foloseasca aceleasi stiluri */
     .bookmark-dropdown form {
         margin-bottom: 5px;
     }
@@ -305,10 +314,12 @@
         .bookmark-dropdown form:last-of-type {
             margin-bottom: 0;
         }
+
+    /* Logica de afisare Bookmark */
     .bookmark-container {
         position: relative;
         display: inline-block;
-        padding-bottom: 10px; /* Creează o zonă invizibilă de legătură sub iconiță */
+        padding-bottom: 10px;
         margin-bottom: -10px;
     }
 
@@ -316,19 +327,18 @@
         display: none;
         position: absolute;
         right: 0;
-        bottom: 100%; /* Se deschide deasupra */
+        bottom: 100%;
         background-color: white;
-        min-width: 200px;
+        min-width: 220px; /* Latime putin mai mare */
         z-index: 1050;
-        margin-bottom: 2px; /* Micșorează distanța față de iconiță */
-        /* Adăugăm un "pseudo-element" pentru a umple spațiul gol */
+        margin-bottom: 2px;
     }
 
         .bookmark-dropdown::after {
             content: "";
             position: absolute;
             width: 100%;
-            height: 15px; /* Pod invizibil între meniu și iconiță */
+            height: 15px;
             bottom: -15px;
             left: 0;
             background: transparent;
@@ -344,7 +354,6 @@
         let formData = new FormData();
         formData.append("Id", postId);
 
-        //facem cerere catre server
         fetch('/Posts/LikePost', {
             method: 'POST',
             body: formData
@@ -352,12 +361,9 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                //gasim div urile corespunzatoare iconitei si a afisarii numaului de like uri prin id-uri sugestive ale
-                //elementelor
                 let icon = document.getElementById("like-icon-" + postId);
                 let countSpan = document.getElementById("like-count-" + postId);
 
-                //actualizam iconita (inima plina sau goala, dupa caz)
                 if (data.isLiked) {
                     icon.classList.remove("bi-heart", "text-dark");
                     icon.classList.add("bi-heart-fill", "text-danger");
@@ -365,8 +371,6 @@
                     icon.classList.remove("bi-heart-fill", "text-danger");
                     icon.classList.add("bi-heart", "text-dark");
                 }
-
-               //actualizam numarul de like uri
                 countSpan.innerText = data.count;
             }
         })
