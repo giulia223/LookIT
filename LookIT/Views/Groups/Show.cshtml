@@ -47,7 +47,7 @@
                                 @* Butonul de părăsire grup pentru membri *@
                                 <form asp-controller="GroupMembers" asp-action="LeaveGroup" method="post" onsubmit="return confirm('Sigur vrei să părăsești acest grup?');">
                                     @Html.AntiForgeryToken()
-                                    <input type="hidden" name="roupId" value="@ViewBag.GroupDetails.GroupId" />
+                                    <input type="hidden" name="groupId" value="@ViewBag.GroupDetails.GroupId" />
                                     <button type="submit" class="btn btn-sm w-100 text-danger fw-bold" style="background-color: #f0f2f5; border: none;">
                                         <i class="bi bi-box-arrow-right me-1"></i> Părăsește grupul
                                     </button>

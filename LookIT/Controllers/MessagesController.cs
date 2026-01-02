@@ -165,16 +165,17 @@ namespace LookIT.Controllers
         //stergere mesaj 
         [HttpPost]
         [Authorize(Roles = "User,Administrator")]
-        public IActionResult DeleteMessage(int Id)
+        public async Task<IActionResult> DeleteMessage(int Id)
         {
             var msg = _context.Messages.Find(Id);
             var groupId = msg.GroupId;
             var userId = _userManager.GetUserId(User);
+            var currentUser = await _userManager.GetUserAsync(User);
             if (msg == null)
             {
                 return NotFound();
             }
-            if (msg.UserId != userId)
+            if (msg.UserId != userId || await _userManager.IsInRoleAsync(currentUser, "Administrator"))
             {
                 TempData["message"] = "Nu aveti dreptul sa stergeti un mesaj care nu va apartine.";
                 TempData["messageType"] = "alert-danger";
