@@ -4,12 +4,20 @@
 @inject UserManager<ApplicationUser> UserManager
 
 @{
+    //userul cu care suntem logat in sesiune
     var loggedUser = await UserManager.GetUserAsync(User);
+
+    //id ul userului cu care suntem logat in sesiune
     var currentUserId = UserManager.GetUserId(User);
-    bool isLiked = Model.Likes.Any(l => l.UserId == currentUserId);
+
+    //verificam daca utilizatorul cu care suntem logat a apreciat postarea sau nu
+    bool isLiked = Model.Likes
+                        .Any(like => like.UserId == currentUserId);
+
+    //numarul de like uri ale posatrii
     int likeCount = Model.Likes.Count;
 
-    // Verificăm drepturile
+    //verificam drepturile (daca este administrator sau este utilizatorul care a adaugat postarea)
     bool hasRights = (ViewBag.EsteUser == true && Model.AuthorId == ViewBag.UserCurent) || ViewBag.EsteAdministrator == true;
 }
 
@@ -36,8 +44,9 @@
         @* HEADER POSTARE *@
         <div class="d-flex justify-content-between align-items-start mb-3">
 
-            @* 1. Autor *@
+            @*zona pentru afisarea autorului*@
             <div class="d-flex align-items-center">
+
                 <a asp-controller="Profile" asp-action="Details" asp-route-userId="@Model.AuthorId" asp-area="" class="text-decoration-none">
                     <img src="@Model.Author.ProfilePictureUrl"
                          alt="Profile Picture"
@@ -46,60 +55,70 @@
                 </a>
 
                 <div class="d-flex flex-column ms-2">
+
                     <a asp-controller="Profile" asp-action="Details" asp-route-userId="@Model.AuthorId" asp-area="" class="text-decoration-none">
                         <span class="fw-bold text-dark" style="font-size: 0.95rem; line-height: 1.2;">
                             @Model.Author.FullName
                         </span>
                     </a>
+
                     <small class="text-muted" style="font-size: 0.8rem;">
                         @Model.Date.ToString("d MMMM HH:mm")
                         <i class="bi bi-globe"></i>
                     </small>
+
                 </div>
+
             </div>
 
-            @* 2. Meniu Optiuni (Stilizat identic cu Bookmark) *@
+            @*meniul pentru editarea si stergerea postarii (doar daca utilizatorul este in drepturi)*@
             @if (hasRights)
             {
                 <div class="dropdown">
+
                     <button class="btn btn-link text-dark text-decoration-none p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="bi bi-three-dots-vertical fs-5"></i>
                     </button>
 
                     @* Adaugat clasa custom-dropdown-menu *@
                     <ul class="dropdown-menu dropdown-menu-end border-0 shadow custom-dropdown-menu p-2 rounded-3">
+
                         <li>
                             <a class="dropdown-item custom-dropdown-item d-flex align-items-center gap-2 rounded-2"
                                asp-controller="Posts" asp-action="Edit" asp-route-id="@Model.PostId">
                                 <i class="bi bi-pencil"></i>
-                                <span class="fw-bold small">Editează postarea</span>
+                                <span class="text-dark">Editează postarea</span>
                             </a>
                         </li>
+
                         <li>
                             <form method="post" asp-controller="Posts" asp-action="Delete" asp-route-id="@Model.PostId">
-                                @* Adaugat clasa delete-item pentru rosu la hover *@
                                 <button class="dropdown-item custom-dropdown-item delete-item d-flex align-items-center gap-2 rounded-2" type="submit">
                                     <i class="bi bi-trash"></i>
-                                    <span class="fw-bold small">Șterge postarea</span>
+                                    <span class="text-dark">Șterge postarea</span>
                                 </button>
                             </form>
                         </li>
+
                     </ul>
+
                 </div>
             }
         </div>
 
-        @* CONTINUT *@
+        @*continut de tip text*@
         @if (!string.IsNullOrEmpty(@Model.TextContent))
         {
             <div class="mb-2">@Html.Raw(Model.TextContent)</div>
         }
 
+        @*continut de tip imagine*@
         @if (@Model.ImageUrl != null)
         {
             <img src="@Model.ImageUrl" alt="Post Image" class="rounded-2 w-100 border mb-2" style="height: auto; max-height: 600px; object-fit: contain;" />
         }
 
+        @*continut de tip videoclip*@
         @if (@Model.VideoUrl != null)
         {
             <div class="mt-2 mb-2">
@@ -109,28 +128,35 @@
             </div>
         }
 
-        @* BARA DE ACTIUNI *@
+        @*bara de actiuni (like si save) doar daca utilizatorl este autentificat*@
         @if (ViewBag.EsteUser == true || ViewBag.EsteAdministrator == true)
         {
             <div class="d-flex justify-content-between align-items-center mt-3 px-1">
 
-                @* LIKE *@
+                @*logica pentru like la postare*@
                 <div class="d-flex align-items-center">
+
                     <button type="button"
                             onclick="toggleLike(@Model.PostId)"
                             class="btn p-0 border-0 d-flex align-items-center gap-1"
                             style="background: none; outline: none;">
 
+                        @*daca postarea este deja apreciata de catre utilizatorul autentificat, iconita
+                            va fi o inima plina. In caz contrar, este o inima goala
+                        *@
                         <i id="like-icon-@Model.PostId"
                            class="bi @(isLiked ? "bi-heart-fill text-danger" : "bi-heart text-dark") fs-4">
                         </i>
+
                     </button>
+
+                    @*numaul total de like-uri ale postarii*@
                     <span id="like-count-@Model.PostId" class="ms-1 fw-bold text-muted" style="font-size: 0.9rem;">
                         @likeCount
                     </span>
                 </div>
 
-                @* BOOKMARK (SAVE) *@
+                @*logica pentru salvarea postarilor in colectii*@
                 <div class="bookmark-container">
                     <div class="bookmark-trigger">
                         <i class="bi bi-bookmark fs-4 cursor-pointer text-dark"></i>
@@ -285,7 +311,7 @@
         border: none;
         width: 100%;
         text-align: left;
-        padding: 10px 16px; /* Spatiere generoasa */
+        padding: 10px 16px;
         color: #212529;
         display: flex;
         align-items: center;
@@ -293,20 +319,16 @@
         transition: background-color 0.2s, color 0.2s;
     }
 
-        /* Hover standard: Albastru */
         .custom-dropdown-item:hover {
             background-color: #f8f9fa;
-            color: #0d6efd; /* Albastru Bootstrap */
+            color: #0d6efd;
         }
 
-        /* Hover specific pentru Delete: Rosu (pentru a arata ca e periculos) */
-        /* Daca vrei si asta albastru, sterge blocul de mai jos */
         .custom-dropdown-item.delete-item:hover {
-            background-color: #fff5f5; /* Un rosu foarte pal */
-            color: #dc3545; /* Rosu Bootstrap */
+            background-color: #fff5f5;
+            color: #dc3545;
         }
 
-    /* Ajustari pentru meniul de Bookmark ca sa foloseasca aceleasi stiluri */
     .bookmark-dropdown form {
         margin-bottom: 5px;
     }
@@ -315,31 +337,37 @@
             margin-bottom: 0;
         }
 
-    /* Logica de afisare Bookmark */
+    /* --- LOGICA MODIFICATĂ PENTRU POZIȚIONARE JOS-DREAPTA --- */
     .bookmark-container {
         position: relative;
         display: inline-block;
-        padding-bottom: 10px;
-        margin-bottom: -10px;
+        /* Am scos padding-bottom, nu mai e necesar daca meniul e jos */
+        padding-top: 10px;
+        margin-top: -10px;
     }
 
     .bookmark-dropdown {
         display: none;
         position: absolute;
-        right: 0;
-        bottom: 100%;
+        right: 0; /* Aliniat la dreapta containerului */
+        /* MODIFICARE AICI: Îl mutăm JOS (top: 100%) în loc de SUS (bottom: 100%) */
+        top: 100%;
+        bottom: auto;
         background-color: white;
-        min-width: 220px; /* Latime putin mai mare */
+        min-width: 220px;
         z-index: 1050;
-        margin-bottom: 2px;
+        margin-top: 2px; /* Spațiu mic între iconiță și meniu */
     }
 
+        /* "Podul" invizibil acum trebuie să fie SUS, între iconiță și meniu */
         .bookmark-dropdown::after {
             content: "";
             position: absolute;
             width: 100%;
             height: 15px;
-            bottom: -15px;
+            /* MODIFICARE: Îl punem DEASUPRA meniului */
+            top: -15px;
+            bottom: auto;
             left: 0;
             background: transparent;
         }

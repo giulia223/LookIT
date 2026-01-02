@@ -257,10 +257,16 @@ namespace LookIT.Controllers
             var grp = _context.Groups.Find(Id);
             if (grp != null && (grp.ModeratorId == _userManager.GetUserId(User) || User.IsInRole("Administrator"))) {
 
-                var groupMessages = _context.Messages.Where(m => m.GroupId == Id).ToList();
+                var groupMessages = _context.Messages
+                                            .Where(m => m.GroupId == Id)
+                                            .ToList();
+
                 _context.Messages.RemoveRange(groupMessages);
 
-                var groupMembers = _context.GroupMembers.Where(gm => gm.GroupId == Id).ToList();
+                var groupMembers = _context.GroupMembers
+                                           .Where(gm => gm.GroupId == Id)
+                                           .ToList();
+
                 _context.GroupMembers.RemoveRange(groupMembers);
               
             }
