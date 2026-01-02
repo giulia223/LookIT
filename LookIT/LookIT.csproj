@@ -8,16 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Views\NewFolder\**" />
     <Compile Remove="wwwroot\NewFolder1\**" />
     <Compile Remove="wwwroot\NewFolder\**" />
-    <Content Remove="Views\NewFolder\**" />
     <Content Remove="wwwroot\NewFolder1\**" />
     <Content Remove="wwwroot\NewFolder\**" />
-    <EmbeddedResource Remove="Views\NewFolder\**" />
     <EmbeddedResource Remove="wwwroot\NewFolder1\**" />
     <EmbeddedResource Remove="wwwroot\NewFolder\**" />
-    <None Remove="Views\NewFolder\**" />
     <None Remove="wwwroot\NewFolder1\**" />
     <None Remove="wwwroot\NewFolder\**" />
   </ItemGroup>
@@ -32,10 +28,10 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.11" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.11" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.11" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.11" />
   </ItemGroup>
 
   <ItemGroup>

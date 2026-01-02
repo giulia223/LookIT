@@ -21,6 +21,14 @@
                 <div class="card-body p-4">
                     <form asp-action="New" asp-controller="Collections" method="post">
 
+                        @if (ViewBag.PostToSave != null)
+                        {
+                            <input type="hidden" name="PostToSave" value="@ViewBag.PostToSave" />
+                            <div class="alert alert-info">
+                                Această colecție va include automat postarea curentă după creare.
+                            </div>
+                        }
+
                         <div class="mb-4">
                             <label asp-for="Name" class="form-label fw-semibold text-secondary small text-uppercase ls-1">Nume colecție</label>
                             <div class="input-group">

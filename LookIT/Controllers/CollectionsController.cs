@@ -103,16 +103,31 @@ namespace LookIT.Controllers
         //formularul in care se completeaza detele unei colectii
         //avem [HttpGet] implicit
         [Authorize(Roles="User,Administrator")]
-        public IActionResult New()
+        public IActionResult New(int? postId)
         {
+            var collection = new Collection();
+            
+            //verificam daca avem parametrul optinal de salvare (adica daca venim de pe calea unei postari in crearea colectiei)
+            //verificam cu o variabila in ViewBag in care dintre cazuri ne incadram
 
-            return View();
+            //venim de pe pagina unei postari, cand vrem sa o salvam si selectam ,,Colectie noua"
+            if(postId.HasValue)
+            {
+                ViewBag.PostToSave = postId;
+            }
+
+            //suntem in pagina propriilor colectii si vrem sa adugam o colectie goala
+            else
+            {
+                ViewBag.PostToSave = null;
+            }
+            return View(collection);
         }
 
         //adaugarea colectiei in baza de date
         [HttpPost]
         [Authorize(Roles ="User,Administrator")]
-        public IActionResult New(Collection collection)
+        public IActionResult New(Collection collection, int? PostToSave)
         {
             collection.UserId = _userManager.GetUserId(User);
             collection.CreationDate = DateTime.Now;
@@ -123,11 +138,28 @@ namespace LookIT.Controllers
             {
                 ModelState.AddModelError("Name", "Exista deja o colectie cu acest nume.");
             }
+
             //daca trece din validarile din model
             if (ModelState.IsValid)
             {
                 db.Collections.Add(collection);
                 db.SaveChanges();
+
+                if (PostToSave.HasValue)
+                {
+                    var save = new PostCollection
+                    {
+                        PostId = PostToSave.Value,
+                        CollectionId = collection.CollectionId,
+                        AddedDate = DateTime.Now
+                    };
+
+                    db.PostCollections.Add(save);
+                    db.SaveChanges();
+
+                    return RedirectToAction("Show", "Posts", new { id = PostToSave.Value });
+                }
+               
                 TempData["message"] = "Colectia a fost adaugata";
                 TempData["messageType"] = "alert-success";
                 return RedirectToAction("Index");
