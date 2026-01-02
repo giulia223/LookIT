@@ -103,6 +103,37 @@ namespace LookIT.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("LookIT.Models.Collection", b =>
+                {
+                    b.Property<int>("CollectionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CollectionId"));
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("UserId")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("CollectionId");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("Name", "UserId")
+                        .IsUnique()
+                        .HasFilter("[UserId] IS NOT NULL");
+
+                    b.ToTable("Collections");
+                });
+
             modelBuilder.Entity("LookIT.Models.Comment", b =>
                 {
                     b.Property<int>("CommentId")
@@ -229,16 +260,26 @@ namespace LookIT.Migrations
 
             modelBuilder.Entity("LookIT.Models.Like", b =>
                 {
-                    b.Property<string>("UserId")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<int>("LikeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LikeId"));
 
                     b.Property<int>("PostId")
                         .HasColumnType("int");
 
-                    b.HasKey("UserId", "PostId");
+                    b.Property<string>("UserId")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("LikeId");
 
                     b.HasIndex("PostId");
+
+                    b.HasIndex("UserId", "PostId")
+                        .IsUnique()
+                        .HasFilter("[UserId] IS NOT NULL");
 
                     b.ToTable("Likes");
                 });
@@ -308,20 +349,31 @@ namespace LookIT.Migrations
                     b.ToTable("Posts");
                 });
 
-            modelBuilder.Entity("LookIT.Models.Save", b =>
+            modelBuilder.Entity("LookIT.Models.PostCollection", b =>
                 {
-                    b.Property<string>("UserId")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("AddedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CollectionId")
+                        .HasColumnType("int");
 
                     b.Property<int>("PostId")
                         .HasColumnType("int");
 
-                    b.HasKey("UserId", "PostId");
+                    b.HasKey("Id");
 
-                    b.HasIndex("PostId");
+                    b.HasIndex("CollectionId");
 
-                    b.ToTable("Saves");
+                    b.HasIndex("PostId", "CollectionId")
+                        .IsUnique();
+
+                    b.ToTable("PostCollections");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -465,6 +517,16 @@ namespace LookIT.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("LookIT.Models.Collection", b =>
+                {
+                    b.HasOne("LookIT.Models.ApplicationUser", "User")
+                        .WithMany("Collections")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("LookIT.Models.Comment", b =>
                 {
                     b.HasOne("LookIT.Models.Post", "Post")
@@ -542,8 +604,7 @@ namespace LookIT.Migrations
                     b.HasOne("LookIT.Models.ApplicationUser", "User")
                         .WithMany("LikedPosts")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Post");
 
@@ -578,23 +639,23 @@ namespace LookIT.Migrations
                     b.Navigation("Author");
                 });
 
-            modelBuilder.Entity("LookIT.Models.Save", b =>
+            modelBuilder.Entity("LookIT.Models.PostCollection", b =>
                 {
-                    b.HasOne("LookIT.Models.Post", "Post")
-                        .WithMany("Saves")
-                        .HasForeignKey("PostId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("LookIT.Models.ApplicationUser", "User")
-                        .WithMany("SavedPosts")
-                        .HasForeignKey("UserId")
+                    b.HasOne("LookIT.Models.Collection", "Collection")
+                        .WithMany("PostCollections")
+                        .HasForeignKey("CollectionId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Post");
+                    b.HasOne("LookIT.Models.Post", "Post")
+                        .WithMany("PostCollections")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
-                    b.Navigation("User");
+                    b.Navigation("Collection");
+
+                    b.Navigation("Post");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -650,6 +711,8 @@ namespace LookIT.Migrations
 
             modelBuilder.Entity("LookIT.Models.ApplicationUser", b =>
                 {
+                    b.Navigation("Collections");
+
                     b.Navigation("Comments");
 
                     b.Navigation("Groups");
@@ -662,11 +725,14 @@ namespace LookIT.Migrations
 
                     b.Navigation("ReceivedFollowRequests");
 
-                    b.Navigation("SavedPosts");
-
                     b.Navigation("SentFollowRequests");
 
                     b.Navigation("SentMessages");
+                });
+
+            modelBuilder.Entity("LookIT.Models.Collection", b =>
+                {
+                    b.Navigation("PostCollections");
                 });
 
             modelBuilder.Entity("LookIT.Models.Group", b =>
@@ -682,7 +748,7 @@ namespace LookIT.Migrations
 
                     b.Navigation("Likes");
 
-                    b.Navigation("Saves");
+                    b.Navigation("PostCollections");
                 });
 #pragma warning restore 612, 618
         }

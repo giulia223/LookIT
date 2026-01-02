@@ -19,7 +19,8 @@ namespace LookIT.Data
         public DbSet<FollowRequest> FollowRequests { get; set; }
         public DbSet<GroupMember> GroupMembers { get; set; }
         public DbSet<Message> Messages { get; set; }
-        public DbSet<Save> Saves { get; set; }
+        public DbSet<Collection> Collections { get; set; }
+        public DbSet<PostCollection> PostCollections { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -34,7 +35,7 @@ namespace LookIT.Data
 
             //am fost nevoita sa pun restrict pentru ca s-ar fi format ciclu 
             //daca un user are comentarii la postarile altor useri, nu il pot sterge
-            //se face manual in controller : sterg comentariile si apoi userul
+            //am gestionat cazul in care sterg userul -> ii voi sterge comentariile lasate
             modelBuilder.Entity<Comment>()
                 .HasOne<ApplicationUser>(comment =>comment.User)
                 .WithMany(user => user.Comments)
@@ -57,11 +58,13 @@ namespace LookIT.Data
                 .HasForeignKey(group => group.ModeratorId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            //modelBuilder.Entity<FollowRequest>()
-            //    .HasKey(followRequest => new { followRequest.FollowerId, followRequest.FollowingId});
+
+            //constangere la nivel de baze de date: sa nu avem posibilitatea de a avea duplicate de tipul followerId, followngId
             modelBuilder.Entity<FollowRequest>()
-        .HasIndex(f => new { f.FollowerId, f.FollowingId })
-        .IsUnique();
+                .HasIndex(f => new { f.FollowerId, f.FollowingId })
+                .IsUnique();
+
+
             //am fost nevoita sa pun restrict pentru ca s-ar fi format ciclu 
             //daca un user a dat follow altor useri, nu il pot sterge
             //se face manual in controller : sterg sentRequests si apoi userul
@@ -81,10 +84,11 @@ namespace LookIT.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Like>()
-                .HasKey(like => new { like.UserId, like.PostId });
+                .HasIndex(like => new { like.UserId, like.PostId })
+                .IsUnique();
 
             //am fost nevoita sa pun restrict pentru ca s-ar fi format ciclu 
-            //daca un user are a dat like la postarile altor useri, nu il pot sterge
+            //daca un user dat like la postarile altor useri, nu il pot sterge
             //se face manual in controller : sterg like urile date si apoi userul
             modelBuilder.Entity<Like>()
                 .HasOne<ApplicationUser>(like => like.User)
@@ -131,24 +135,43 @@ namespace LookIT.Data
                 .HasForeignKey(message => message.GroupId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<Save>()
-                .HasKey(save => new { save.UserId, save.PostId });
 
-            //am fost nevoita sa pun restrict pentru ca s-ar fi format ciclu 
-            //daca un user a dat save la postarile altor useri, nu il pot sterge
-            //se face manual in controller : sterg salvarile si apoi userul
-            modelBuilder.Entity<Save>()
-                .HasOne<ApplicationUser>(save => save.User)
-                .WithMany(user => user.SavedPosts)
-                .HasForeignKey(save => save.UserId)
+            //cand stergem un utilizator, nu ii vom sterge si colectiile, le vom sterge manual din controller
+            //am gestionat cazul in care sterg un utilizator -> trebuie sa ii sterg si colectiile
+            modelBuilder.Entity<Collection>()
+                .HasOne<ApplicationUser>(collection => collection.User)
+                .WithMany(user => user.Collections)
+                .HasForeignKey(collection => collection.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            //daca sterg o postare, vor fi sterse si salvarile asociate in cascada
-            modelBuilder.Entity<Save>()
-                .HasOne<Post>(save => save.Post)
-                .WithMany(post => post.Saves)
-                .HasForeignKey(save => save.PostId)
-                .OnDelete(DeleteBehavior.Cascade);
+            //constrangere la nivel de baze de date: sa nu avem aceesi postare de mai multe ori in aceeasi colectie
+            modelBuilder.Entity<PostCollection>()
+                .HasIndex(postCollection => new { postCollection.PostId, postCollection.CollectionId })
+                .IsUnique();
+
+            //cnstrangere la nivel de baze de date: sa nu avem 2 colectii cu acelasi nume ale aceluiasi utilizator
+            modelBuilder.Entity<Collection>()
+                .HasIndex(collection => new { collection.Name, collection.UserId })
+                .IsUnique();
+
+
+           //din motive de siguranta pentru formarea ciclurilor, vom sterge manual legaturile dintre colectii si postari salvate
+           //atunci cand stergem una dintre aceste entitati
+           //am gestionat cazul in care sterg o postare -> rebuie sa sterg legaturile
+            modelBuilder.Entity<PostCollection>()
+                .HasOne(postCollection => postCollection.Post)
+                .WithMany(post => post.PostCollections)
+                .HasForeignKey(postCollection => postCollection.PostId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            //din motive de siguranta pentru formarea ciclurilor, vom sterge manual legaturile dintre colectii si postari salvate
+            //atunci cand stergem una dintre aceste entitati
+            //am gestionat cazul in care sterg o colecti -> trebuie sa sterg legaturile
+            modelBuilder.Entity<PostCollection>()
+                .HasOne(postCollection => postCollection.Collection)
+                .WithMany(collection => collection.PostCollections)
+                .HasForeignKey(postCollection => postCollection.CollectionId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<ApplicationUser>()
                 .Property(user => user.Id)

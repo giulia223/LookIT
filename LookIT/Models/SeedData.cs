@@ -24,18 +24,18 @@ namespace LookIT.Models
                 // CREAREA ROLURILOR IN BD
                 // daca nu contine roluri, acestea se vor crea
                 context.Roles.AddRange(
+                    new IdentityRole
+                    {
+                        Id = "2c5e174e-3b0e-446f-86af-483d56fd7210",
+                        Name = "Administrator",
+                        NormalizedName = "Administrator".ToUpper()
+                    },
 
-                new IdentityRole
-                {
-                    Id = "2c5e174e-3b0e-446f-86af-483d56fd7210",
-                    Name = "Administrator",
-                    NormalizedName = "Administrator".ToUpper()
-                },
-
-                new IdentityRole
-                {
-                    Id = "fd923264-a322-4bec-b112-54a05940b661", 
-                    Name = "User", NormalizedName = "User".ToUpper() }
+                    new IdentityRole
+                    {
+                        Id = "fd923264-a322-4bec-b112-54a05940b661", 
+                        Name = "User", NormalizedName = "User".ToUpper() 
+                    }
                 );
 
                 // o noua instanta pe care o vom utiliza pentru crearea parolelor utilizatorilor
@@ -46,41 +46,62 @@ namespace LookIT.Models
                 // Se creeaza cate un user pentru fiecare rol
 
                 context.Users.AddRange( 
-                new ApplicationUser
-                {
-                    Id = "8e445865-a24d-4543-a6c6-9443d048cdb0", // primary key
-                    UserName = "administrator@test.com",
-                    EmailConfirmed = true,
-                    NormalizedEmail = "ADMINISTRATOR@TEST.COM",
-                    Email = "administrator@test.com",
-                    NormalizedUserName = "ADMINISTRATOR@TEST.COM",
-                    PasswordHash = hasher.HashPassword(null,"Admin1!")
-                },
+                    new ApplicationUser
+                    {
+                        Id = "8e445865-a24d-4543-a6c6-9443d048cdb0", // primary key
+                        UserName = "administrator@test.com",
+                        FullName = "Administrator LookIT",
+                        EmailConfirmed = true,
+                        NormalizedEmail = "ADMINISTRATOR@TEST.COM",
+                        Email = "administrator@test.com",
+                        NormalizedUserName = "ADMINISTRATOR@TEST.COM",
+                        PasswordHash = hasher.HashPassword(null,"Admin1!")
+                    },
 
-                new ApplicationUser
-                {
-                    Id = "ca57146f-4211-4b21-8a2d-2c3e9611f50c", // primary key
-                    UserName = "user@test.com",
-                    EmailConfirmed = true,
-                    NormalizedEmail = "USER@TEST.COM",
-                    Email = "user@test.com",
-                    NormalizedUserName = "USER@TEST.COM",
-                    PasswordHash = hasher.HashPassword(null, "User1!")
-                } );
+                    new ApplicationUser
+                    {
+                        Id = "ca57146f-4211-4b21-8a2d-2c3e9611f50c", // primary key
+                        UserName = "user@test.com",
+                        FullName = "User LookIT",
+                        EmailConfirmed = true,
+                        NormalizedEmail = "USER@TEST.COM",
+                        Email = "user@test.com",
+                        NormalizedUserName = "USER@TEST.COM",
+                        PasswordHash = hasher.HashPassword(null, "User1!")
+                    } 
+                );
 
                 // ASOCIEREA USER-ROLE
                 context.UserRoles.AddRange(
-                new IdentityUserRole<string>
-                {
-                    RoleId = "2c5e174e-3b0e-446f-86af-483d56fd7210",
-                    UserId = "8e445865-a24d-4543-a6c6-9443d048cdb0"
-                },
+                    new IdentityUserRole<string>
+                    {
+                        RoleId = "2c5e174e-3b0e-446f-86af-483d56fd7210",
+                        UserId = "8e445865-a24d-4543-a6c6-9443d048cdb0"
+                    },
 
-                new IdentityUserRole<string>
-                {
-                    RoleId = "fd923264-a322-4bec-b112-54a05940b661",
-                    UserId = "ca57146f-4211-4b21-8a2d-2c3e9611f50c"
-                });
+                    new IdentityUserRole<string>
+                    {
+                        RoleId = "fd923264-a322-4bec-b112-54a05940b661",
+                        UserId = "ca57146f-4211-4b21-8a2d-2c3e9611f50c"
+                    }
+                );
+
+                context.Collections.AddRange(
+                    new Collection
+                    {
+                        Name = "All Posts",
+                        UserId = "8e445865-a24d-4543-a6c6-9443d048cdb0", 
+                        CreationDate = DateTime.Now
+                    },
+
+                    new Collection
+                    {
+                        Name = "All Posts",
+                        UserId = "ca57146f-4211-4b21-8a2d-2c3e9611f50c", 
+                        CreationDate = DateTime.Now
+                    }
+                );
+
                 context.SaveChanges();
             }
         }

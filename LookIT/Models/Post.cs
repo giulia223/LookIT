@@ -33,11 +33,13 @@ namespace LookIT.Models
         //o postare poate avea o colectie de comentarii
         public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
 
-        //relatia many-to-many dintre postari si likes
+        //o postare este apreciata de mai multe persone/utilizatori
         public virtual ICollection<Like> Likes { get; set; } = new List<Like>();
 
-        //relatia many-to-many dintre postari si saves
-        public virtual ICollection<Save> Saves { get; set; } = new List<Save>();
+        //relatia many-to-many dintre Post si Collection
+        public virtual ICollection<PostCollection> PostCollections { get; set; } = new List<PostCollection>();
+
+
 
     }
 }

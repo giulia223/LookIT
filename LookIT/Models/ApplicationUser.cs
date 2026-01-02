@@ -31,8 +31,8 @@ namespace LookIT.Models
         //un user poate aprecia mai multe posatri
         public virtual ICollection<Like> LikedPosts { get; set; } = new List<Like>();
 
-        //un user poate salva mai multe posatri
-        public virtual ICollection<Save> SavedPosts { get; set; } = new List<Save>();
+        //un user poate sa creeze mai multe colectii
+        public virtual ICollection<Collection> Collections { get; set; } = new List<Collection>();
 
         //un user poate urmari mai multi useri
         public virtual ICollection<FollowRequest> SentFollowRequests { get; set; } = new List<FollowRequest>();

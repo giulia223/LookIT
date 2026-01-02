@@ -82,7 +82,67 @@
 
             </div>
         </div>
+    }
+    @if (ViewBag.LastPage > 1)
+    {
+        <div class="d-flex justify-content-center my-4">
+            @{
+                int currentPage = ViewBag.CurrentPage;
+                int lastPage = ViewBag.LastPage;
+                int prevPage = currentPage > 1 ? currentPage - 1 : 1;
+                int nextPage = currentPage < lastPage ? currentPage + 1 : lastPage;
+            }
 
+            <nav aria-label="Page navigation">
+                <ul class="pagination align-items-center gap-2">
+
+                    @* --- BUTONUL PREVIOUS (Cerc cu iconita) --- *@
+                    <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                        <a class="page-link rounded-circle d-flex align-items-center justify-content-center shadow-sm"
+                           href="@ViewBag.PaginationBaseUrl@prevPage"
+                           aria-label="Previous"
+                           style="width: 40px; height: 40px;">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    </li>
+
+                    @* --- BUTOANELE NUMEROTATE --- *@
+                    @for (int i = 1; i <= lastPage; i++)
+                    {
+                        @* Logica pentru a nu afisa TOATE paginile daca sunt multe (optional, dar util) *@
+                        @* Afisam prima, ultima, curenta si vecinii ei *@
+                        if (i == 1 || i == lastPage || (i >= currentPage - 1 && i <= currentPage + 1))
+                        {
+                            <li class="page-item @(i == currentPage ? "active" : "")">
+                                <a class="page-link rounded-circle d-flex align-items-center justify-content-center shadow-sm fw-bold"
+                                   href="@ViewBag.PaginationBaseUrl@i"
+                                   style="width: 40px; height: 40px;">
+                                    @i
+                                </a>
+                            </li>
+                        }
+                        else if (i == currentPage - 2 || i == currentPage + 2)
+                        {
+                            @* Puncte de suspensie (...) *@
+                            <li class="page-item disabled">
+                                <span class="page-link border-0 bg-transparent text-muted">...</span>
+                            </li>
+                        }
+                    }
+
+                    @* --- BUTONUL NEXT (Cerc cu iconita) --- *@
+                    <li class="page-item @(currentPage == lastPage ? "disabled" : "")">
+                        <a class="page-link rounded-circle d-flex align-items-center justify-content-center shadow-sm"
+                           href="@ViewBag.PaginationBaseUrl@nextPage"
+                           aria-label="Next"
+                           style="width: 40px; height: 40px;">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+
+                </ul>
+            </nav>
+        </div>
     }
 }
 else
@@ -106,4 +166,37 @@ else
         </div>
     </div>
 }
+
+<style>
+    /* Resetăm stilurile default ale pagination */
+    .pagination .page-item .page-link {
+        border: none;
+        color: #555; /* Gri închis pentru text */
+        background-color: #fff;
+        transition: all 0.2s ease-in-out;
+    }
+
+    /* Hover pe butoanele normale */
+    .pagination .page-item:not(.active):not(.disabled) .page-link:hover {
+        background-color: #e7f3ff; /* Albastru foarte deschis la hover */
+        color: #1877f2; /* Albastrul FB */
+        transform: translateY(-2px); /* Mic efect de ridicare */
+    }
+
+    /* Starea ACTIVE (Pagina curentă) */
+    .pagination .page-item.active .page-link {
+        background-color: #1877f2; /* Albastrul principal */
+        color: #fff;
+        box-shadow: 0 4px 6px rgba(24, 119, 242, 0.3) !important; /* Umbra albastra */
+        pointer-events: none; /* Nu poti da click pe pagina curenta */
+    }
+
+    /* Starea DISABLED (Săgețile când nu mai poți da next/prev) */
+    .pagination .page-item.disabled .page-link {
+        background-color: #f0f2f5;
+        color: #bcc0c4;
+        opacity: 0.7;
+        box-shadow: none !important;
+    }
+</style>
 
