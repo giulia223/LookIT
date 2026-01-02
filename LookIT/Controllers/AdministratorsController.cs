@@ -216,7 +216,7 @@ namespace LookIT.Controllers
                 _context.Collections.RemoveRange(userCollections);
             }
 
-            //de asemenea, am restrictionat si daca un utilizator are postari salvate in colectiile altor utilizatori, nu il putem sterge'
+            //de asemenea, am restrictionat si daca un utilizator are postari salvate in colectiile altor utilizatori, nu il putem sterge
             //vom prelua id-urile postarilor sale 
             var userPostIds = _context.Posts
                                       .Where(post => post.AuthorId == Id)
@@ -235,6 +235,26 @@ namespace LookIT.Controllers
                 _context.PostCollections.RemoveRange(dependentPostCollections);
             }
 
+            //pentru ca avem restrictie la stergerea unui utilizator daca daca este urmarit/urmareste/a dat cerere/a primit cerere de urmarire, trebuie sa le
+            //stergem manual din baza de date
+            //vom lua o singura lista de cereri de urmarire (acceptate sau in pending) care va retine atat cele date de user, cat si cele primite
+            var allFollowRequests = _context.FollowRequests
+                                                 .Where(follow => follow.FollowingId == Id || follow.FollowerId == Id)
+                                                 .ToList();
+
+            if (allFollowRequests.Any()) 
+            {  
+                _context.FollowRequests.RemoveRange(allFollowRequests);
+            }
+
+            //am restrictionat ca daca un utilizator are postari apreciate, nu il pot sterge. Trebuie mai intai sa sterg aprecierile la postari, iar mai apoi userul
+            var likedPosts = _context.Likes
+                                     .Where(like => like.UserId == Id);
+
+            if (likedPosts.Any()) 
+            { 
+                _context.Likes.RemoveRange(likedPosts);
+            }
 
             //salvam toate modiifcarile
             await _context.SaveChangesAsync();

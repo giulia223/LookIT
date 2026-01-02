@@ -1,36 +1,63 @@
 ﻿@model LookIT.Models.Message
 @using Microsoft.AspNetCore.Identity
-@using System.Security.Claims @* <--- NECESAR *@
+@using System.Security.Claims
 @inject UserManager<ApplicationUser> UserManager
+
+@{
+    // 1. Pregătim variabilele pentru a păstra HTML-ul curat
+    bool userExists = Model.User != null;
+
+    string profilePic = userExists 
+    && !string.IsNullOrEmpty(Model.User.ProfilePictureUrl) ? Model.User.ProfilePictureUrl: "/images/unknown_person.jpg";
+
+    string displayName = userExists ? Model.User.FullName : "Utilizator șters";
+}
 
 <div class="card-body">
     <div class="d-flex align-items-center mb-2">
+
+        @* --- ZONA AVATAR --- *@
         <div class="rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
-            @* Verificam daca userul mesajului nu e null pentru a evita alta eroare *@
-            @if (Model.User != null)
+            @if (userExists)
             {
-                <img src="@Model.User.ProfilePictureUrl" class="rounded-circle border" style="width:40px;height:40px;object-fit:cover;" />
+                <a asp-controller="Profile" asp-action="Details" asp-route-userId="@Model.UserId" class="text-decoration-none">
+                    <img src="@profilePic" class="rounded-circle border" style="width:40px;height:40px;object-fit:cover;" />
+                </a>
+            }
+            else
+            {
+                <img src="@profilePic" class="rounded-circle border opacity-75" style="width:40px;height:40px;object-fit:cover; cursor: default;" />
             }
         </div>
+
+        @* --- ZONA NUME & DATA --- *@
         <div>
-            <h6 class="mb-0 fw-bold" style="color: #050505;">@(Model.User?.FullName ?? "Utilizator șters")</h6>
+            @if (userExists)
+            {
+                <a asp-controller="Profile" asp-action="Details" asp-route-userId="@Model.UserId" class="text-decoration-none">
+                    <h6 class="mb-0 fw-bold" style="color: #050505;">@displayName</h6>
+                </a>
+            }
+            else
+            {
+                <h6 class="mb-0 fw-bold text-muted fst-italic">@displayName</h6>
+            }
+
             <small class="text-muted">@Model.Date.ToString("dd MMM, HH:mm")</small>
         </div>
     </div>
 
+    @* --- CONTINUT MESAJ --- *@
     <div class="message-content py-2">
         <p style="font-size: 0.95rem; color: #1c1e21;">@Html.Raw(Model.Content)</p>
     </div>
 
+    @* --- BUTOANE ACTIUNI (Edit/Delete) --- *@
     @{
-        // SOLUȚIA: Luăm ID-ul direct din Claims (fără database call)
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        // Verificăm rolul direct din User (fără database call și fără risc de null pointer pe obiectul user)
         var isAdmin = User.IsInRole("Administrator");
     }
 
-    @* Verificăm condițiile *@
     @if (currentUserId != null && (Model.UserId == currentUserId || isAdmin))
     {
         <div class="border-top pt-2 d-flex gap-2">
