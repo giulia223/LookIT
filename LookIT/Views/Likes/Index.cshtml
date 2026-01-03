@@ -1,0 +1,174 @@
+﻿@model List<LookIT.Models.Post>
+
+@{
+    ViewData["Title"] = "Aprecieri";
+}
+
+<div class="container py-4">
+
+    @* HEADER *@
+    <div class="d-flex align-items-center mb-4 px-2">
+        <h4 class="fw-bold mb-0 me-2">Postări apreciate</h4>
+        <i class="bi bi-heart-fill text-danger"></i>
+        <small class="text-muted ms-auto">@Model.Count aprecieri</small>
+    </div>
+
+    @if (Model.Any())
+    {
+        <div class="likes-grid">
+            @foreach (var post in Model)
+            {
+                <a asp-controller="Posts" asp-action="Show" asp-route-id="@post.PostId" class="post-item-link">
+                    <div class="post-thumbnail shadow-sm">
+
+                        @* LOGICA DE AFISARE IN FUNCTIE DE TIPUL POSTARII *@
+
+                        @if (!string.IsNullOrEmpty(post.ImageUrl))
+                        {
+                            @* CAZUL 1: IMAGINE *@
+                            <img src="@post.ImageUrl" alt="Post Image" class="w-100 h-100 object-fit-cover" />
+                            <div class="type-indicator">
+                                <i class="bi bi-image"></i>
+                            </div>
+                        }
+                        else if (!string.IsNullOrEmpty(post.VideoUrl))
+                        {
+                            @* CAZUL 2: VIDEO *@
+                            <video class="w-100 h-100 object-fit-cover" muted>
+                                <source src="@post.VideoUrl" type="video/mp4">
+                            </video>
+                            @* Iconita Play peste video *@
+                            <div class="video-overlay">
+                                <i class="bi bi-play-circle-fill"></i>
+                            </div>
+                        }
+                        else
+                        {
+                            @* CAZUL 3: DOAR TEXT *@
+                            <div class="text-preview p-3 d-flex align-items-center justify-content-center text-center h-100 bg-light">
+                                <span class="small text-dark fw-medium text-truncate-3">
+                                    @* Curatam tagurile HTML daca e cazul sau afisam textul brut *@
+                                    @Html.Raw(post.TextContent?.Length > 50 ? post.TextContent.Substring(0, 50) + "..." : post.TextContent)
+                                </span>
+                            </div>
+                            <div class="type-indicator">
+                                <i class="bi bi-card-text"></i>
+                            </div>
+                        }
+
+                        @* HOVER OVERLAY (Arata autorul cand pui mouse-ul) *@
+                        <div class="hover-overlay">
+                            <span class="small text-white fw-bold">
+                                <i class="bi bi-person-fill me-1"></i>@post.Author?.FullName
+                            </span>
+                        </div>
+                    </div>
+                </a>
+            }
+        </div>
+    }
+    else
+    {
+        @* EMPTY STATE *@
+        <div class="text-center py-5 mt-5">
+            <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                <i class="bi bi-heart text-muted opacity-50" style="font-size: 2.5rem;"></i>
+            </div>
+            <h5 class="fw-bold text-dark">Nu ai aprecieri</h5>
+            <p class="text-muted small">Apasă pe inimioară la postările care îți plac.</p>
+            <a asp-controller="Posts" asp-action="Index" class="btn btn-primary btn-sm rounded-pill px-4 fw-bold">
+                Explorează
+            </a>
+        </div>
+    }
+</div>
+
+<style>
+    /* GRID SYSTEM (Identic cu cel de la colectii pentru consistenta) */
+    .likes-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr); /* 3 coloane pe mobil (stil Instagram) */
+        gap: 3px; /* Spatiu foarte mic intre ele (stil Instagram) */
+    }
+
+    .post-item-link {
+        display: block;
+        text-decoration: none;
+    }
+
+    /* Patratul Postarii */
+    .post-thumbnail {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        background-color: #f8f9fa;
+        overflow: hidden;
+        /* Pe desktop punem colturi rotunjite, pe mobil lasam patrat complet pt efect de grid */
+        border-radius: 0;
+    }
+
+   
+
+    .post-thumbnail:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    }
+
+    }
+
+    .object-fit-cover {
+        object-fit: cover;
+    }
+
+    /* Indicator tip (Imagine/Text) colt dreapta sus */
+    .type-indicator {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        color: white;
+        text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+        font-size: 1.1rem;
+    }
+
+    /* Video Play Icon Centrat */
+    .video-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0,0,0,0.2);
+        color: white;
+        font-size: 2.5rem;
+    }
+
+    /* Text preview style */
+    .text-truncate-3 {
+        display: -webkit-box;
+        -webkit-line-clamp: 4;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    /* Hover Overlay (Darken + Info) */
+    .hover-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.3);
+        display: flex;
+        align-items: flex-end;
+        padding: 10px;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+
+    .post-thumbnail:hover .hover-overlay {
+        opacity: 1;
+    }
+</style>

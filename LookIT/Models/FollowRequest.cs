@@ -15,8 +15,6 @@ namespace LookIT.Models
         public int Id { get; set; }
         public DateTime Date {  get; set; }
 
-        // am pus UserId nvarchar(50) 
-        //100 bytes + 100 bytes = 200 bytes < 900 bytes
         [Required(ErrorMessage = "FollowerId este obligatoriu")]
         public string FollowerId { get; set; }
 

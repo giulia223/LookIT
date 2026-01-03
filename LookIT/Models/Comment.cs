@@ -7,21 +7,27 @@ namespace LookIT.Models
         [Key]
         public int CommentId { get; set; }
 
+        //nu punem Required pentru ca atunci va esua la validarile din model in momentul adaugarii comentariului
         public DateTime Date {  get; set; }
 
-        [Required(ErrorMessage ="Continutul comentariului nu poate fi gol")]
-        [StringLength(1000, ErrorMessage ="Continutul comentariului nu poate depasi {1} de caractere")]
+        public DateTime? DateModified { get; set; }
 
-        public string Content { get; set; }
-        [Required(ErrorMessage ="Autorul comentariului este obligatoriu")]
-        public string UserId { get; set; }
+        [Required(ErrorMessage ="Continutul comentariului nu poate fi gol.")]
+        [StringLength(1000, ErrorMessage ="Continutul comentariului nu poate depasi {1} de caractere.")]
+        public string? Content { get; set; }
 
-        public virtual ApplicationUser User { get; set; }
+        //cheie externa (FK) - un comentariu este postat de catre un user
+        //nu punem required pentru ca atunci va esua la validarile din model in momentul adaugarii comentariului
 
-        [Required(ErrorMessage = "Postarea este obligatorie")]
+        public string? UserId { get; set; }
+
+        //cheie externa (FK) - un comentariu este postat de catre un user
         public int PostId { get; set; }
 
-        public virtual Post Post { get; set; }
+        //proprietatea de navigatie - un comentariu este postat de catre un user
+        public virtual ApplicationUser? User { get; set; }
 
+        //proprietatea de navigatie - un comentariu apartine unei postari
+        public virtual Post? Post { get; set; }
     }
 }

@@ -1,17 +1,20 @@
 ﻿@model LookIT.Models.Message
 @using Microsoft.AspNetCore.Identity
+@using System.Security.Claims @* <--- NECESAR *@
 @inject UserManager<ApplicationUser> UserManager
 
 <div class="card-body">
     <div class="d-flex align-items-center mb-2">
         <div class="rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
-            <a asp-controller="Profile" asp-action="Details" asp-route-userId="@Model.User.Id" class="text-dark">
+            @* Verificam daca userul mesajului nu e null pentru a evita alta eroare *@
+            @if (Model.User != null)
+            {
                 <img src="@Model.User.ProfilePictureUrl" class="rounded-circle border" style="width:40px;height:40px;object-fit:cover;" />
-            </a>
+            }
         </div>
         <div>
-            <h6 class="mb-0 fw-bold" style="color: #050505;">@Model.User.FullName</h6>
-            <small class="text-muted">@Model.Date.ToString("dd MMM HH:mm")</small>
+            <h6 class="mb-0 fw-bold" style="color: #050505;">@(Model.User?.FullName ?? "Utilizator șters")</h6>
+            <small class="text-muted">@Model.Date.ToString("dd MMM, HH:mm")</small>
         </div>
     </div>
 
@@ -20,15 +23,24 @@
     </div>
 
     @{
-        var currentUser = await UserManager.GetUserAsync(User);
+        // SOLUȚIA: Luăm ID-ul direct din Claims (fără database call)
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        // Verificăm rolul direct din User (fără database call și fără risc de null pointer pe obiectul user)
+        var isAdmin = User.IsInRole("Administrator");
     }
 
-    @if (Model.UserId == UserManager.GetUserId(User) || await UserManager.IsInRoleAsync(currentUser, "Administrator"))
+    @* Verificăm condițiile *@
+    @if (currentUserId != null && (Model.UserId == currentUserId || isAdmin))
     {
         <div class="border-top pt-2 d-flex gap-2">
-            <a class="btn btn-light btn-sm flex-fill text-muted" asp-controller="Messages" asp-action="Edit" asp-route-id="@Model.MessageId"><i class="bi bi-pencil"></i> Edit</a>
+            <a class="btn btn-light btn-sm flex-fill text-muted" asp-controller="Messages" asp-action="Edit" asp-route-id="@Model.MessageId">
+                <i class="bi bi-pencil"></i> Edit
+            </a>
             <form method="post" asp-controller="Messages" asp-action="DeleteMessage" asp-route-id="@Model.MessageId" class="flex-fill">
-                <button class="btn btn-light btn-sm w-100 text-danger" type="submit"><i class="bi bi-trash"></i> Delete</button>
+                <button class="btn btn-light btn-sm w-100 text-danger" type="submit">
+                    <i class="bi bi-trash"></i> Delete
+                </button>
             </form>
         </div>
     }

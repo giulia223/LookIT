@@ -1,23 +1,54 @@
 ﻿@model LookIT.Models.ViewModels.SearchViewModel
 
-<div class="container mt-4">
-    <h2>Rezultate pentru: "@Model.SearchTerm"</h2>
-    <hr />
+@{
+    ViewData["Title"] = "Rezultate căutare";
+}
+
+<div class="container py-4" style="max-width: 900px;">
+
+    @* HEADER ZONA DE CĂUTARE *@
+    <div class="mb-4">
+        <h4 class="fw-bold d-flex align-items-center gap-2">
+            <i class="bi bi-search text-primary"></i>
+            Rezultate pentru: <span class="text-primary">"@Model.SearchTerm"</span>
+        </h4>
+        <p class="text-muted small">Am găsit @Model.Users.Count rezultate.</p>
+    </div>
 
     @if (Model.Users.Any())
     {
-        <h4 class="mb-3">Persoane</h4>
-        <div class="row mb-5">
+        <div class="row g-3">
             @foreach (var user in Model.Users)
             {
-                <div class="col-md-4 mb-3">
-                    <div class="card">
-                        <div class="card-body d-flex align-items-center">
-                            <img src="@user.ProfilePictureUrl" class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit:cover">
-                            <div>
-                                <h5 class="card-title mb-0">@user.FullName</h5>
-                                <a asp-controller="Profile" asp-action="Details" asp-route-userId="@user.Id" class="btn btn-sm btn-outline-primary mt-1">Vezi Profil</a>
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 user-card">
+                        <div class="card-body p-3 d-flex align-items-center justify-content-between">
+
+                            @* INFO UTILIZATOR (Stânga) *@
+                            <div class="d-flex align-items-center overflow-hidden">
+                                <a asp-controller="Profile" asp-action="Details" asp-route-userId="@user.Id" class="flex-shrink-0">
+                                    <img src="@user.ProfilePictureUrl"
+                                         class="rounded-circle border"
+                                         style="width: 56px; height: 56px; object-fit: cover;"
+                                         alt="@user.FullName">
+                                </a>
+
+                                <div class="ms-3 text-truncate">
+                                    <a asp-controller="Profile" asp-action="Details" asp-route-userId="@user.Id" class="text-decoration-none text-dark">
+                                        <h6 class="fw-bold mb-0 text-truncate">@user.FullName</h6>
+                                    </a>
+                                    <small class="text-muted">Utilizator LookIT</small>
+                                </div>
                             </div>
+
+                            @* BUTON ACȚIUNE (Dreapta) *@
+                            <div class="ms-2">
+                                <a asp-controller="Profile" asp-action="Details" asp-route-userId="@user.Id"
+                                   class="btn btn-light border rounded-pill btn-sm fw-bold px-3 action-btn text-nowrap">
+                                    Vezi profil
+                                </a>
+                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -26,6 +57,43 @@
     }
     else if (!string.IsNullOrEmpty(Model.SearchTerm))
     {
-        <p>Nu am găsit persoane cu acest nume.</p>
+        @* EMPTY STATE *@
+        <div class="text-center py-5 bg-white border-0 shadow-sm rounded-4 mt-2">
+            <div class="mb-3">
+                <i class="bi bi-search text-muted opacity-25" style="font-size: 3.5rem;"></i>
+            </div>
+            <h5 class="fw-bold text-dark">Niciun rezultat găsit</h5>
+            <p class="text-muted small mb-0">Nu am găsit persoane cu numele "<strong>@Model.SearchTerm</strong>".</p>
+            <p class="text-muted small">Încearcă să cauți alt nume.</p>
+
+            <a asp-controller="Posts" asp-action="Index" class="btn btn-primary rounded-pill px-4 mt-3 fw-bold shadow-sm">
+                Înapoi la Feed
+            </a>
+        </div>
     }
 </div>
+
+<style>
+    /* Cardul utilizatorului - FĂRĂ TRANZIȚIE */
+    .user-card {
+        background-color: #fff;
+        /* Am scos transition și transform */
+    }
+
+        /* Doar umbra se intensifică puțin la hover, dar instantaneu */
+        .user-card:hover {
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08) !important;
+        }
+
+    /* Stil butoane - FĂRĂ TRANZIȚIE */
+    .action-btn {
+        background-color: #f8f9fa;
+        color: #333;
+    }
+
+        .action-btn:hover {
+            background-color: #e9ecef;
+            border-color: #dee2e6;
+            color: #000;
+        }
+</style>

@@ -1,67 +1,152 @@
 ﻿@page
 @model RegisterModel
 @{
-    ViewData["Title"] = "Register";
+    ViewData["Title"] = "Înregistrare";
 }
 
-<h1>@ViewData["Title"]</h1>
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
 
-<div class="row">
-    <div class="col-md-4">
-        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-            <h2>Create a new account.</h2>
-            <hr />
-            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                <label asp-for="Input.Email">Email</label>
-                <span asp-validation-for="Input.Email" class="text-danger"></span>
-            </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label asp-for="Input.Password">Password</label>
-                <span asp-validation-for="Input.Password" class="text-danger"></span>
-            </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label asp-for="Input.ConfirmPassword">Confirm Password</label>
-                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
-            </div>
-            <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
-        </form>
-    </div>
-    <div class="col-md-6 col-md-offset-2">
-        <section>
-            <h3>Use another service to register.</h3>
-            <hr />
-            @{
-                if ((Model.ExternalLogins?.Count ?? 0) == 0)
-                {
-                    <div>
-                        <p>
-                            There are no external authentication services configured. See this <a href="https://go.microsoft.com/fwlink/?LinkID=532715">article
-                            about setting up this ASP.NET application to support logging in via external services</a>.
-                        </p>
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-4">
+
+                    <div class="text-center mb-4">
+                        <h3 class="fw-bold">Creează un cont</h3>
+                        <p class="text-muted small">Alătură-te comunității LookIT</p>
                     </div>
-                }
-                else
-                {
-                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
-                        <div>
-                            <p>
-                                @foreach (var provider in Model.ExternalLogins!)
-                                {
-                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
-                                }
-                            </p>
+
+                    <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post" enctype="multipart/form-data">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+
+                        @* --- ZONA DE POZĂ (Cu Preview) --- *@
+                        <div class="text-center mb-4">
+                            <div class="position-relative d-inline-block">
+                                @* Placeholder Imagine *@
+                                <img id="imagePreview"
+                                     src="/images/unknown_person.jpg"
+                                     class="rounded-circle border border-3 border-light shadow-sm"
+                                     style="width: 100px; height: 100px; object-fit: cover;" />
+
+                                @* Butonul de upload suprapus *@
+                                <label for="Input_ProfilePicture" class="position-absolute bottom-0 end-0 bg-white border shadow-sm rounded-circle p-2 cursor-pointer" style="cursor: pointer; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="bi bi-camera-fill text-primary" style="font-size: 0.9rem;"></i>
+                                </label>
+                            </div>
+
+                            @* Input ascuns - ID-ul generat de ASP este de obicei Input_ProfilePicture *@
+                            <input asp-for="Input.ProfilePicture" class="d-none" accept="image/*" onchange="previewProfileImage(this)" />
+                            <span asp-validation-for="Input.ProfilePicture" class="text-danger small d-block mt-1"></span>
                         </div>
+
+                        @* --- INPUT: NUME COMPLET --- *@
+                        <div class="mb-3">
+                            <label class="form-label small text-muted fw-bold ms-1">NUME COMPLET</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0 rounded-start-3 ps-3">
+                                    <i class="bi bi-person text-muted"></i>
+                                </span>
+                                <input asp-for="Input.FullName" class="form-control bg-light border-0 rounded-end-3 py-2" placeholder="Numele tău" />
+                            </div>
+                            <span asp-validation-for="Input.FullName" class="text-danger small ms-1"></span>
+                        </div>
+
+                        @* --- INPUT: EMAIL --- *@
+                        <div class="mb-3">
+                            <label class="form-label small text-muted fw-bold ms-1">EMAIL</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0 rounded-start-3 ps-3">
+                                    <i class="bi bi-envelope text-muted"></i>
+                                </span>
+                                <input asp-for="Input.Email" class="form-control bg-light border-0 rounded-end-3 py-2" placeholder="Email" />
+                            </div>
+                            <span asp-validation-for="Input.Email" class="text-danger small ms-1"></span>
+                        </div>
+
+                        @* --- INPUT: DESCRIERE --- *@
+                        <div class="mb-3">
+                            <label class="form-label small text-muted fw-bold ms-1">DESCRIERE</label>
+                            <textarea asp-for="Input.Description" class="form-control bg-light border-0 rounded-3 p-3" placeholder="Zi-ne ceva despre tine (opțional)..." style="height: 80px"></textarea>
+                            <span asp-validation-for="Input.Description" class="text-danger small ms-1"></span>
+                        </div>
+
+                        @* --- INPUT: PAROLA --- *@
+                        <div class="mb-3">
+                            <label class="form-label small text-muted fw-bold ms-1">PAROLA</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0 rounded-start-3 ps-3">
+                                    <i class="bi bi-lock text-muted"></i>
+                                </span>
+                                <input asp-for="Input.Password" class="form-control bg-light border-0 rounded-end-3 py-2" placeholder="Parolă" />
+                            </div>
+                            <span asp-validation-for="Input.Password" class="text-danger small ms-1"></span>
+                        </div>
+
+                        @* --- INPUT: CONFIRMARE PAROLA --- *@
+                        <div class="mb-4">
+                            <label class="form-label small text-muted fw-bold ms-1">CONFIRMA PAROLA</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0 rounded-start-3 ps-3">
+                                    <i class="bi bi-check2-circle text-muted"></i>
+                                </span>
+                                <input asp-for="Input.ConfirmPassword" class="form-control bg-light border-0 rounded-end-3 py-2" placeholder="Confirmă Parola" />
+                            </div>
+                            <span asp-validation-for="Input.ConfirmPassword" class="text-danger small ms-1"></span>
+                        </div>
+
+                        @* --- BUTON REGISTER --- *@
+                        <div class="d-grid mb-3">
+                            <button id="registerSubmit" type="submit" class="btn btn-primary rounded-pill py-2 fw-bold shadow-sm">
+                                Înregistrează-te
+                            </button>
+                        </div>
+
+                        <div class="text-center">
+                            <small class="text-muted">Ai deja un cont? <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl" class="text-decoration-none fw-bold">Autentifică-te</a></small>
+                        </div>
+
                     </form>
-                }
-            }
-        </section>
+
+                    @* --- LOGIN EXTERN (Dacă există) --- *@
+                    @if ((Model.ExternalLogins?.Count ?? 0) > 0)
+                    {
+                        <div class="d-flex align-items-center my-4">
+                            <hr class="flex-grow-1 m-0 text-muted">
+                            <span class="mx-3 text-muted small text-uppercase">sau</span>
+                            <hr class="flex-grow-1 m-0 text-muted">
+                        </div>
+
+                        <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="text-center">
+                            @foreach (var provider in Model.ExternalLogins!)
+                            {
+                                <button type="submit" class="btn btn-outline-secondary rounded-pill w-100 mb-2" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">
+                                    <i class="bi bi-box-arrow-in-right me-2"></i> Continuă cu @provider.DisplayName
+                                </button>
+                            }
+                        </form>
+                    }
+
+                </div>
+            </div>
+
+        </div>
     </div>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        function previewProfileImage(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    document.getElementById('imagePreview').src = e.target.result;
+                }
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
 }

@@ -167,14 +167,80 @@ namespace LookIT.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> DeleteUser(string id)
+        public async Task<IActionResult> DeleteUser(string Id)
         {
-            var user = await _userManager.FindByIdAsync(id);
+            var user = await _userManager.FindByIdAsync(Id);
+
+            //utilizatorul nu a fost gasit
             if (user == null)
             {
                 return NotFound();
             }
+
+            //nu trebuie sa sterg postarile manual pentru ca am setat OnDeleteCascade la relatia dintre "un user poate avea mai multe postari"
+            //totusi, trebuie sa sterg mai intai comentariile asociate unui utilizator pentru a putea sterge userul
+            //caci am setat OnDeleteRestrict pentru evitarea ciclurilor
+
+            var comments = _context.Comments
+                                    .Where(comment => comment.UserId == Id)
+                                    .ToList();
+
+            //daca avem comentarii, le vom sterge manual
+            if(comments.Count > 0)
+            {
+                _context.Comments.RemoveRange(comments);
+            }
+
+            //stergem colectiile asociate unui utilizator manual pentru a putea sterge userul pentru ca am setet OnDeleteRestrict
+            //preluam colectiile utilizatorului
+            var userCollections = _context.Collections
+                                          .Where(collection => collection.UserId == Id)
+                                          .ToList();
+
+            //pentru ca am restrictionat ca daca stergem colectia, sa nu se sterga si legaturile dintre colectii si postari,
+            //com sterge manual legaturile dintre colectiile utilizatorului si postarile din ele
+            foreach (var collection in userCollections)
+            {
+                var postCols = _context.PostCollections
+                                       .Where(postCollection => postCollection.CollectionId == collection.CollectionId)
+                                       .ToList();
+                if (postCols.Any())
+                {
+                    _context.PostCollections.RemoveRange(postCols);
+                }
+            }
+
+            //dupa care, vom sterge colectiile
+            if (userCollections.Any())
+            {
+                _context.Collections.RemoveRange(userCollections);
+            }
+
+            //de asemenea, am restrictionat si daca un utilizator are postari salvate in colectiile altor utilizatori, nu il putem sterge'
+            //vom prelua id-urile postarilor sale 
+            var userPostIds = _context.Posts
+                                      .Where(post => post.AuthorId == Id)
+                                      .Select(post => post.PostId)
+                                      .ToList();
+
+            //vom cauta in PostCollections legaturile intre postarea utilizatorului pe care vreau sa o sterg, si colectiile altor
+            //utilizatori
+            var dependentPostCollections = _context.PostCollections
+                                                   .Where(pc => userPostIds.Contains(pc.PostId))
+                                                   .ToList();
+
+            //stergem dependentele
+            if (dependentPostCollections.Any())
+            {
+                _context.PostCollections.RemoveRange(dependentPostCollections);
+            }
+
+
+            //salvam toate modiifcarile
+            await _context.SaveChangesAsync();
+
             var result = await _userManager.DeleteAsync(user);
+
             if (result.Succeeded)
             {
                 TempData["message"] = "Utilizator sters.\n";
