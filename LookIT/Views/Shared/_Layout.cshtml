@@ -91,6 +91,14 @@
                             </a>
                         </li>
 
+                         <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Groups" asp-action="Index"
+                                   data-bs-toggle="tooltip" title="Toate Grupurile">
+                                    <i class="bi bi-grid fs-4"></i>
+                                    <span class="d-lg-none">Groups</span>
+                                </a>
+                            </li>
+
                         @if (User.IsInRole("User") || User.IsInRole("Administrator"))
                         {
                             <li class="nav-item">
@@ -101,21 +109,15 @@
                                 </a>
                             </li>
 
-                            <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Groups" asp-action="Index"
-                                   data-bs-toggle="tooltip" title="Toate Grupurile">
-                                    <i class="bi bi-grid fs-4"></i>
-                                    <span class="d-lg-none">Groups</span>
-                                </a>
-                            </li>
+                           
 
-                            <li class="nav-item">
+                            @* <li class="nav-item">
                                 <a class="nav-link" asp-area="" asp-controller="GroupMembers" asp-action="Show"
                                    data-bs-toggle="tooltip" title="Grupurile Mele">
                                     <i class="bi bi-person-workspace fs-4"></i>
                                     <span class="d-lg-none">Your Groups</span>
                                 </a>
-                            </li>
+                            </li> *@
 
                             @if (User.IsInRole("Administrator"))
                             {

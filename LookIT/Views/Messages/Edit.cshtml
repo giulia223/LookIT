@@ -32,19 +32,75 @@
 
                     <div class="card-body p-4">
                         @* Atenție: asp-route-id trebuie să fie ID-ul mesajului pentru ruterul de editare *@
-                        <form asp-controller="Messages" asp-action="Edit" asp-route-id="@Model.MessageId" method="post">
-
+                        <form asp-controller="Messages" asp-action="Edit" asp-route-id="@Model.MessageId" method="post" enctype="multipart/form-data">
+                            <div asp-validation-summary="All" class="text-danger mb-3"></div>
                             @* Câmpuri ascunse necesare pentru Model Binding *@
                             <input type="hidden" asp-for="MessageId" />
                             <input type="hidden" asp-for="GroupId" />
 
+                            <div class="form-group mb-3">
+
+                                <label class="form-label fw-bold">Imagine</label>
+                                <input type="file" name="Image" id="imageInput" class="form-control" accept="image/*" />
+                                <small class="text-muted">Formate acceptate: jpg, jpeg, png, gif.</small>
+
+                                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                                {
+                                    <div id="currentImageContainer" class="mt-3 p-2 border rounded bg-light position-relative text-center">
+                                        <p class="mb-1 text-muted small">Imagine curentă</p>
+                                        <img src="@Model.ImageUrl" alt="Current Image" class="img-fluid rounded border mx-auto d-block" style="max-height: 300px;" />
+                                    </div>
+
+                                    <div class="form-check mt-2 d-inline-block text-start" id="deleteImage">
+                                        <input class="form-check-input border-danger" type="checkbox" name="DeleteImage" value="true" id="deleteImageCheck">
+                                        <label class="form-check-label text-danger fw-bold" for="deleteImageCheck">Sterge imaginea</label>
+                                    </div>
+                                }
+
+                                <div id="newImageContainer" class="mt-3 d-none p-2 border rounded bg-light position-relative text-center">
+                                    <p class="mb-1 text-muted small">Imagine nouă</p>
+                                    <img id="newImagePreview" src="#" class="img-fluid rounded mx-auto d-block" style="max-height: 300px;" />
+                                </div>
+
+                            </div>
+
+                            <div class="form-group mb-3">
+
+                                <label class="form-label fw-bold">Video</label>
+                                <input type="file" name="Video" id="videoInput" class="form-control" accept="video/*" />
+                                <small class="text-muted">Formate acceptate: MP4, WebM, etc.</small>
+
+                                @if (!string.IsNullOrEmpty(Model.VideoUrl))
+                                {
+                                    <div id="currentVideoContainer" class="mt-3 p-2 border rounded bg-light position-relative text-center">
+
+                                        <p class="mb-1 text-muted small">Video curent</p>
+                                        <video controls class="w-100 rounded border mx-auto d-block" style="max-height: 300px;">
+                                            <source src="@Model.VideoUrl" type="video/mp4">
+                                        </video>
+                                    </div>
+
+                                    <div class="form-check mt-2 d-inline-block text-start" id="deleteVideo" ">
+                                        <input class="form-check-input border-danger" type="checkbox" name="DeleteVideo" value="true" id="deleteVideoCheck">
+                                        <label class="form-check-label text-danger fw-bold" for="deleteVideoCheck">Sterge videoclip</label>
+                                    </div>
+                                }
+
+                                <div id="newVideoContainer" class="mt-3 d-none p-2 border rounded bg-light position-relative text-center">
+                                    <p class="mb-1 text-muted small">Video nou</p>
+                                    <video id="newVideoPreview" controls class="w-100 rounded mx-auto d-block" style="max-height: 300px;">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                </div>
+
+                            </div>
                             @* Input Content Mesaj *@
                             <div class="form-group mb-3">
-                                <label asp-for="Content" class="form-label fw-bold" style="color: #4b4f56;">Conținut mesaj</label>
+                                <label asp-for="TextContent" class="form-label fw-bold" style="color: #4b4f56;">Conținut mesaj</label>
                                 <div class="bg-white">
-                                    <textarea asp-for="Content" class="form-control summernote"></textarea>
+                                    <textarea asp-for="TextContent" class="form-control summernote"></textarea>
                                 </div>
-                                <span asp-validation-for="Content" class="text-danger small"></span>
+                                <span asp-validation-for="TextContent" class="text-danger small"></span>
                             </div>
 
                             @* Butoane Acțiune *@
@@ -88,3 +144,26 @@
         transition: 0.2s;
     }
 </style>
+
+@section Scripts{
+    <script>
+        $('.summernote').summernote({
+            height: 200,
+            disableDragAndDrop: true,
+            placeholder: 'Scrie mesajul tău aici...',
+            // Definim fonturile exact ca în imaginea ta
+            fontNames: ['Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Helvetica', 'Impact', 'Tahoma', 'Times New Roman', 'Verdana'],
+            toolbar: [
+                ['style', ['style']],
+                ['font', ['bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript', 'clear']],
+                ['fontname', ['fontname']],
+                ['fontsize', ['fontsize']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph', 'height']],
+                ['table', ['table']],
+                ['insert', ['link', 'hr']], // Am eliminat 'picture' și 'video'
+                ['view', ['fullscreen', 'codeview', 'help']]
+            ]
+        });
+    </script>
+}

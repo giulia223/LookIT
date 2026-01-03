@@ -19,8 +19,22 @@
     </div>
 
     <div class="message-content py-2">
-        <p style="font-size: 0.95rem; color: #1c1e21;">@Html.Raw(Model.Content)</p>
+        <p style="font-size: 0.95rem; color: #1c1e21;">@Html.Raw(Model.TextContent)</p>
     </div>
+
+    @if (@Model.ImageUrl != null)
+    {
+        <img src="@Model.ImageUrl" alt="Post Image" class="rounded-2 w-100 border mb-2" style="height: auto; max-height: 600px; object-fit: contain;" />
+    }
+
+    @if (@Model.VideoUrl != null)
+    {
+        <div class="mt-2 mb-2">
+            <video controls preload="metadata" class="w-100 rounded-2 border" style="max-height: 600px; background-color: #000;">
+                <source src="@Model.VideoUrl" type="video/mp4">
+            </video>
+        </div>
+    }
 
     @{
         // SOLUȚIA: Luăm ID-ul direct din Claims (fără database call)

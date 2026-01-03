@@ -1,4 +1,4 @@
-﻿@{
+﻿@* @{
     ViewBag.Title = "Index";
 }
 
@@ -12,21 +12,78 @@
        style="background-color: #92E4BA; border-color: #90C67F; color: #845763; font-weight: 500;"
        href="/Administrators/Index"> Utilizatori </a>
 
-    <a class="btn btn-lg"
-       style="background-color: #92E4BA; border-color: #90C67F; color: #845763; font-weight: 500;"
-       href="/Posts/Index"> Postari </a>
-
-    <a class="btn btn-lg"
-       style="background-color: #92E4BA; border-color: #90C67F; color: #845763; font-weight: 500;"
-       href="/Comments/Index"> Comentarii </a>
-
-    <a class="btn btn-lg"
-       style="background-color: #92E4BA; border-color: #90C67F; color: #845763; font-weight: 500;"
-       href="/Groups/Index"> Grupuri </a>
-
-    <a class="btn btn-lg"
-       style="background-color: #92E4BA; border-color: #90C67F; color: #845763; font-weight: 500;"
-       href="/Messages/Index"> Mesaje </a>
 </div>
 
-<br />
+<br /> *@
+
+@{
+    ViewBag.Title = "Panou Administrare";
+}
+
+<div style="background-color: #f0f2f5; min-height: 90vh; padding: 40px 0;">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-12 text-center">
+                <i class="bi bi-shield-lock-fill" style="font-size: 3rem; color: #1877f2;"></i>
+                <h2 class="fw-bold mt-2" style="color: #1c1e21;">Panou de Control Administrator</h2>
+                <p class="text-muted mx-auto" style="max-width: 500px;">
+                    Gestionează comunitatea LookIT: monitorizează utilizatorii, moderează conținutul și asigură respectarea regulamentului platformei.
+                </p>
+            </div>
+        </div>
+
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm" style="border-radius: 10px;">
+                    <div class="card-body text-center p-4">
+                        <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 70px; height: 70px;">
+                            <i class="bi bi-people-fill" style="font-size: 2rem; color: #1877f2;"></i>
+                        </div>
+                        <h4 class="card-title fw-bold">Gestionare Utilizatori</h4>
+                        <p class="card-text text-muted small">
+                            Vezi lista completă a membrilor, editează profiluri sau suspendă conturile care nu respectă regulile.
+                        </p>
+                        <a href="/Administrators/Index" class="btn w-100"
+                           style="background-color: #1877f2; color: white; font-weight: 600; border-radius: 6px;">
+                            Vezi toți utilizatorii
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm" style="border-radius: 10px;">
+                    <div class="card-body text-center p-4">
+                        <div class="rounded-circle bg-success bg-opacity-10 d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 70px; height: 70px;">
+                            <i class="bi bi-collection-play-fill" style="font-size: 2rem; color: #42b72a;"></i>
+                        </div>
+                        <h4 class="card-title fw-bold">Moderare Grupuri</h4>
+                        <p class="card-text text-muted small">
+                            Monitorizează comunitățile create, verifică descrierile și intervine în caz de raportări.
+                        </p>
+                        <a href="/Groups/Index" class="btn btn-outline-success w-100" style="font-weight: 600; border-radius: 6px;">
+                            Administrează grupuri
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm" style="border-radius: 10px;">
+                    <div class="card-body text-center p-4">
+                        <div class="rounded-circle bg-danger bg-opacity-10 d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 70px; height: 70px;">
+                            <i class="bi bi-exclamation-octagon-fill" style="font-size: 2rem; color: #f02849;"></i>
+                        </div>
+                        <h4 class="card-title fw-bold">Raportări & Spam</h4>
+                        <p class="card-text text-muted small">
+                            Analizează mesajele raportate de utilizatori și ia măsuri împotriva conținutului neadecvat.
+                        </p>
+                        <button class="btn btn-light w-100 border text-muted" disabled style="font-weight: 600; border-radius: 6px;">
+                            În curând
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
