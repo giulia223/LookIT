@@ -784,7 +784,7 @@ namespace LookIT.Controllers
                 db.Likes.Remove(existingRelation);
                 isLikedNow = false;
 
-                TempData["message"] = "Postarea a fost eliminata din apreeri";
+                TempData["message"] = "Postarea a fost eliminata din apreceri";
                 TempData["messageType"] = "alert-warning";
             }
 

@@ -7,8 +7,17 @@ namespace LookIT.Models
         [Key]
         public int MessageId { get; set; }
         public DateTime Date { get; set; }
-        [Required(ErrorMessage ="Continutul mesajului nu poate fi gol")]
-        public string Content { get; set; }
+        //daca este postare de tip text
+        [StringLength(5000, ErrorMessage = "Mesajul nu poate depăși {1} de caractere.")]
+        public string? TextContent { get; set; }
+
+        //daca este postare de tip imagine (stocam url ul)
+        [StringLength(500, ErrorMessage = "Url-ul imaginii nu poate depasi {1} de caractere.")]
+        public string? ImageUrl { get; set; }
+
+        //daca este postare de tip video (stocam url ul)
+        [StringLength(500, ErrorMessage = "Url-ul videoclipului nu poate depasi {1} de caractere.")]
+        public string? VideoUrl { get; set; }
 
         public int GroupId { get; set; }
         public virtual Group? Group { get; set; }

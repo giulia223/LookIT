@@ -199,14 +199,17 @@ namespace LookIT.Controllers
 
             //pentru ca am restrictionat ca daca stergem colectia, sa nu se sterga si legaturile dintre colectii si postari,
             //com sterge manual legaturile dintre colectiile utilizatorului si postarile din ele
-            foreach (var collection in userCollections)
+            if (userCollections.Any())
             {
-                var postCols = _context.PostCollections
-                                       .Where(postCollection => postCollection.CollectionId == collection.CollectionId)
-                                       .ToList();
-                if (postCols.Any())
+                foreach (var collection in userCollections)
                 {
-                    _context.PostCollections.RemoveRange(postCols);
+                    var postCols = _context.PostCollections
+                                           .Where(postCollection => postCollection.CollectionId == collection.CollectionId)
+                                           .ToList();
+                    if (postCols.Any())
+                    {
+                        _context.PostCollections.RemoveRange(postCols);
+                    }
                 }
             }
 
@@ -229,12 +232,45 @@ namespace LookIT.Controllers
                                                    .Where(pc => userPostIds.Contains(pc.PostId))
                                                    .ToList();
 
+            //cautam postarile la care user ul a primit like uri
+
+            if (userPostIds.Any())
+            {
+                var likes = _context.Likes
+                                    .Where(like => userPostIds.Contains(like.PostId))
+                                    .ToList();
+                if (likes.Any())
+                {
+                    _context.Likes.RemoveRange(likes);
+                }
+            }   
+
             //stergem dependentele
             if (dependentPostCollections.Any())
             {
                 _context.PostCollections.RemoveRange(dependentPostCollections);
             }
 
+            var follow = _context.FollowRequests.Where(follower => follower.FollowerId == Id).ToList();
+
+            var following = _context.FollowRequests.Where(following => following.FollowingId == Id).ToList();
+
+            if (follow.Any())
+            {
+                _context.FollowRequests.RemoveRange(follow);
+            }
+
+            if (following.Any())
+            {
+                _context.FollowRequests.RemoveRange(following);
+            }
+
+            var liking = _context.Likes.Where(like => like.UserId == Id);
+
+            if (liking.Any())
+            {
+                _context.Likes.RemoveRange(liking);
+            }
 
             //salvam toate modiifcarile
             await _context.SaveChangesAsync();
