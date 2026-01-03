@@ -199,14 +199,17 @@ namespace LookIT.Controllers
 
             //pentru ca am restrictionat ca daca stergem colectia, sa nu se sterga si legaturile dintre colectii si postari,
             //com sterge manual legaturile dintre colectiile utilizatorului si postarile din ele
-            foreach (var collection in userCollections)
+            if (userCollections.Any())
             {
-                var postCols = _context.PostCollections
-                                       .Where(postCollection => postCollection.CollectionId == collection.CollectionId)
-                                       .ToList();
-                if (postCols.Any())
+                foreach (var collection in userCollections)
                 {
-                    _context.PostCollections.RemoveRange(postCols);
+                    var postCols = _context.PostCollections
+                                           .Where(postCollection => postCollection.CollectionId == collection.CollectionId)
+                                           .ToList();
+                    if (postCols.Any())
+                    {
+                        _context.PostCollections.RemoveRange(postCols);
+                    }
                 }
             }
 
@@ -229,31 +232,44 @@ namespace LookIT.Controllers
                                                    .Where(pc => userPostIds.Contains(pc.PostId))
                                                    .ToList();
 
+            //cautam postarile la care user ul a primit like uri
+
+            if (userPostIds.Any())
+            {
+                var likes = _context.Likes
+                                    .Where(like => userPostIds.Contains(like.PostId))
+                                    .ToList();
+                if (likes.Any())
+                {
+                    _context.Likes.RemoveRange(likes);
+                }
+            }   
+
             //stergem dependentele
             if (dependentPostCollections.Any())
             {
                 _context.PostCollections.RemoveRange(dependentPostCollections);
             }
 
-            //pentru ca avem restrictie la stergerea unui utilizator daca daca este urmarit/urmareste/a dat cerere/a primit cerere de urmarire, trebuie sa le
-            //stergem manual din baza de date
-            //vom lua o singura lista de cereri de urmarire (acceptate sau in pending) care va retine atat cele date de user, cat si cele primite
-            var allFollowRequests = _context.FollowRequests
-                                                 .Where(follow => follow.FollowingId == Id || follow.FollowerId == Id)
-                                                 .ToList();
+            var follow = _context.FollowRequests.Where(follower => follower.FollowerId == Id).ToList();
 
-            if (allFollowRequests.Any()) 
-            {  
-                _context.FollowRequests.RemoveRange(allFollowRequests);
+            var following = _context.FollowRequests.Where(following => following.FollowingId == Id).ToList();
+
+            if (follow.Any())
+            {
+                _context.FollowRequests.RemoveRange(follow);
             }
 
-            //am restrictionat ca daca un utilizator are postari apreciate, nu il pot sterge. Trebuie mai intai sa sterg aprecierile la postari, iar mai apoi userul
-            var likedPosts = _context.Likes
-                                     .Where(like => like.UserId == Id);
+            if (following.Any())
+            {
+                _context.FollowRequests.RemoveRange(following);
+            }
 
-            if (likedPosts.Any()) 
-            { 
-                _context.Likes.RemoveRange(likedPosts);
+            var liking = _context.Likes.Where(like => like.UserId == Id);
+
+            if (liking.Any())
+            {
+                _context.Likes.RemoveRange(liking);
             }
 
             //salvam toate modiifcarile

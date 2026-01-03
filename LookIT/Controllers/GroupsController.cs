@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 
 namespace LookIT.Controllers
 {
@@ -25,12 +26,46 @@ namespace LookIT.Controllers
         //afisare toate grupurile
         public IActionResult Index()
         {
-            
+
+            int _perPage = 4;
             var groups = _context.Groups.Include(g => g.Messages)
                                     .Include(g => g.Moderator).ToList();
 
-            ViewBag.Groups = groups;
+            //verificam de fiecare data numarul postarilor totale
+            int totalItems = groups.Count();
+
+            //se preia pagina curenta din View-ul asociat, numarul paginii este valoarea parametrului page din ruta
+            var currentPage = Convert.ToInt32(HttpContext.Request.Query["page"]);
+
+            //trebuie sa fortam ca pagina curenta sa fie 1, altfel cand dam next pentru prima data, ne vom intoarce tot pe rprima pagina
+            if (currentPage == 0)
+            {
+                currentPage = 1;
+            }
+
+            //pentru prima pagina offsetul o sa fie 0, pentru pagina a doua va fi 4
+            //asadar, offsetul este egal cu numarul de posari care au fost deja afisate pe paginile anterioarw
+            var offset = 0;
+
+            //se calculeaza offsetul in functie de numarul paginii la care suntem
+            if (!currentPage.Equals(0))
+            {
+                offset = (currentPage - 1) * _perPage;
+            }
+
+            //se preiau postarile corespunzatoare pentru feicare pagina la care ne aflam in functie de offset
+            var paginatedGroups = groups.Skip(offset).Take(_perPage).ToList();
+
+            //preluam numarul ultimei pagini
+            ViewBag.lastPage = (int)Math.Ceiling((double)totalItems / _perPage);
+            ViewBag.CurrentPage = currentPage;
+
+            //trimitem postarile cu ajutorul unui ViwBag  catre View0ul corespunzator
+            ViewBag.PaginationBaseUrl = "/Groups/Index/?page=";
+            ViewBag.Groups = paginatedGroups;
+
             return View();
+
         }
 
         //afisare detalii grup
@@ -47,6 +82,7 @@ namespace LookIT.Controllers
             {
                 return NotFound();
             }
+            SetAccessRights();
             ViewBag.GroupDetails = grp;
             ViewBag.Messages = grp.Messages.OrderByDescending(m => m.Date).ToList();
             ViewBag.ActiveMembersCount = grp.Members.Count(m => m.Status != "Pending");
@@ -196,9 +232,10 @@ namespace LookIT.Controllers
             {
                 return NotFound();
             }
-            if (grp.ModeratorId == _userManager.GetUserId(User)) 
+            if (grp.ModeratorId == _userManager.GetUserId(User) || User.IsInRole("Administrator")) 
             {
                 return View(grp);
+                SetAccessRights();
             }
             else
             {
@@ -222,8 +259,9 @@ namespace LookIT.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    if (grp.ModeratorId == _userManager.GetUserId(User))
+                    if (grp.ModeratorId == _userManager.GetUserId(User) || User.IsInRole("Administrator"))
                     {
+                        SetAccessRights();
                         grp.Description = group.Description;
                         grp.GroupName = group.GroupName;
                         TempData["message"] = "Grupul a fost modificat";
@@ -278,8 +316,27 @@ namespace LookIT.Controllers
             _context.Groups.Remove(grp);
             _context.SaveChanges();
 
+            if (User.IsInRole("Administrator"))
+            {
+                return RedirectToAction("Index", "Groups");
+            }
+
             return RedirectToAction("Show", "GroupMembers");
 
+        }
+
+        private void SetAccessRights()
+        {
+            ViewBag.EsteUser = false;
+
+            if (User.IsInRole("User"))
+            {
+                ViewBag.EsteUser = true;
+            }
+
+            ViewBag.UserCurent = _userManager.GetUserId(User);
+
+            ViewBag.EsteAdministrator = User.IsInRole("Administrator");
         }
 
 

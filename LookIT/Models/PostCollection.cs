@@ -4,7 +4,7 @@ namespace LookIT.Models
 {
     public class PostCollection
     {
-        //tabelul asociativ care face legatura intre Post si Collection
+        //tabelul care face legatura intre Post si Collection
         //o postare poate fi salvata in mai multe colectii, iar o colectie
         //contine mai multe postari
 
