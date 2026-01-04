@@ -2,6 +2,7 @@ using LookIT.Data;
 using LookIT.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using LookIT.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +22,8 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("RequireAdministratorRole",
          policy => policy.RequireRole("Administrator"));
 });
+
+builder.Services.AddScoped<ISentimentAnalysisService, SentimentAnalysisService>();
 
 var app = builder.Build();
 

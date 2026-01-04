@@ -1,6 +1,8 @@
 ﻿using Ganss.Xss;
+using Humanizer.Configuration;
 using LookIT.Data;
 using LookIT.Models;
+using LookIT.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -8,7 +10,12 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Hosting;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Json;
 using static System.Net.Mime.MediaTypeNames;
+using Message = LookIT.Models.Message;
 
 namespace LookIT.Controllers
 {
@@ -18,13 +25,17 @@ namespace LookIT.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IWebHostEnvironment _env;
+        private readonly IConfiguration _configuration;
+        private readonly ISentimentAnalysisService _sentimentService;
 
-        public MessagesController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IWebHostEnvironment env)
+        public MessagesController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IWebHostEnvironment env, IConfiguration configuration, ISentimentAnalysisService sentimentService)
         {
             _context = context;
             _userManager = userManager;
             _roleManager = roleManager;
             _env = env;
+            _configuration = configuration;
+            _sentimentService = sentimentService;
         }
 
         //afisare toate mesajele
@@ -170,15 +181,60 @@ namespace LookIT.Controllers
                 msg.VideoUrl = databaseFileName;
             }
 
+            //if (hasText)
+            //{
+            //    var aiCheck = await CheckContentGemini(msg.TextContent);
+
+            //    if (!aiCheck.IsSafe)
+            //    {
+            //        // Mesajul de eroare cerut
+            //        ModelState.AddModelError("TextContent",
+            //            $"Conținutul tău conține termeni nepotriviți (Detectat: {aiCheck.Reasons}). Te rugăm să reformulezi.");
+
+            //        return View(msg);
+            //    }
+
+            //}
+
             if (ModelState.IsValid)
             {
-                _context.Messages.Add(msg);
-                _context.SaveChanges();
-               
-                TempData["message"] = "Mesajul a fost trimis cu succes";
-                TempData["messageType"] = "alert-success";
 
-                return RedirectToAction("Show", "Groups", new {Id = msg.GroupId});
+                // Analizam sentimentul comentariului folosind OpenAI API
+                string cleanText = System.Text.RegularExpressions.Regex.Replace(msg.TextContent ?? "", "<.*?>", string.Empty);
+
+                var sentimentResult = await _sentimentService.AnalyzeSentimentAsync(cleanText);
+                if (sentimentResult.Success)
+                {
+                    if (sentimentResult.Label == "unsafe")
+                        msg.IsSafe = false;
+                    else
+                        msg.IsSafe = true;
+                    if (!msg.IsSafe)
+                    {
+                        ModelState.AddModelError("TextContent", "Conținutul tău a fost marcat ca nepotrivit. Te rugăm să reformulezi.");
+                        return View(msg);
+                    }
+                    else
+                    {
+                        _context.Messages.Add(msg);
+                        _context.SaveChanges();
+
+                        TempData["message"] = "Mesajul a fost trimis cu succes";
+                        TempData["messageType"] = "alert-success";
+
+                        return RedirectToAction("Show", "Groups", new { Id = msg.GroupId });
+                    }
+                }
+                else
+                {
+                    _context.Messages.Add(msg);
+                    _context.SaveChanges();
+
+                    TempData["message"] = "Mesajul a fost trimis cu succes";
+                    TempData["messageType"] = "alert-success";
+
+                    return RedirectToAction("Show", "Groups", new { Id = msg.GroupId });
+                }
             }
 
             else
@@ -377,10 +433,40 @@ namespace LookIT.Controllers
                             }
                         }
                         msg.TextContent = sanitizer.Sanitize(requestmsg.TextContent);
-                        TempData["message"] = "Mesajul a fost modificat";
-                        TempData["messageType"] = "alert-success";
-                        _context.SaveChanges();
-                        return RedirectToAction("Show", "Groups", new { Id = msg.GroupId });
+                        string cleanText = System.Text.RegularExpressions.Regex.Replace(msg.TextContent ?? "", "<.*?>", string.Empty);
+
+                        var sentimentResult = await _sentimentService.AnalyzeSentimentAsync(cleanText);
+                        if (sentimentResult.Success)
+                        {
+                            if (sentimentResult.Label == "unsafe")
+                                msg.IsSafe = false;
+                            else
+                                msg.IsSafe = true;
+                            if (!msg.IsSafe)
+                            {
+                                ModelState.AddModelError("TextContent", "Conținutul tău a fost marcat ca nepotrivit. Te rugăm să reformulezi.");
+                                return View(msg);
+                            }
+                            else
+                            {
+                                
+                                _context.SaveChanges();
+
+                                TempData["message"] = "Mesajul a fost modificat cu succes";
+                                TempData["messageType"] = "alert-success";
+
+                                return RedirectToAction("Show", "Groups", new { Id = msg.GroupId });
+                            }
+                        }
+                        else
+                        {
+                            _context.SaveChanges();
+                            TempData["message"] = "Mesajul a fost modificat";
+                            TempData["messageType"] = "alert-success";
+                            _context.SaveChanges();
+                            return RedirectToAction("Show", "Groups", new { Id = msg.GroupId });
+                        }
+                           
                     }
                     else
                     {
@@ -464,5 +550,43 @@ namespace LookIT.Controllers
             ViewBag.EsteAdministrator = User.IsInRole("Administrator");
         }
 
+        //private async Task<(bool IsSafe, string Reasons)> CheckContentRawAI(string text)
+        //{
+        //    try
+        //    {
+        //        var apiKey = _configuration["OpenAI:ApiKey"];
+        //        System.Diagnostics.Debug.WriteLine("Cheia mea este: " + _configuration["OpenAI:ApiKey"]);
+        //        using var client = new HttpClient();
+        //        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
+
+        //        var requestBody = new { input = text };
+        //        var jsonContent = new StringContent(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json");
+
+        //        var response = await client.PostAsync("https://api.openai.com/v1/moderations", jsonContent);
+
+        //        if (response.IsSuccessStatusCode)
+        //        {
+        //            var responseString = await response.Content.ReadAsStringAsync();
+        //            var data = JsonSerializer.Deserialize<OpenAIModerationResponse>(responseString);
+
+        //            var result = data.results.FirstOrDefault();
+        //            if (result != null && result.flagged)
+        //            {
+        //                // Luăm doar categoriile care au valoarea 'true'
+        //                var violations = result.categories.Where(c => c.Value).Select(c => c.Key);
+        //                return (false, string.Join(", ", violations));
+        //            }
+        //        }
+        //        return (true, "");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        // Dacă pică netul sau API-ul OpenAI, lăsăm mesajul să treacă (fail-safe)
+        //        //return (true, "");
+        //        return (false, "Eroare tehnică AI: " + ex.Message);
+        //    }
+        //}
+        
     }
 }
+
