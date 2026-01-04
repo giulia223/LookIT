@@ -153,6 +153,15 @@ namespace LookIT.Migrations
                     b.Property<DateTime?>("DateModified")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("FlagCategory")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("IsFlagged")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ModeratedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("PostId")
                         .HasColumnType("int");
 

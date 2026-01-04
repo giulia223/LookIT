@@ -240,39 +240,49 @@ namespace LookIT.Controllers
         }
 
         // LISTA DE URMĂRITORI (Cine mă urmărește pe mine)
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> Followers(string userId)
         {
-            var user = await _context.Users.FindAsync(userId);
-            if (user == null) return NotFound();
+            var user = await _context.Users
+                                     .FindAsync(userId);
+
+            //aici am modififcat pentru ca pot vedrea lista de urmaritori si urmariri chiar daca nu am cont (logca este ca pot vizualiza 
+            //profiluri chiar daca nu sunt autentificat)
+            //if (user == null) return NotFound();
 
             ViewData["Title"] = $"Urmăritori - {user.FullName}";
 
             // Căutăm relațiile unde 'userId' este DESTINATARUL (FollowingId) și statusul e Accepted
             var followers = await _context.FollowRequests
-                .Include(f => f.Follower) // Avem nevoie de datele celui care dă follow
-                .Where(f => f.FollowingId == userId && f.Status == FollowStatus.Accepted)
-                .Select(f => f.Follower) // Selectăm doar userii, nu obiectul cererii
-                .ToListAsync();
+                                          .Include(f => f.Follower) // Avem nevoie de datele celui care dă follow
+                                          .Where(f => f.FollowingId == userId && f.Status == FollowStatus.Accepted)
+                                          .Select(f => f.Follower) // Selectăm doar userii, nu obiectul cererii
+                                          .ToListAsync();
 
             return View("UserList", followers); // Refolosim un View comun "UserList"
         }
 
         // LISTA DE URMĂRIRI (Pe cine urmăresc eu)
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> Following(string userId)
         {
-            var user = await _context.Users.FindAsync(userId);
-            if (user == null) return NotFound();
+            var user = await _context.Users
+                                     .FindAsync(userId);
+
+            //aici am modififcat pentru ca pot vedrea lista de urmaritori si urmariri chiar daca nu am cont (logca este ca pot vizualiza 
+            //profiluri chiar daca nu sunt autentificat)
+            //if (user == null) return NotFound();
 
             ViewData["Title"] = $"Urmăriri - {user.FullName}";
 
             // Căutăm relațiile unde 'userId' este EXPEDITORUL (FollowerId) și statusul e Accepted
             var following = await _context.FollowRequests
-                .Include(f => f.Following) // Avem nevoie de datele celui urmărit
-                .Where(f => f.FollowerId == userId && f.Status == FollowStatus.Accepted)
-                .Select(f => f.Following)
-                .ToListAsync();
+                                          .Include(f => f.Following) // Avem nevoie de datele celui urmărit
+                                          .Where(f => f.FollowerId == userId && f.Status == FollowStatus.Accepted)
+                                          .Select(f => f.Following)
+                                          .ToListAsync();
 
             return View("UserList", following);
         }

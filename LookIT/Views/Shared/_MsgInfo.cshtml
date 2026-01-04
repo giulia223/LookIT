@@ -1,0 +1,88 @@
+﻿@model LookIT.Models.Message
+@using Microsoft.AspNetCore.Identity
+@using System.Security.Claims
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    // 1. Pregătim variabilele pentru a păstra HTML-ul curat
+    bool userExists = Model.User != null;
+
+    string profilePic = userExists 
+    && !string.IsNullOrEmpty(Model.User.ProfilePictureUrl) ? Model.User.ProfilePictureUrl: "/images/unknown_person.jpg";
+
+    string displayName = userExists ? Model.User.FullName : "Utilizator șters";
+}
+
+<div class="card-body">
+    <div class="d-flex align-items-center mb-2">
+
+        @* --- ZONA AVATAR --- *@
+        <div class="rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+            @if (userExists)
+            {
+                <a asp-controller="Profile" asp-action="Details" asp-route-userId="@Model.UserId" class="text-decoration-none">
+                    <img src="@profilePic" class="rounded-circle border" style="width:40px;height:40px;object-fit:cover;" />
+                </a>
+            }
+            else
+            {
+                <img src="@profilePic" class="rounded-circle border opacity-75" style="width:40px;height:40px;object-fit:cover; cursor: default;" />
+            }
+        </div>
+
+        @* --- ZONA NUME & DATA --- *@
+        <div>
+            @if (userExists)
+            {
+                <a asp-controller="Profile" asp-action="Details" asp-route-userId="@Model.UserId" class="text-decoration-none">
+                    <h6 class="mb-0 fw-bold" style="color: #050505;">@displayName</h6>
+                </a>
+            }
+            else
+            {
+                <h6 class="mb-0 fw-bold text-muted fst-italic">@displayName</h6>
+            }
+
+            <small class="text-muted">@Model.Date.ToString("dd MMM, HH:mm")</small>
+        </div>
+    </div>
+
+    @* --- CONTINUT MESAJ --- *@
+    <div class="message-content py-2">
+        <p style="font-size: 0.95rem; color: #1c1e21;">@Html.Raw(Model.TextContent)</p>
+    </div>
+
+    @if (@Model.ImageUrl != null)
+    {
+        <img src="@Model.ImageUrl" alt="Post Image" class="rounded-2 w-100 border mb-2" style="height: auto; max-height: 600px; object-fit: contain;" />
+    }
+
+    @if (@Model.VideoUrl != null)
+    {
+        <div class="mt-2 mb-2">
+            <video controls preload="metadata" class="w-100 rounded-2 border" style="max-height: 600px; background-color: #000;">
+                <source src="@Model.VideoUrl" type="video/mp4">
+            </video>
+        </div>
+    }
+
+    @* --- BUTOANE ACTIUNI (Edit/Delete) --- *@
+    @{
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var isAdmin = User.IsInRole("Administrator");
+    }
+
+    @if (currentUserId != null && (Model.UserId == currentUserId || isAdmin))
+    {
+        <div class="border-top pt-2 d-flex gap-2">
+            <a class="btn btn-light btn-sm flex-fill text-muted" asp-controller="Messages" asp-action="Edit" asp-route-id="@Model.MessageId">
+                <i class="bi bi-pencil"></i> Edit
+            </a>
+            <form method="post" asp-controller="Messages" asp-action="DeleteMessage" asp-route-id="@Model.MessageId" class="flex-fill">
+                <button class="btn btn-light btn-sm w-100 text-danger" type="submit">
+                    <i class="bi bi-trash"></i> Delete
+                </button>
+            </form>
+        </div>
+    }
+</div>

@@ -2,6 +2,7 @@ using LookIT.Data;
 using LookIT.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using LookIT.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +16,9 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.R
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
+
+//inregistrare serviciu pentru analiza de comentariu
+builder.Services.AddScoped<IModerationService,ModerationService>();
 
 builder.Services.AddAuthorization(options =>
 {

@@ -1,40 +1,89 @@
-﻿@if (ViewBag.Message != null)
+﻿@{
+    ViewData["Title"] = "Colecțiile mele";
+}
+
+@* --- 1. ALERTĂ MESAJ --- *@
+@if (ViewBag.Message != null)
 {
     <div class="container mt-3">
         <div class="row justify-content-center">
-            <div class="col-md-6">
-                <div class="alert @ViewBag.Alert alert-dismissible fade show border-0 shadow-sm rounded-pill text-center py-2 px-4" role="alert">
-                    <i class="bi bi-info-circle me-2"></i>
-                    <span style="font-size: 0.95rem; font-weight: 500;">@ViewBag.Message</span>
-                    <button type="button" class="btn-close small" data-bs-dismiss="alert" aria-label="Close" style="padding: 1rem;"></button>
+            <div class="col-md-8 col-lg-6">
+                <div class="alert alert-success border-0 shadow-sm rounded-4 d-flex align-items-center py-3" role="alert">
+                    <div class="d-flex align-items-center justify-content-center rounded-circle bg-white text-success me-3 shadow-sm" style="width: 35px; height: 35px; min-width: 35px;">
+                        <i class="bi bi-check-lg"></i>
+                    </div>
+                    <div class="flex-grow-1 fw-medium">
+                        @ViewBag.Message
+                    </div>
+                    <button type="button" class="btn-close ms-2" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             </div>
         </div>
     </div>
 }
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold">Colecțiile mele</h2>
-        <a href="/Collections/New" class="btn btn-outline-dark rounded-pill px-4">
+<div class="container mt-4 mb-5">
+
+    @* --- 2. BUTON ÎNAPOI --- *@
+    <div class="mb-4">
+        <a asp-controller="Profile" asp-action="Details" asp-route-userId="@ViewBag.UserCurent" class="btn btn-sm btn-light rounded-pill px-3 fw-bold text-muted border-0 shadow-sm">
+            <i class="bi bi-arrow-left me-1"></i> Înapoi la Profil
+        </a>
+    </div>
+
+    @* --- 3. HEADER --- *@
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-end align-items-md-center mb-5 pb-3 border-bottom gap-3">
+        <div>
+            <h2 class="fw-bold mb-1">Colecțiile mele</h2>
+            <p class="text-muted mb-0 small">Gestionează și organizează postările tale favorite.</p>
+        </div>
+
+        <a href="/Collections/New" class="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow-sm">
             <i class="bi bi-plus-lg me-1"></i> Colecție nouă
         </a>
     </div>
 
+    @* --- 4. GRID COLECȚII --- *@
     @if (ViewBag.Collections.Count > 0)
     {
         <div class="collections-grid">
             @foreach (var collection in ViewBag.Collections)
             {
-                <a asp-controller="Collections" asp-action="Show" asp-area="" asp-route-Id="@collection.CollectionId" class="collection-card">
-                    <div class="collection-content">
-                        <div class="collection-info">
-                            <h3 class="collection-title">@collection.Name</h3>
-                            <span class="collection-date">
-                                <i class="bi bi-calendar3 me-1"></i>
-                                @collection.CreationDate.ToString("dd.MM.yyyy")
-                            </span>
+                <a asp-controller="Collections" asp-action="Show" asp-route-Id="@collection.CollectionId" class="text-decoration-none">
+                    <div class="card h-100 border-0 shadow-sm rounded-4 collection-card overflow-hidden">
+
+                        @* --- ICONIȚĂ PINNED (DOAR PENTRU ALL POSTS) --- *@
+                        @if (collection.Name == "All Posts")
+                        {
+                            <div class="position-absolute top-0 end-0 m-3" style="z-index: 10;">
+                                <div class="bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center"
+                                     style="width: 32px; height: 32px; color: #B13079;"
+                                     title="Colecție Fixată">
+                                    <i class="bi bi-pin-angle-fill fs-6"></i>
+                                </div>
+                            </div>
+                        }
+
+                        <div class="card-body p-4 d-flex flex-column align-items-center text-center justify-content-center" style="min-height: 220px;">
+
+                            @* Iconiță centrală *@
+                            <div class="icon-wrapper mb-3">
+                                <i class="bi bi-folder-fill"></i>
+                            </div>
+
+                            @* Titlu *@
+                            <h5 class="fw-bold text-dark text-truncate w-100 mb-1" style="font-size: 1.1rem;">
+                                @collection.Name
+                            </h5>
+
+                            @* Data *@
+                            <p class="text-muted small mb-0">
+                                Creată: @collection.CreationDate.ToString("dd MMM yyyy")
+                            </p>
                         </div>
+
+                        @* Footer decorativ *@
+                        <div class="card-footer border-0 p-0" style="height: 4px; background: linear-gradient(90deg, #B13079, #D87BB0);"></div>
                     </div>
                 </a>
             }
@@ -42,70 +91,64 @@
     }
     else
     {
-        <div class="text-center py-5 mt-5">
-            <div class="mb-3">
-                <i class="bi bi-bookmark-plus" style="font-size: 4rem; color: #dee2e6;"></i>
+        @* --- 5. EMPTY STATE --- *@
+        <div class="text-center py-5 mt-4 rounded-4 bg-light border border-dashed">
+            <div class="mb-4 d-inline-block position-relative">
+                <div class="bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center"
+                     style="width: 100px; height: 100px;">
+                    <i class="bi bi-journal-bookmark opacity-50" style="font-size: 3rem; color: #B13079;"></i>
+                </div>
             </div>
-            <h4 class="text-secondary">Nu ai nicio colecție creată</h4>
-            <p class="text-muted">Începe să îți organizezi postările salvate creând prima ta colecție.</p>
-            <a href="/Collections/New" class="btn btn-primary rounded-pill mt-3 px-5">
+
+            <h3 class="fw-bold text-dark mb-2">Nu ai nicio colecție</h3>
+            <p class="text-muted mb-4 small" style="max-width: 400px; margin: 0 auto;">
+                Începe să îți organizezi postările salvate creând prima ta colecție chiar acum.
+            </p>
+
+            <a href="/Collections/New" class="btn btn-primary rounded-pill px-5 py-2 fw-bold shadow-sm">
                 Creează colecție
             </a>
         </div>
     }
 </div>
 
+@* --- 6. STILURI CSS --- *@
 <style>
-    /* Grid-ul de colecții */
+    /* Grid Responsive */
     .collections-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
         gap: 25px;
     }
 
-    /* Cardul stil Instagram */
+    /* Cardul Colecției */
     .collection-card {
+        background-color: #fff;
+        transition: transform 0.2s ease, box-shadow 0.3s ease;
         position: relative;
-        width: 100%;
-        aspect-ratio: 1 / 1;
-        border-radius: 12px;
-        overflow: hidden;
-        text-decoration: none;
-        background-color: #f8f9fa; /* Fundal fad/gri deschis */
-        border: 1px solid #efefef;
-        transition: all 0.3s ease;
-        display: block;
     }
 
+        /* Umbra subtilă */
         .collection-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.06) !important;
         }
 
-    /* Overlay gradient pentru lizibilitatea textului */
-    .collection-content {
-        position: absolute;
-        bottom: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.6) 100%);
+    /* Wrapper Iconiță */
+    .icon-wrapper {
+        width: 80px;
+        height: 80px;
+        background-color: #FBF1F7;
+        border-radius: 50%;
         display: flex;
-        flex-direction: column;
-        justify-content: flex-end;
-        padding: 20px;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        color: #B13079;
     }
 
-    .collection-title {
-        color: white;
-        font-size: 1.25rem;
-        font-weight: 600;
-        margin: 0;
-        text-transform: capitalize;
-    }
-
-    .collection-date {
-        color: rgba(255,255,255,0.8);
-        font-size: 0.8rem;
-        margin-top: 4px;
+    .border-dashed {
+        border-style: dashed !important;
+        border-color: #dee2e6 !important;
     }
 </style>

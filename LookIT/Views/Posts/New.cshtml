@@ -1,91 +1,229 @@
 ﻿@model LookIT.Models.Post
 
-<h2 class="text-center mt-5">Adăugare postare</h2>
-<br />
+@{
+    ViewData["Title"] = "Creează o postare";
+}
 
-<div class="container mt-5">
-    <div class="row">
-        <div class="col-md-6 offset-md-3">
-            <div class="card p-4 shadow-sm">
+<div class="container py-5">
 
-                <form method="post" asp-action="New" asp-controller="Posts" enctype="multipart/form-data">
+    <div class="row justify-content-center">
 
-                    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+        <div class="col-lg-8 col-xl-6">
 
-                    <div class="form-group mb-3">
-                        <label class="form-label fw-bold">Încarcă Imaginea</label>
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
 
-                        <input type="file" name="Image" id="imageInput" class="form-control" accept="image/*" />
-                        <small class="text-muted">Formate acceptate: jpg, jpeg, png, gif.</small>
+                <div class="card-header bg-white border-bottom py-3 px-4 d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold mb-0">Creează o postare</h5>
+                    <a asp-action="Index" asp-controller="Posts" asp-area="" class="btn btn-sm btn-outline-secondary rounded-pill">
+                        <i class="bi bi-x-lg"></i> Anulează
+                    </a>
+                </div>
 
-                        <div id="imagePreviewContainer" class="mt-3 d-none text-center bg-light p-2 rounded">
-                            <p class="mb-1 text-muted small">Previzualizare imagine:</p>
-                            <img id="imagePreview" src="#" alt="Image Preview" class="img-fluid rounded border" style="max-height: 300px;" />
+                <div class="card-body p-4">
+
+                    <form method="post" asp-action="New" asp-controller="Posts" enctype="multipart/form-data">
+
+                        @*zona in care vor vfi trecute erorile intalnite din model sau inainte da a aduaga postarea in baza de date*@
+                        <div asp-validation-summary="All" class="text-danger mb-3 small"></div>
+
+                        @*zona de editor text, summernote integrat*@
+                        <div class="mb-4">
+                            <textarea asp-for="TextContent" class="form-control summernote border-0 shadow-none"
+                                      placeholder="La ce te gândești?"></textarea>
+                            <span asp-validation-for="TextContent" class="text-danger small"></span>
                         </div>
-                    </div>
 
-                    <div class="form-group mb-3">
-                        <label class="form-label fw-bold">Încarcă Video</label>
+                        @*zona in care se afla intreaga logica legata de upload media
+                          se va putea alege oricare din cele 2 variante, iar alegerea repetate a uneia dintre ele duce la suprascrierea a ceea ce era inainte*@
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-muted small text-uppercase">Adaugă în postarea ta</label>
 
-                        <input type="file" name="Video" id="videoInput" class="form-control" accept="video/*" />
-                        <small class="text-muted">Formate acceptate: MP4, WebM, etc.</small>
+                            <div class="d-flex gap-2">
 
-                        <div id="videoPreviewContainer" class="mt-3 d-none text-center bg-light p-2 rounded">
-                            <p class="mb-1 text-muted small">Previzualizare video:</p>
-                            <video id="videoPreview" controls class="w-100 rounded border" style="max-height: 300px;">
-                                Your browser does not support the video tag.
-                            </video>
+                                @*buton de upload al imaginii*@
+                                <div class="flex-fill position-relative">
+
+                                    <input type="file" name="Image" id="imageInput" class="position-absolute top-0 start-0 w-100 h-100 opacity-0 cursor-pointer" 
+                                             accept="image/*" style="z-index: 10;" />
+
+                                    <div class="border rounded-3 p-3 text-center bg-light upload-box transition-hover">
+                                        <i class="bi bi-image text-success fs-3 mb-1 d-block"></i>
+                                        <span class="small fw-bold text-muted">Foto</span>
+                                    </div>
+
+                                </div>
+
+                                @*buton de upload la videoclipului*@
+                                <div class="flex-fill position-relative">
+
+                                    <input type="file" name="Video" id="videoInput" class="position-absolute top-0 start-0 w-100 h-100 opacity-0 cursor-pointer" 
+                                             accept="video/*" style="z-index: 10;" />
+
+                                    <div class="border rounded-3 p-3 text-center bg-light upload-box transition-hover">
+                                        <i class="bi bi-camera-video-fill text-danger fs-3 mb-1 d-block"></i>
+                                        <span class="small fw-bold text-muted">Video</span>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
                         </div>
-                    </div>
 
-                    <div class="form-group mb-4">
-                        <label asp-for="TextContent" class="form-label fw-bold">Conținut postare</label>
-                        @* Am schimbat id="summernote" în class="summernote" pentru a se potrivi cu fișierul tău JS *@
-                        <textarea asp-for="TextContent" class="form-control summernote"></textarea>
-                        <span asp-validation-for="TextContent" class="text-danger"></span>
-                    </div>
+                        @*zona de previzualizare al imaginii (daca am ales una)*@
+                        @*div-ul are asociat clasa d-none initial pentu a nu se afisa in pagina. Logica de adaugare/sterge a previzuzalizarii este realizata de scriptul js*@
+                        <div id="imagePreviewContainer" class="mb-3 d-none position-relative">
 
-                    <div class="d-grid">
-                        <button class="btn btn-success" type="submit">Postează</button>
-                    </div>
+                            <div class="card border-0 bg-dark rounded-3 overflow-hidden">
 
-                </form>
+                                <img id="imagePreview" src="#" class="img-fluid w-100" style="max-height: 400px; object-fit: contain;" />
+
+                                @*buton de stergere al imaginii pe care o selectam*@
+                                <button type="button" id="removeImage" class="btn btn-light rounded-circle position-absolute top-0 end-0 m-2 shadow-sm" style="width: 32px; height: 32px; padding: 0;">
+                                    <i class="bi bi-x"></i>
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                        @*zona de previzualizare a videoclipului (daca am ales un videoclip)*@
+                        @*div-ul are asociat clasa d-none initial pentu a nu se afisa in pagina. Logica de adaugare/sterge a previzuzalizarii este realizata de scriptul js*@
+                        <div id="videoPreviewContainer" class="mb-3 d-none position-relative">
+
+                            <div class="card border-0 bg-black rounded-3 overflow-hidden">
+                                <video id="videoPreview" controls class="w-100" style="max-height: 400px;">
+                                    Your browser does not support the video tag.
+                                </video>
+
+                                @*buton de stergere al videoclipului pe care il selectam*@
+                                <button type="button" id="removeVideo" class="btn btn-light rounded-circle position-absolute top-0 end-0 m-2 shadow-sm" style="width: 32px; height: 32px; padding: 0; z-index: 20;">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                            </div>
+
+                        </div>
+
+                        @*buton de submit: adaugam postarea*@
+                        <div class="d-grid mt-4">
+                            <button class="btn btn-primary fw-bold py-2 rounded-3" type="submit" style="background-color: #1877f2; border: none;">
+                                Postează
+                            </button>
+                        </div>
+
+                    </form>
+
+                </div>
+
             </div>
+
         </div>
+
     </div>
+
 </div>
 
+@*elemente de stilizare css*@
+<style>
+    .cursor-pointer {
+        cursor: pointer;
+    }
+
+    .upload-box {
+        transition: background-color 0.2s, transform 0.2s;
+    }
+
+        .upload-box:hover {
+            background-color: #e4e6eb !important; /* Gri mai inchis la hover */
+            transform: translateY(-2px);
+        }
+    /* Ascundem toolbar-ul complex summernote pentru un look mai clean, sau il simplificam */
+    .note-editor.note-frame {
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    .note-toolbar {
+        background: transparent !important;
+        border-bottom: 1px solid #eee !important;
+    }
+
+    .note-statusbar {
+        display: none !important;
+    }
+</style>
+
+@*sectiune cu JavaScript unde ne ocupam de logica previzulaizarii imaginilor, videoclipurilor cat si cea de stergere a acestora*@
 @section Scripts {
     <script>
-        const imageInput = document.getElementById('imageInput');
-        const videoInput = document.getElementById('videoInput');
 
+        const imageInput = document.getElementById('imageInput');    //inpututl pentru adaugarea unei imagini
+        const videoInput = document.getElementById('videoInput');    //inputul pentru adaugarea unui videoclip
+
+        //sectiune pentru containerul de previzualizare al imaginii, alaturi de butinul de stergere al acesteia
         const imgContainer = document.getElementById('imagePreviewContainer');
         const imgPreview = document.getElementById('imagePreview');
+        const removeImgBtn = document.getElementById('removeImage');
 
+
+        //sectiune pentru containerul de previzualizare al videoclipului, alaturi de butinul de stergere al acestuia
         const vidContainer = document.getElementById('videoPreviewContainer');
         const vidPreview = document.getElementById('videoPreview');
+        const removeVidBtn = document.getElementById('removeVideo');
 
+        //logica de imagine
+        //in momenyul sesizarii unei schimbari (change)
         imageInput.addEventListener('change', function() {
             const file = this.files[0];
+
+            //daca fisierul selectat nu este null
             if (file) {
+
+                //asociem imaginii sursa
                 imgPreview.src = URL.createObjectURL(file);
+
+                //eliminam clasa d-none pentru containerul de previzulizare al imaginii, insemnand ca il vom face vizibil in pagina
                 imgContainer.classList.remove('d-none');
-            } else {
-                imgContainer.classList.add('d-none');
-            }    
+            }
         });
 
+        //adaugam un eventlistener de click pe containerul de stergere al imaginii
+        removeImgBtn.addEventListener('click', function() {
+
+            //dam reset la input
+            imageInput.value = '';
+
+            //stergem sursa din containerul de prezivualizare
+            imgPreview.src = '#';
+
+            //ascundem containerul de previzlualizare al imaginii prin adaugarea clasei d-none
+            imgContainer.classList.add('d-none');
+        });
+
+        //logica de videoclip
         videoInput.addEventListener('change', function() {
             const file = this.files[0];
+
             if (file) {
+
+                //asociem videoclipului sursa
                 vidPreview.src = URL.createObjectURL(file);
+
+                //eliminam clasa d-none pentru containerul de previzulizare al videoxlipului, insemnand ca il vom face vizibil in pagina
                 vidContainer.classList.remove('d-none');
-            } else {
-                vidContainer.classList.add('d-none');
             }
-            
         });
 
+        removeVidBtn.addEventListener('click', function() {
+
+            //dam reset la input
+            videoInput.value = '';
+
+            //stergem sursa din containerul de prezivualizare
+            vidPreview.src = '';
+
+            //ascundem containerul de previzlualizare al videoclipului prin adaugarea clasei d-none
+            vidContainer.classList.add('d-none');
+        });
     </script>
 }

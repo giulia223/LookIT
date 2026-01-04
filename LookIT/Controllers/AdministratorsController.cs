@@ -219,7 +219,7 @@ namespace LookIT.Controllers
                 _context.Collections.RemoveRange(userCollections);
             }
 
-            //de asemenea, am restrictionat si daca un utilizator are postari salvate in colectiile altor utilizatori, nu il putem sterge'
+            //de asemenea, am restrictionat si daca un utilizator are postari salvate in colectiile altor utilizatori, nu il putem sterge
             //vom prelua id-urile postarilor sale 
             var userPostIds = _context.Posts
                                       .Where(post => post.AuthorId == Id)

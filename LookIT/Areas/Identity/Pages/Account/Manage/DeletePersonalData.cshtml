@@ -1,0 +1,70 @@
+﻿@page
+@model DeletePersonalDataModel
+@{
+    ViewData["Title"] = "Ștergere date personale";
+    ViewData["ActivePage"] = ManageNavPages.PersonalData;
+}
+
+<div class="row justify-content-start">
+    <div class="col-md-10 col-lg-8">
+
+        @* Card container *@
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body p-4">
+
+                <h4 class="fw-bold mb-3 text-danger">@ViewData["Title"]</h4>
+
+                @* Alertă stilizată *@
+                <div class="alert alert-warning border-0 rounded-3 shadow-sm d-flex align-items-center mb-4" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill fs-4 me-3 text-warning"></i>
+                    <div>
+                        <p class="mb-0">
+                            <strong>Atenție!</strong> Ștergerea acestor date va elimina permanent contul tău și nu va putea fi recuperat.
+                        </p>
+                    </div>
+                </div>
+
+                <div>
+                    <form id="delete-user" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+
+                        @if (Model.RequirePassword)
+                        {
+                            <div class="mb-4">
+                                <label asp-for="Input.Password" class="form-label small text-muted fw-bold ms-1">INTRODU PAROLA PENTRU CONFIRMARE</label>
+                                <div class="input-group">
+                                    @* Iconiță Shield/Lock *@
+                                    <span class="input-group-text border-0 rounded-start-3 ps-3">
+                                        <i class="bi bi-shield-lock-fill"></i>
+                                    </span>
+
+                                    <input asp-for="Input.Password" class="form-control custom-input-bg border-0 rounded-end-3 py-2" autocomplete="current-password" aria-required="true" placeholder="Parola ta" />
+                                </div>
+                                <span asp-validation-for="Input.Password" class="text-danger small ms-1"></span>
+                            </div>
+                        }
+
+                        @* Zona de Acțiuni: Două butoane unul lângă altul *@
+                        <div class="d-flex gap-3">
+                            @* 1. Buton Anulare (Înapoi) *@
+                            <a asp-page="PersonalData" class="btn btn-outline-secondary rounded-pill py-2 fw-bold shadow-sm w-50 d-flex align-items-center justify-content-center text-decoration-none">
+                                <i class="bi bi-arrow-left me-2"></i> Renunta
+                            </a>    
+
+                            @* 2. Buton Ștergere (Pericol) *@
+                            <button class="btn btn-danger rounded-pill py-2 fw-bold shadow-sm w-50" type="submit">
+                                <i class="bi bi-trash3-fill me-2"></i> Șterge contul
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
