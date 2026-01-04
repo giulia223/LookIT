@@ -180,17 +180,17 @@
 
     /* Hover pe butoanele normale */
     .pagination .page-item:not(.active):not(.disabled) .page-link:hover {
-        background-color: #e7f3ff; /* Albastru foarte deschis la hover */
-        color: #1877f2; /* Albastrul FB */
+        background-color: #FBF1F7; /* Roz pal la hover */
+        color: #B13079; /* Magenta LookIT */
         transform: translateY(-2px); /* Mic efect de ridicare */
     }
 
     /* Starea ACTIVE (Pagina curentă) */
     .pagination .page-item.active .page-link {
-        background-color: #1877f2; /* Albastrul principal */
+        background-color: #D87CB0; /* Magenta LookIT */
         color: #fff;
-        box-shadow: 0 4px 6px rgba(24, 119, 242, 0.3) !important; /* Umbra albastra */
-        pointer-events: none; /* Nu poti da click pe pagina curenta */
+        box-shadow: 0 4px 6px rgba(177, 48, 121, 0.3) !important; /* Umbră magenta */
+        pointer-events: none;
     }
 
     /* Starea DISABLED (Săgețile când nu mai poți da next/prev) */
@@ -200,5 +200,4 @@
         opacity: 0.7;
         box-shadow: none !important;
     }
-</style>
-
+ </style>

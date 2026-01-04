@@ -1,6 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,137 +11,84 @@
 
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="~/LookIT.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-          integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
-          crossorigin="anonymous" referrerpolicy="no-referrer" />
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.css" rel="stylesheet">
-
-    <style>
-        /* Ajustări specifice pentru header */
-        .navbar-nav .nav-link {
-            font-weight: 500;
-            color: #555;
-            transition: color 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-            .navbar-nav .nav-link:hover, .navbar-nav .nav-link.active {
-                color: #0d6efd !important; /* Bootstrap Primary Color */
-            }
-
-        .search-input:focus {
-            box-shadow: none;
-            border-color: #dee2e6;
-            background-color: white !important;
-        }
-        /* Sticky header fix */
-        body {
-            padding-top: 70px;
-        }
-
-        header {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 1030;
-        }
-    </style>
 </head>
-<body class="bg-light">
+<body>
     <header>
-        <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm py-2">
-            <div class="container">
-                <a class="navbar-brand d-flex align-items-center" asp-area="" asp-controller="Posts" asp-action="Index">
-                    @* Aici punem imaginea *@
-                    <img src="~/images/logo-lookit.png" alt="LookIT Logo" style="height: 40px; width: auto;" />
+        <nav class="navbar navbar-expand-lg navbar-light shadow-none">
+            @* Folosim container-fluid pentru a întinde elementele spre colțuri *@
+            <div class="container-fluid px-3 px-lg-5">
+
+                <a class="navbar-brand d-flex align-items-center me-lg-5" asp-area="" asp-controller="Posts" asp-action="Index">
+                    <img src="~/images/logo-lookit.png" alt="LookIT" />
                 </a>
 
-                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
                 <div class="navbar-collapse collapse">
 
-                    <form asp-controller="Search" asp-action="Index" method="get" class="d-flex mx-auto my-3 my-lg-0 w-100" style="max-width: 350px;">
-                        <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0 rounded-start-pill text-muted">
+                    @* Search Bar *@
+                    <form asp-controller="Search" asp-action="Index" method="get" class="d-flex mx-auto my-3 my-lg-0 w-100" style="max-width: 500px;">
+                        <div class="input-group search-container w-100 align-items-center">
+                            <span class="search-icon ps-2 pe-3">
                                 <i class="bi bi-search"></i>
                             </span>
-                            <input class="form-control bg-light border-start-0 rounded-end-pill ps-0 search-input"
+                            <input class="form-control search-input"
                                    type="search"
                                    name="query"
                                    placeholder="Caută pe LookIT..."
-                                   aria-label="Search">
+                                   autocomplete="off">
                         </div>
                     </form>
 
-                    <ul class="navbar-nav ms-auto align-items-center gap-3 gap-lg-4">
-
+                    @* Navigare *@
+                    <ul class="navbar-nav ms-auto align-items-center gap-2 gap-lg-4">
                         <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Posts" asp-action="Index"
-                               data-bs-toggle="tooltip" title="For you">
-                                <i class="bi bi-house-door fs-4"></i>
-                                <span class="d-lg-none">For You</span>
+                            <a class="nav-link" asp-area="" asp-controller="Posts" asp-action="Index" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Acasă">
+                                <i class="bi bi-house-door-fill nav-icon"></i>
+                                <span class="d-lg-none ms-2">Acasă</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Groups" asp-action="Index" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Grupuri">
+                                <i class="bi bi-grid-fill nav-icon"></i>
+                                <span class="d-lg-none ms-2">Grupuri</span>
                             </a>
                         </li>
 
-                         <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Groups" asp-action="Index"
-                                   data-bs-toggle="tooltip" title="Toate Grupurile">
-                                    <i class="bi bi-grid fs-4"></i>
-                                    <span class="d-lg-none">Groups</span>
-                                </a>
-                            </li>
-
-                        @if (User.IsInRole("User") || User.IsInRole("Administrator"))
+                        @if (User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Posts" asp-action="Feed"
-                                   data-bs-toggle="tooltip" title="Following">
-                                    <i class="bi bi-people fs-4"></i>
-                                    <span class="d-lg-none">Following</span>
+                                <a class="nav-link" asp-area="" asp-controller="Posts" asp-action="Feed" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Urmărești">
+                                    <i class="bi bi-people-fill nav-icon"></i>
+                                    <span class="d-lg-none ms-2">Urmărești</span>
                                 </a>
                             </li>
-
-                           
-
-                            @* <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="GroupMembers" asp-action="Show"
-                                   data-bs-toggle="tooltip" title="Grupurile Mele">
-                                    <i class="bi bi-person-workspace fs-4"></i>
-                                    <span class="d-lg-none">Your Groups</span>
+                            <li class="nav-item ms-lg-2">
+                                <a class="nav-link btn-new-post d-flex align-items-center gap-2" asp-area="" asp-controller="Posts" asp-action="New">
+                                    <i class="bi bi-plus-lg fs-5"></i>
+                                    <span class="d-none d-xl-inline fw-bold" style="font-size: 0.9rem;">Creează</span>
+                                    <span class="d-lg-none">Creează postare</span>
                                 </a>
-                            </li> *@
-
+                            </li>
                             @if (User.IsInRole("Administrator"))
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link text-danger" asp-area="" asp-controller="Administrators" asp-action="Page"
-                                       data-bs-toggle="tooltip" title="Panou Admin">
-                                        <i class="bi bi-shield-lock-fill fs-4"></i>
-                                        <span class="d-lg-none">Panou Admin</span>
+                                    <a class="nav-link text-danger" asp-area="" asp-controller="Administrators" asp-action="Page" data-bs-toggle="tooltip" title="Admin">
+                                        <i class="bi bi-shield-check nav-icon"></i>
+                                        <span class="d-lg-none ms-2">Admin</span>
                                     </a>
                                 </li>
                             }
-
-                            <li class="nav-item">
-                                <a class="nav-link text-primary" asp-area="" asp-controller="Posts" asp-action="New"
-                                   data-bs-toggle="tooltip" title="Adaugă postare">
-                                    <i class="bi bi-plus-square-fill fs-4"></i>
-                                    <span class="d-lg-none">Postare nouă</span>
-                                </a>
-                            </li>
                         }
 
-                        <li class="nav-item ps-lg-2 border-start-lg">
+                        <li class="nav-item ps-lg-3 ms-lg-2 border-start-lg">
                             <partial name="_LoginPartial" />
                         </li>
                     </ul>
@@ -149,25 +97,25 @@
         </nav>
     </header>
 
-    <div class="container">
+    <div class="container container-xxl">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted bg-white mt-auto">
-        <div class="container py-3 text-center">
-            &copy; 2025 - LookIT - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    @* Footer Clasic *@
+    <footer class="border-top footer text-muted">
+        <div class="container text-center">
+            <small>&copy; 2025 - <strong>LookIT</strong> - Conectăm oameni.</small>
+            - <a asp-area="" asp-controller="Home" asp-action="Privacy" class="text-decoration-none text-muted small">Politica de confidențialitate</a>
         </div>
     </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
     <script src="~/lib/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.js"></script>
     <script src="~/js/Summernote.js" asp-append-version="true"></script>
 

@@ -1,5 +1,44 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿@model LookIT.Models.Comment
+
+<div class="d-flex gap-2 mb-3">
+    <div class="flex-shrink-0">
+        <a asp-controller="Profile" asp-action="Details" asp-route-userId="@Model.UserId" class="text-decoration-none">
+            <img src="@(!string.IsNullOrEmpty(Model.User.ProfilePictureUrl) ? Model.User.ProfilePictureUrl : "/images/unknown_person_jpg")"
+                 class="rounded-circle border" style="width: 32px; height: 32px; object-fit: cover;" />
+        </a>
+    </div>
+    <div class="flex-grow-1">
+        <div class="bg-light rounded-4 px-3 py-2 d-inline-block border" style="min-width: 220px; max-width: 100%;">
+            <div class="d-flex align-items-center justify-content-between mb-1">
+                <a asp-controller="Profile" asp-action="Details" asp-route-userId="@Model.UserId" class="text-decoration-none">
+                    <span class="fw-bold text-dark" style="font-size: 0.85rem;">
+                        @(Model.User.FullName ?? "Utilizator necunoscut")
+                    </span>
+                </a>
+                @if (Model.DateModified.HasValue)
+                {
+                    <small class="text-muted ms-4" style="font-size: 0.7rem;">
+                        Editat (@Model.DateModified.Value.ToString(Model.DateModified.Value.Year == DateTime.Now.Year ? "d MMM HH:mm" : "d MMM yyyy HH:mm") )
+                    </small>
+                }
+            </div>
+            <div class="text-break" style="font-size: 0.9rem;">@Model.Content</div>
+        </div>
+        <div class="d-flex align-items-center gap-3 ms-2 mt-1">
+            <small class="text-muted" style="font-size: 0.75rem;">
+                @Model.Date.ToString(Model.Date.Year == DateTime.Now.Year ? "d MMM HH:mm" : "d MMM yyyy HH:mm")
+            </small>
+            @if (Model.UserId == ViewBag.UserCurent || ViewBag.EsteAdministrator == true)
+            {
+                <a class="text-decoration-none text-secondary fw-bold" style="font-size: 0.75rem;"
+                   asp-controller="Comments" asp-action="Edit" asp-route-id="@Model.CommentId">Editează</a>
+                <form method="post" asp-controller="Comments" asp-action="Delete" asp-route-id="@Model.CommentId" class="d-inline">
+                    <button class="btn btn-link text-danger text-decoration-none fw-bold p-0 border-0"
+                            style="font-size: 0.75rem; line-height: 1;" type="submit">
+                        Șterge
+                    </button>
+                </form>
+            }
+        </div>
+    </div>
+</div>

@@ -830,7 +830,6 @@ namespace LookIT.Controllers
             return Json(new { success = true, isLiked = isLikedNow, count = newCount });
         }
 
-
         //conditiile de afisare pentru butoanele de editare si steregere
         //butoanele sunt aflate in view-uri
         private void SetAccessRights()
