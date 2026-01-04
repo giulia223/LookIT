@@ -11,8 +11,7 @@
     var currentUserId = UserManager.GetUserId(User);
 
     //verificam daca utilizatorul cu care suntem logat a apreciat postarea sau nu
-    bool isLiked = Model.Likes
-                        .Any(like => like.UserId == currentUserId);
+    bool isLiked = Model.Likes.Any(like => like.UserId == currentUserId);
 
     //numarul de like uri ale posatrii
     int likeCount = Model.Likes.Count;
@@ -38,6 +37,14 @@
 
 <br />
 
+@* --- 0. BUTON ÎNAPOI (Intoarce userul la pagina anterioara) --- *@
+<div class="container mb-3 mx-auto" style="max-width: 600px;">
+    @* Folosim javascript:history.back() pentru a simula butonul Back al browserului *@
+    <a href="javascript:history.back()" class="btn btn-sm btn-light rounded-pill px-3 fw-bold text-muted border-0 shadow-sm">
+        <i class="bi bi-arrow-left me-1"></i> Înapoi
+    </a>
+</div>
+
 <div class="card mb-3 mx-auto border-0 shadow-sm" style="max-width: 600px;">
     <div class="card-body p-3">
 
@@ -48,7 +55,7 @@
             <div class="d-flex align-items-center">
 
                 <a asp-controller="Profile" asp-action="Details" asp-route-userId="@Model.AuthorId" asp-area="" class="text-decoration-none">
-                    <img src="@Model.Author.ProfilePictureUrl"
+                    <img src="@(!string.IsNullOrEmpty(Model.Author.ProfilePictureUrl) ? Model.Author.ProfilePictureUrl : "/images/default-profile.png")"
                          alt="Profile Picture"
                          class="rounded-circle border"
                          style="width: 40px; height: 40px; object-fit: cover;" />
@@ -223,7 +230,7 @@
                     <input type="hidden" name="PostId" value="@Model.PostId" />
 
                     <div class="d-flex gap-2 align-items-start">
-                        <img src="@loggedUser?.ProfilePictureUrl"
+                        <img src="@(!string.IsNullOrEmpty(loggedUser?.ProfilePictureUrl) ? loggedUser.ProfilePictureUrl : "/images/default-profile.png")"
                              class="rounded-circle border"
                              style="width: 32px; height: 32px; object-fit: cover;"
                              alt="Me" />
@@ -254,7 +261,7 @@
                     <div class="d-flex gap-2 mb-3">
                         <div class="flex-shrink-0">
                             <a asp-controller="Profile" asp-action="Details" asp-route-userId="@comment.UserId" asp-area="" class="text-decoration-none">
-                                <img src="@comment.User.ProfilePictureUrl" alt="Profile"
+                                <img src="@(!string.IsNullOrEmpty(comment.User.ProfilePictureUrl) ? comment.User.ProfilePictureUrl : "/images/default-profile.png")" alt="Profile"
                                      class="rounded-circle border" style="width: 32px; height: 32px; object-fit: cover;" />
                             </a>
                         </div>
@@ -269,8 +276,10 @@
                                     </a>
                                     @if (comment.DateModified.HasValue)
                                     {
-                                        <small class="text-muted ms-4" style="font-size: 0.7rem;">Editat ( 
-                                            @comment.DateModified.Value.ToString(comment.DateModified.Value.Year == DateTime.Now.Year ? "d MMM HH:mm" : "d MMM yyyy HH:mm") )</small>
+                                        <small class="text-muted ms-4" style="font-size: 0.7rem;">
+                                            Editat (
+                                            @comment.DateModified.Value.ToString(comment.DateModified.Value.Year == DateTime.Now.Year ? "d MMM HH:mm" : "d MMM yyyy HH:mm") )
+                                        </small>
                                     }
                                 </div>
                                 <div class="text-break" style="font-size: 0.9rem;">@comment.Content</div>

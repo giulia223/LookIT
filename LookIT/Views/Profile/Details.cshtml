@@ -5,83 +5,105 @@
     bool showFullProfile = ViewBag.ShowFullProfile;
 }
 
-<div class="container mt-4">
+<div class="container mt-4 mb-5">
 
-    <div class="card mb-4 text-center border-0 shadow-sm">
-        <div class="card-body">
-            <img src="@Model.ProfilePictureUrl"
-                 alt="Profile Picture"
-                 class="rounded-circle mb-3"
-                 style="width: 150px; height: 150px; object-fit: cover; border: 3px solid #eee;" />
+    @* --- 0. BUTON ÎNAPOI (NOU) --- *@
+    <div class="mb-4">
+        <a href="javascript:history.back()" class="btn btn-sm btn-light rounded-pill px-3 fw-bold text-muted border-0 shadow-sm">
+            <i class="bi bi-arrow-left me-1"></i> Înapoi
+        </a>
+    </div>
 
-            <h3>@Model.FullName</h3>
-            <div class="d-flex justify-content-center gap-5 my-3 text-center">
-
-                <div>
-                    <span class="fw-bold d-block fs-5">@ViewBag.UserPosts.Count</span>
-                    <small class="text-muted">Postări</small>
-                </div>
-
-                @if (showFullProfile)
-                {
-                    <a asp-action="Followers" asp-route-userId="@Model.Id" class="text-decoration-none text-dark">
-                        <span class="fw-bold d-block fs-5">@ViewBag.FollowersCount</span>
-                        <small class="text-muted">Urmăritori</small>
-                    </a>
-                }
-                else
-                {
-                    <div>
-                        <span class="fw-bold d-block fs-5">@ViewBag.FollowersCount</span>
-                        <small class="text-muted">Urmăritori</small>
-                    </div>
-                }
-
-                @if (showFullProfile)
-                {
-                    <a asp-action="Following" asp-route-userId="@Model.Id" class="text-decoration-none text-dark">
-                        <span class="fw-bold d-block fs-5">@ViewBag.FollowingCount</span>
-                        <small class="text-muted">Urmăriri</small>
-                    </a>
-                }
-                else
-                {
-                    <div>
-                        <span class="fw-bold d-block fs-5">@ViewBag.FollowingCount</span>
-                        <small class="text-muted">Urmăriri</small>
-                    </div>
-                }
+    @* --- 1. CARD PROFIL HEADER --- *@
+    <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+        <div class="card-body p-4 text-center">
+            
+            @* Poza de profil *@
+            <div class="d-inline-block position-relative mb-3">
+                <img src="@(!string.IsNullOrEmpty(Model.ProfilePictureUrl) ? Model.ProfilePictureUrl : "/images/default-profile.png")"
+                     alt="Profile Picture"
+                     class="rounded-circle shadow-sm"
+                     style="width: 140px; height: 140px; object-fit: cover; box-shadow: 0 0 0 2px #FBF1F7;" />
             </div>
 
-            <p class="text-muted">
+            <h3 class="fw-bold mb-1">@Model.FullName</h3>
+            
+            @* Descriere *@
+            <p class="text-muted small mx-auto mb-3" style="max-width: 500px;">
                 @if (!string.IsNullOrEmpty(Model.Description))
                 {
                     @Model.Description
                 }
                 else
                 {
-                    <em>Fără descriere.</em>
+                    <span class="fst-italic opacity-50">Fără descriere.</span>
                 }
             </p>
 
+            @* Statistici (Postări, Urmăritori, Urmăriri) *@
+            <div class="d-flex justify-content-center gap-4 gap-md-5 my-4 border-top border-bottom py-3 bg-light bg-opacity-25">
+                
+                @* Postări *@
+                <div class="text-center">
+                    <span class="fw-bold d-block fs-5 text-dark">@ViewBag.UserPosts.Count</span>
+                    <small class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">Postări</small>
+                </div>
+
+                @* Urmăritori *@
+                <div class="text-center">
+                    @if (showFullProfile)
+                    {
+                        <a asp-action="Followers" asp-route-userId="@Model.Id" class="text-decoration-none text-dark hover-magenta">
+                            <span class="fw-bold d-block fs-5">@ViewBag.FollowersCount</span>
+                            <small class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">Urmăritori</small>
+                        </a>
+                    }
+                    else
+                    {
+                        <span class="fw-bold d-block fs-5">@ViewBag.FollowersCount</span>
+                        <small class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">Urmăritori</small>
+                    }
+                </div>
+
+                @* Urmăriri *@
+                <div class="text-center">
+                    @if (showFullProfile)
+                    {
+                        <a asp-action="Following" asp-route-userId="@Model.Id" class="text-decoration-none text-dark hover-magenta">
+                            <span class="fw-bold d-block fs-5">@ViewBag.FollowingCount</span>
+                            <small class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">Urmăriri</small>
+                        </a>
+                    }
+                    else
+                    {
+                        <span class="fw-bold d-block fs-5">@ViewBag.FollowingCount</span>
+                        <small class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">Urmăriri</small>
+                    }
+                </div>
+            </div>
+
+            @* Cont Privat Badge *@
             @if (!Model.Public)
             {
-                <span class="badge bg-secondary"><i class="bi bi-lock-fill"></i> Cont Privat</span>
+                <div class="mb-3">
+                    <span class="badge bg-light text-secondary border rounded-pill px-3 py-2">
+                        <i class="bi bi-lock-fill me-1"></i> Cont Privat
+                    </span>
+                </div>
             }
 
-            @* --- ZONA DE ACTIUNI (BUTOANE) --- *@
-            <div class="mt-4 d-flex flex-wrap justify-content-center gap-2">
+            @* --- ZONA DE ACȚIUNI (BUTOANE) --- *@
+            <div class="d-flex flex-wrap justify-content-center gap-2">
                 @if (ViewBag.IsOwner)
                 {
-                    @* 1. Buton: EDITEAZA PROFIL (Nume, Descriere, Poza) *@
-                    <a asp-action="Edit" class="btn btn-light border fw-bold px-4 rounded-3 shadow-sm action-btn">
+                    @* PROPRIETAR *@
+                    <a asp-action="Edit" class="btn btn-outline-secondary rounded-pill px-4 fw-bold btn-action">
                         <i class="bi bi-pencil-square me-1"></i> Editează
                     </a>
 
-                    @* 3. Buton: CERERI *@
-                    <a asp-controller="FollowRequests" asp-action="MyRequests"
-                       class="btn btn-light border fw-bold px-3 rounded-3 shadow-sm action-btn position-relative text-dark"
-                       data-bs-toggle="tooltip" title="Cereri">
+                    <a asp-controller="FollowRequests" asp-action="MyRequests" 
+                       class="btn btn-outline-secondary rounded-pill px-3 fw-bold btn-action position-relative" 
+                       data-bs-toggle="tooltip" title="Cereri de urmărire">
                         <i class="bi bi-person-check-fill"></i>
                         @if (ViewBag.HasPendingRequests == true)
                         {
@@ -89,39 +111,33 @@
                         }
                     </a>
 
-                    @* 4. Buton: COLECTII *@
-                    <a asp-action="Index" asp-controller="Collections" asp-area=""
-                       class="btn btn-light border rounded-3 shadow-sm action-btn px-3"
-                       data-bs-toggle="tooltip" title="Salvate">
-                        <i class="bi bi-bookmark-fill text-secondary"></i>
+                    <a asp-action="Index" asp-controller="Collections" class="btn btn-outline-secondary rounded-pill px-3 fw-bold btn-action" data-bs-toggle="tooltip" title="Colecții">
+                        <i class="bi bi-bookmark-fill"></i>
                     </a>
 
-                    @* 5. Buton: APRECIATE *@
-                    <a asp-action="Index" asp-controller="Likes" asp-area=""
-                       class="btn btn-light border rounded-3 shadow-sm action-btn px-3"
-                       data-bs-toggle="tooltip" title="Apreciate">
-                        <i class="bi bi-heart-fill text-danger opacity-75"></i>
+                    <a asp-action="Index" asp-controller="Likes" class="btn btn-outline-secondary rounded-pill px-3 fw-bold btn-action" data-bs-toggle="tooltip" title="Apreciate">
+                        <i class="bi bi-heart-fill"></i>
                     </a>
                 }
-                else if(User.Identity.IsAuthenticated)
+                else if (User.Identity.IsAuthenticated)
                 {
-                    @* --- ZONA PENTRU VIZITATORI (Follow/Unfollow) --- *@
+                    @* VIZITATOR *@
                     <form asp-action="FollowToggle" asp-route-userId="@Model.Id" method="post">
                         @if (ViewBag.IsFollowing)
                         {
-                            <button type="submit" class="btn btn-light border fw-bold px-4 rounded-3 shadow-sm action-btn text-dark">
+                            <button type="submit" class="btn btn-outline-secondary rounded-pill px-4 fw-bold btn-action">
                                 Urmărești <i class="bi bi-check2"></i>
                             </button>
                         }
                         else if (ViewBag.IsPending)
                         {
-                            <button type="submit" class="btn btn-secondary fw-bold px-4 rounded-3 disabled border-0">
+                            <button type="submit" class="btn btn-secondary rounded-pill px-4 fw-bold disabled border-0">
                                 Cerere trimisă
                             </button>
                         }
                         else
                         {
-                            <button type="submit" class="btn btn-primary fw-bold px-5 rounded-3 shadow-sm action-btn">
+                            <button type="submit" class="btn btn-primary rounded-pill px-5 fw-bold shadow-sm">
                                 Urmărește
                             </button>
                         }
@@ -131,30 +147,20 @@
         </div>
     </div>
 
-    <hr />
-
-
-@if (showFullProfile)
-{
-        <div class="row g-1 mb-5">
-            @{
-                var posts = ViewBag.UserPosts as List<LookIT.Models.Post>;
-            }
-
-            @if (posts != null && posts.Any())
-            {
+    @* --- 2. GRID POSTĂRI --- *@
+    @if (showFullProfile)
+    {
+        var posts = ViewBag.UserPosts as List<LookIT.Models.Post>;
+        if (posts != null && posts.Any())
+        {
+            <div class="row g-1">
                 @foreach (var post in posts)
                 {
                     <div class="col-4">
-                        <a asp-controller="Posts" asp-action="Show" asp-route-id="@post.PostId" class="text-decoration-none user-select-none">
-
-                            @* MODIFICARE AICI: Am schimbat 'rounded' cu 'rounded-0' *@
-                            @* Am pastrat 'border' pentru un contur fin, dar il poti sterge daca vrei *@
-                            <div class="ratio ratio-1x1 border rounded-0 overflow-hidden position-relative shadow-sm bg-light post-card-hover">
-
-                                @* ========================================================== *@
-                                @* 1. ZONA ICONITE (Colt Dreapta Sus)                         *@
-                                @* ========================================================== *@
+                        <a asp-controller="Posts" asp-action="Show" asp-route-id="@post.PostId" class="text-decoration-none user-select-none d-block">
+                            <div class="ratio ratio-1x1 border-0 rounded-0 overflow-hidden position-relative shadow-sm bg-light post-card-hover">
+                                
+                                @* Iconiță tip conținut *@
                                 <div class="position-absolute top-0 end-0 m-2" style="z-index: 10;">
                                     @if (!string.IsNullOrEmpty(post.VideoUrl))
                                     {
@@ -170,10 +176,7 @@
                                     }
                                 </div>
 
-                                @* ========================================================== *@
-                                @* 2. CONTINUTUL CARDULUI                                     *@
-                                @* ========================================================== *@
-
+                                @* Content *@
                                 @if (!string.IsNullOrEmpty(post.ImageUrl))
                                 {
                                     <img src="@post.ImageUrl" class="w-100 h-100" style="object-fit: cover;" alt="Post Image">
@@ -186,160 +189,83 @@
                                 }
                                 else
                                 {
-                                    @* TEXT *@
-                                    var rawHtml = post.TextContent ?? "";
-                                    var plainText = System.Text.RegularExpressions.Regex.Replace(rawHtml, "<.*?>", " ").Trim();
-                                    var previewText = plainText.Length > 70 ? plainText.Substring(0, 70) + "..." : plainText;
-
                                     <div class="d-flex flex-column align-items-center justify-content-center h-100 p-3 text-center bg-white">
                                         <i class="bi bi-quote fs-1 text-muted opacity-25 mb-1"></i>
-                                        <small class="fw-bold text-dark text-break fst-italic pe-2 ps-2" style="font-family: 'Georgia', serif; line-height: 1.3;">
+                                        <small class="fw-bold text-dark text-break fst-italic px-2" style="font-family: 'Georgia', serif; line-height: 1.3;">
+                                            @{
+                                                var rawHtml = post.TextContent ?? "";
+                                                var plainText = System.Text.RegularExpressions.Regex.Replace(rawHtml, "<.*?>", " ").Trim();
+                                                var previewText = plainText.Length > 70 ? plainText.Substring(0, 70) + "..." : plainText;
+                                            }
                                             @previewText
                                         </small>
                                     </div>
                                 }
-
+                                
+                                @* Overlay *@
+                                <div class="card-hover-overlay"></div>
                             </div>
                         </a>
                     </div>
                 }
-            }
-            else
-            {
-                @* Zona "Fara Postari" *@
-                <div class="col-12 py-5 text-center mt-4">
-                    <div class="mb-3">
-                        <i class="bi bi-grid-3x3 text-muted" style="font-size: 3rem; opacity: 0.2;"></i>
-                    </div>
-                    <h5 class="fw-bold text-dark">Încă nu există postări</h5>
+            </div>
+        }
+        else
+        {
+            @* FĂRĂ POSTĂRI *@
+            <div class="text-center py-5 mt-4 rounded-4 bg-light border border-dashed">
+                <div class="mb-3 text-muted opacity-25">
+                    <i class="bi bi-grid-3x3" style="font-size: 3rem;"></i>
                 </div>
-            }
-        </div>
-
-    @* Adaugam un pic de CSS inline pentru hover effect *@
-        <style>
-            .post-card-hover {
-                transition: transform 0.2s;
-            }
-
-                .post-card-hover:hover {
-                    transform: scale(1.02);
-                    z-index: 10;
-                    border-color: #adb5bd !important;
-                }
-        </style>
-}
-else
-{
-    <div class="row">
-        <div class="col-12 py-5 text-center border-0 rounded-4 bg-light mt-2 shadow-sm">
-            <div class="mb-3">
-                <i class="bi bi-lock-fill text-muted" style="font-size: 3.5rem; opacity: 0.5;"></i>
+                <h5 class="fw-bold text-dark">Încă nu există postări</h5>
+            </div>
+        }
+    }
+    else
+    {
+        @* CONT PRIVAT *@
+        <div class="text-center py-5 mt-4 rounded-4 bg-light border border-dashed">
+            <div class="mb-3 text-muted opacity-50">
+                <i class="bi bi-lock-fill" style="font-size: 3rem;"></i>
             </div>
             <h4 class="fw-bold text-dark">Acest cont este privat</h4>
-            <p class="text-muted mx-auto" style="max-width: 350px;">
-                Urmareste acest utilizator pentru a vedea fotografiile și clipurile postate.
+            <p class="text-muted small mx-auto" style="max-width: 350px;">
+                Urmărește acest utilizator pentru a vedea fotografiile și clipurile postate.
             </p>
         </div>
-    </div>
-}
+    }
+</div>
 
-    <style>
-        /* ========================================= */
-        /* 1. STILURI BUTOANE PROFIL (RAMAN LA FEL)  */
-        /* ========================================= */
-        .action-btn {
-            transition: all 0.2s ease-in-out;
-            background-color: #f8f9fa;
-            border-color: #dbdbdb !important;
-            color: #262626;
-            font-size: 0.9rem;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 38px;
-        }
+@* --- STILURI CSS --- *@
+<style>
+    .hover-magenta:hover { color: #B13079 !important; }
 
-            .action-btn:hover {
-                transform: translateY(-2px); /* Doar butoanele se ridica, NU postarile */
-                background-color: #e2e5e9;
-                box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important;
-                color: #000;
-            }
+    .btn-action {
+        background-color: #fff;
+        border-color: #dee2e6;
+        color: #495057;
+        transition: all 0.2s ease;
+    }
 
-            .action-btn:active {
-                transform: translateY(0);
-                background-color: #d3d6da;
-            }
+    .btn-action:hover {
+        background-color: #f8f9fa;
+        color: #B13079;
+        border-color: #B13079;
+    }
 
-            .action-btn i {
-                font-size: 1.1rem;
-                vertical-align: middle;
-            }
+    .post-card-hover { position: relative; }
 
-        .btn-primary.action-btn {
-            background-color: #0d6efd;
-            color: white;
-            border-color: #0d6efd !important;
-        }
+    .card-hover-overlay {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        background-color: rgba(0, 0, 0, 0.3); opacity: 0;
+        transition: opacity 0.2s ease; z-index: 5; pointer-events: none;
+    }
 
-            .btn-primary.action-btn:hover {
-                background-color: #0b5ed7;
-                color: white;
-            }
+    .post-card-hover:hover .card-hover-overlay { opacity: 1; }
 
-        /* ========================================= */
-        /* 2. STILURI POSTARI (FIXE - FARA MISCARE)  */
-        /* ========================================= */
+    .drop-shadow-icon { filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8)); }
 
-        .post-card-hover {
-            position: relative;
-            /* Fortam tranzitia sa fie 0 pentru transformari */
-            transition: none !important;
-            /* Ne asiguram ca nu exista transformari implicite */
-            transform: none !important;
-        }
-
-        /* Asigura-te ca link-ul (<a>) se comporta ca un bloc solid */
-        a.post-card-link {
-            display: block;
-        }
-
-        /* Stratul invizibil pentru overlay (negru semi-transparent) */
-        .post-card-hover::after {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            /* Negru semi-transparent (30%) uniform */
-            background: rgba(0, 0, 0, 0.3);
-            opacity: 0; /* Invizibil implicit */
-            transition: opacity 0.2s ease-in-out;
-            z-index: 1;
-            pointer-events: none;
-        }
-
-        /* La hover apare DOAR overlay-ul, pozitia ramane FIXA */
-        .post-card-hover:hover {
-            cursor: pointer;
-            /* Aici este cheia: suprascriem orice regula de miscare */
-            transform: none !important;
-            margin-top: 0 !important;
-            box-shadow: 0 .125rem .25rem rgba(0,0,0,.075) !important; /* Pastram umbra originala (shadow-sm), nu o marim */
-        }
-
-            .post-card-hover:hover::after {
-                opacity: 1;
-            }
-
-        /* ========================================= */
-        /* 3. ICONITE (ALBE + UMBRA)                 */
-        /* ========================================= */
-        .drop-shadow-icon {
-            filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.8));
-            font-size: 1.1rem;
-            display: inline-block;
-        }
-    </style>
+    .border-dashed {
+        border-style: dashed !important; border-color: #dee2e6 !important;
+    }
+</style>
