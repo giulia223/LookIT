@@ -1,8 +1,11 @@
 ﻿@model LookIT.Models.Comment
 
 <div class="container mt-5">
+
     <div class="row justify-content-center">
+
         <div class="col-md-8 col-lg-6">
+
             <div class="card border-0 shadow-sm rounded-4">
 
                 <div class="card-header bg-primary text-white p-4 rounded-top-4">
@@ -27,6 +30,7 @@
                     </div>
 
                     <form asp-action="Edit" asp-controller="Comments" asp-route-id="@Model.CommentId" method="post">
+                        <input type="hidden" name="Id" value="@Model.CommentId" />
                         <input type="hidden" asp-for="PostId" />
                         @* Asigură-te că transmiți și data originală pentru a nu o pierde la Save dacă nu e setată automat în DB *@
                         <input type="hidden" asp-for="Date" />

@@ -1,5 +1,8 @@
-﻿html {
+﻿/* --- CONFIGURĂRI GENERALE --- */
+html {
     font-size: 14px;
+    position: relative;
+    min-height: 100%;
 }
 
 @media (min-width: 768px) {
@@ -8,96 +11,136 @@
     }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-    position: relative;
-    min-height: 100%;
-}
-
 body {
     margin-bottom: 60px;
-    background-color: #f0f2f5; /* Gri deschis specific FB, arata mai bine decat #F8F6F7 */
+    background-color: #f0f2f5;
 }
 
-/* Stiluri Formulare */
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-    color: var(--bs-secondary-color);
-    text-align: end;
+/* --- FORMULARE ȘI INPUT-URI (GLOBAL) --- */
+
+/* 1. Fundalul gri deschis pentru pătratul iconițelor (cel din imaginea ta) */
+.input-group-text {
+    background-color: #f8f9fa !important; /* Un gri foarte deschis și curat */
+    border: none !important;
+    color: #adb5bd !important; /* Culoarea iconiței (gri neutru) */
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-    text-align: start;
+/* 2. Textul din placeholder: Aceeași culoare cu label-urile (Gri închis) */
+/* Am eliminat orice urmă de magenta/roz de aici */
+.form-control::placeholder {
+    color: #6c757d !important;
+    opacity: 1;
+    font-size: 0.9rem !important;
 }
 
-/* --- NAVIGARE (HEADER) --- */
-/* Aici suprascriem culorile pentru a fi ALBASTRE, nu maro */
+/* 3. Stil Input (Fără mărire text, fără tranziții) */
+.form-control {
+    font-size: 0.9rem !important;
+    transition: none !important;
+    border: none !important; /* Elimină bordura implicită */
+}
+
+    /* 4. ELIMINARE COMPLETĂ CONTUR LA CLICK (Focus) */
+    /* Aceasta oprește evidențierea chenarului când scrii */
+    .form-control:focus,
+    .input-group-text:focus,
+    .btn:focus,
+    .form-check-input:focus {
+        border: none !important;
+        box-shadow: none !important;
+        outline: 0 !important;
+        background-color: #FBF1F7 !important; /* Menținem fundalul roz pal și la focus */
+    }
+
+/* 5. Fundalul roz pastelat pentru câmpul de scriere */
+.custom-input-bg {
+    background-color: #FBF1F7 !important;
+    border: none !important;
+}
+
+    /* Autofill: Menținem rozul pal să nu devină alb/galben */
+    input:-webkit-autofill,
+    .custom-input-bg:-webkit-autofill {
+        -webkit-box-shadow: 0 0 0px 1000px #FBF1F7 inset !important;
+        -webkit-text-fill-color: #212529 !important;
+        transition: background-color 5000s ease-in-out 0s;
+    }   
+
+/* --- NAVIGARE ȘI ALTE STILURI --- */
 .navbar {
-    background-color: #1877f2 !important; /* Albastrul tau */
+    background-color: #C74E92 !important;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1) !important;
 }
 
-
-
-/* Link-urile din meniu */
-.navbar-brand,
-.navbar-nav .nav-link,
-.navbar-dark .navbar-nav .nav-link {
-    color: #ffffff !important; /* Text Alb */
+.navbar-brand, .navbar-nav .nav-link {
+    color: #EBA5CD !important;
     font-weight: 500;
 }
 
-    /* 3. Hover (Când pui mouse-ul pe linkuri) */
-.navbar-nav .nav-link:hover,
-.navbar-nav .nav-link:focus {
-    color: #ffffff !important; /* Rămâne alb */
-    background-color: rgba(255, 255, 255, 0.2); /* Adaugă un fundal alb transparent (efect de sticlă) */
-    border-radius: 8px; /* Rotunjește colțurile fundalului */
-    transition: all 0.2s ease; /* Tranziție fină */
+/* --- SUPRASCRIERE BUTOANE GLOBALE (Din Albastru în Magenta) --- */
+
+/* 1. Starea normală a butonului */
+.btn-primary {
+    background-color: #B13079 !important; /* Culoarea ta Magenta */
+    border-color: #B13079 !important; /* Bordura aceleiași culori */
+    color: #ffffff !important; /* Text alb */
+    /* Opțional: Dacă vrei ca TOATE butoanele principale să fie rotunjite */
+    border-radius: 50rem !important;
+    font-weight: bold;
 }
 
-/* Link activ (pagina curentă) */
-.navbar-nav .nav-link.active {
-    color: #ffffff !important;
-    font-weight: 700; /* Text îngroșat */
-    background-color: rgba(0, 0, 0, 0.1); /* Un fundal puțin mai închis pentru pagina activă */
-    border-radius: 8px;
-}
-
-/* Meniul de mobil (hamburger menu) */
-.navbar-toggler {
-    border-color: rgba(255,255,255,0.5) !important;
-}
-
-.navbar-toggler-icon {
-    filter: invert(1); /* Face iconita alba */
-}
-
-/* --- FOOTER --- */
-.footer {
-    background-color: #ffffff !important; /* Footer alb simplu */
-    color: #65676b !important; /* Text gri */
-    border-top: 1px solid #dee2e6 !important;
-}
-
-    .footer a {
-        color: #65676b !important;
-        text-decoration: none;
+    /* 2. Starea Hover (Când pui mouse-ul pe buton) */
+    .btn-primary:hover,
+    .btn-primary:focus {
+        background-color: #8f2661 !important; /* O nuanță puțin mai închisă */
+        border-color: #8f2661 !important;
     }
 
-        .footer a:hover {
-            color: #1877f2 !important; /* Albastru la hover */
-            text-decoration: underline;
-        }
+    /* 3. Starea Active (Când dai click) */
+    .btn-primary:active {
+        background-color: #6e1d4b !important; /* Și mai închis la click */
+        border-color: #6e1d4b !important;
+    }
 
-/* --- UTILITARE --- */
-/* Clasa utila pentru a taia textul lung cu ... */
-.truncate {
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -moz-box-orient: vertical;
-    -webkit-line-clamp: 5; /* Limita de 5 linii */
+    /* 4. Eliminarea inelului de focus (acel contur strălucitor) */
+    .btn-primary:focus {
+        box-shadow: 0 0 0 0.25rem rgba(177, 48, 121, 0.4) !important; /* Umbră roz transparentă */
+    }
+
+    /* 5. Butoanele dezactivate (Disabled) */
+    .btn-primary:disabled {
+        background-color: #B13079 !important;
+        border-color: #B13079 !important;
+        opacity: 0.65;
+    }
+
+/* --- STILURI PENTRU MENIUL LATERAL (MANAGE / NAV-PILLS) --- */
+
+/* 1. Link-uri Inactive (Starea de repaus) */
+.nav-pills .nav-link {
+    color: #495057 !important; /* Text gri închis */
+    background-color: transparent; /* Fără fundal */
+    font-weight: 500;
+    border-radius: 50rem !important; /* Rotunjire completă (pill) */
+    padding: 10px 20px; /* Mai spațios */
+    transition: all 0.2s ease-in-out;
 }
+
+    /* 2. Link-uri la Hover (Când treci cu mouse-ul) */
+    .nav-pills .nav-link:hover {
+        background-color: #FBF1F7 !important; /* Fundal roz pastelat */
+        color: #DA74AE !important; /* Text Magenta */
+    }
+
+    /* 3. Link-ul ACTIV (Pagina curentă) - Aici eliminăm albastrul */
+    .nav-pills .nav-link.active {
+        background-color: #DA74AE !important; /* Fundal Magenta */
+        color: #ffffff !important; /* Text Alb */
+        box-shadow: 0 4px 6px rgba(177, 48, 121, 0.25) !important; /* Umbră fină roz */
+    }
+
+    /* 4. Ajustare pentru iconițe */
+    .nav-pills .nav-link i {
+        font-size: 1.1rem;
+        vertical-align: text-bottom;
+    }

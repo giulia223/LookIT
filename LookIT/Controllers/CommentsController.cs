@@ -103,6 +103,9 @@ namespace LookIT.Controllers
                             if (moderationResult.IsFlagged is true)
                             {
                                 ModelState.AddModelError("Content", $"Comentariul nu fost editat deoarece incalca regulile comunitatii: {moderationResult.Reason}");
+
+                                //ne asiguram ca comentariul pastreaza id-ul corect pentru a se intoarce in view ul de editare
+                                requestComment.CommentId = Id;
                                 return View(requestComment);
                             }
 

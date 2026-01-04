@@ -1,0 +1,88 @@
+﻿@page
+@model EmailModel
+@{
+    ViewData["Title"] = "Gestionare Email";
+    ViewData["ActivePage"] = ManageNavPages.Email;
+}
+
+<div class="row justify-content-start">
+    <div class="col-md-10 col-lg-8">
+
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body p-4">
+
+                <h4 class="fw-bold mb-3">@ViewData["Title"]</h4>
+                <partial name="_StatusMessage" for="StatusMessage" />
+
+                <form id="email-form" method="post">
+                    <div asp-validation-summary="All" class="text-danger mb-3" role="alert"></div>
+
+                    @* --- LOGICA PENTRU EMAIL CURENT --- *@
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label small text-muted fw-bold ms-1">EMAIL ACTUAL</label>
+
+                        @if (Model.IsEmailConfirmed)
+                        {
+                            <div class="input-group">
+                                @* Iconiță plic *@
+                                <span class="input-group-text border-0 rounded-start-3 ps-3">
+                                    <i class="bi bi-envelope-check"></i>
+                                </span>
+
+                                @* Input roz dezactivat *@
+                                <input asp-for="Email" class="form-control custom-input-bg border-0" placeholder="Emailul tău" disabled />
+
+                                @* Bifa verde pentru confirmare *@
+                                <span class="input-group-text custom-input-bg border-0 rounded-end-3 text-success fw-bold pe-3">
+                                    <i class="bi bi-check-circle-fill me-1"></i> Confirmat
+                                </span>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="input-group">
+                                <span class="input-group-text border-0 rounded-start-3 ps-3">
+                                    <i class="bi bi-envelope-exclamation"></i>
+                                </span>
+                                <input asp-for="Email" class="form-control custom-input-bg border-0 rounded-end-3 py-2" placeholder="Emailul tău" disabled />
+                            </div>
+
+                            @* Butonul de verificare email stilizat ca link sub input *@
+                            <div class="mt-2 text-end">
+                                <button id="email-verification" type="submit" asp-page-handler="SendVerificationEmail"
+                                        class="btn btn-link text-decoration-none small fw-bold p-0 border-0"
+                                        style="color: #B13079;">
+                                    Trimite email de verificare
+                                </button>
+                            </div>
+                        }
+                    </div>
+
+                    @* --- LOGICA PENTRU EMAIL NOU --- *@
+                    <div class="mb-3">
+                        <label asp-for="Input.NewEmail" class="form-label small text-muted fw-bold ms-1">EMAIL NOU</label>
+                        <div class="input-group">
+                            <span class="input-group-text border-0 rounded-start-3 ps-3">
+                                <i class="bi bi-envelope-plus"></i>
+                            </span>
+                            <input asp-for="Input.NewEmail" class="form-control custom-input-bg border-0 rounded-end-3 py-2" autocomplete="email" aria-required="true" placeholder="Introduceți noua adresă de email" />
+                        </div>
+                        <span asp-validation-for="Input.NewEmail" class="text-danger small ms-1"></span>
+                    </div>
+
+                    @* --- BUTON SALVARE --- *@
+                    <div class="d-grid mt-4">
+                        <button id="change-email-button" type="submit" asp-page-handler="ChangeEmail" class="btn btn-primary rounded-pill py-2 fw-bold shadow-sm">
+                            Schimbă email-ul
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

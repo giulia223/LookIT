@@ -1,0 +1,41 @@
+﻿@page
+@model AccessDeniedModel
+@{
+    ViewData["Title"] = "Acces Refuzat";
+}
+
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+
+            @* Card cu design LookIT *@
+            <div class="card border-0 shadow-sm rounded-4 text-center">
+                <div class="card-body p-5">
+
+                    @* 1. Iconiță sugestivă în cerc pastelat *@
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-4"
+                         style="width: 100px; height: 100px; background-color: #FBF1F7;">
+                        <i class="bi bi-shield-lock-fill" style="font-size: 3rem; color: #B13079;"></i>
+                    </div>
+
+                    @* 2. Titlu și Mesaj *@
+                    <h2 class="fw-bold mb-3 text-danger">@ViewData["Title"]</h2>
+
+                    <p class="text-muted mb-4">
+                        Ne pare rău, dar nu ai permisiunea necesară pentru a accesa această resursă.
+                        Dacă crezi că este o greșeală, te rugăm să contactezi administratorul.
+                    </p>
+
+                    @* 3. Buton de Acțiune (Înapoi Acasă) *@
+                    <div class="d-grid gap-2 col-8 mx-auto">
+                        <a asp-controller="Posts" asp-action="Index" asp-route-page="1" class="btn btn-primary rounded-pill py-2 fw-bold shadow-sm">
+                            <i class="bi bi-house-door-fill me-2"></i> Înapoi la pagina principală
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
