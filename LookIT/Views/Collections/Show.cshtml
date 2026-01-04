@@ -7,40 +7,55 @@
 <div class="container mt-4 mb-5">
 
     @* ================================================================================= *@
-    @* 1. HEADER MODERN (Cu iconiță și butoane noi)                                     *@
+    @* 0. BUTON ÎNAPOI                                                                  *@
+    @* ================================================================================= *@
+    @* AM MODIFICAT AICI: mb-3 în loc de mb-5 pentru distanță mai mică *@
+    <div class="mb-3">
+        <a asp-action="Index" asp-controller="Collections" class="btn btn-sm btn-light rounded-pill px-3 fw-bold text-muted border-0 shadow-sm">
+            <i class="bi bi-arrow-left me-1"></i> Înapoi la Colecții
+        </a>
+    </div>
+
+    @* ================================================================================= *@
+    @* 1. HEADER                                                                        *@
     @* ================================================================================= *@
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-end mb-4 border-bottom pb-4 gap-3">
 
         @* Titlu și Iconiță *@
         <div>
             <div class="d-flex align-items-center gap-3">
-                @* Iconita galbena *@
-                <div class="bg-warning bg-opacity-10 p-2 rounded-3 text-warning d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
-                    <i class="bi bi-bookmark-fill fs-3"></i>
+                <div class="d-flex align-items-center justify-content-center rounded-circle"
+                     style="width: 50px; height: 50px; background-color: #FBF1F7;">
+                    <i class="bi bi-bookmark-fill fs-4" style="color: #B13079;"></i>
                 </div>
 
                 <div>
-                    <h1 class="fw-bold mb-0 display-6" style="font-size: 2rem;">@Model.Name</h1>
-                    <p class="text-muted mb-0 small text-uppercase fw-bold tracking-wide">
+                    @* AM MODIFICAT AICI: font-size 1.5rem (mai mic) *@
+                    <h1 class="fw-bold mb-0" style="font-size: 1.5rem;">@Model.Name</h1>
+
+                    @* AM MODIFICAT AICI: font-size 0.8rem (mai mic) *@
+                    <p class="text-muted mb-0 text-uppercase fw-bold tracking-wide" style="font-size: 0.8rem;">
                         @Model.PostCollections.Count @(Model.PostCollections.Count == 1 ? "postare" : "postări")
                     </p>
                 </div>
             </div>
         </div>
 
-        @* Butoane Actiuni (Stil Modern Soft UI) *@
+        @* Butoane Acțiuni *@
         @if ((Model.UserId == ViewBag.UserCurent || ViewBag.EsteAdministrator) && Model.Name != "All Posts")
         {
             <div class="d-flex gap-2">
+                @* Buton Editare *@
                 <a asp-action="Edit" asp-controller="Collections" asp-route-Id="@Model.CollectionId"
-                   class="btn btn-soft-secondary rounded-pill px-4 fw-bold">
-                    <i class="bi bi-pencil-square me-2"></i>Editează
+                   class="btn btn-action rounded-pill px-4 fw-bold shadow-sm">
+                    <i class="bi bi-pencil-square me-2"></i> Editează
                 </a>
 
+                @* Buton Ștergere *@
                 <form method="post" asp-controller="Collections" asp-action="Delete" asp-route-Id="@Model.CollectionId">
-                    <button type="submit" class="btn btn-soft-danger rounded-pill px-4 fw-bold"
+                    <button type="submit" class="btn btn-action-danger rounded-pill px-4 fw-bold shadow-sm"
                             onclick="return confirm('Ești sigur că vrei să ștergi colecția? Postările vor rămâne salvate, dar colecția va dispărea.')">
-                        <i class="bi bi-trash3 me-2"></i>Șterge
+                        <i class="bi bi-trash3 me-2"></i> Șterge
                     </button>
                 </form>
             </div>
@@ -48,7 +63,7 @@
     </div>
 
     @* ================================================================================= *@
-    @* 2. GRID POSTĂRI (Exact codul tău original)                                       *@
+    @* 2. GRID POSTĂRI                                                                  *@
     @* ================================================================================= *@
     @if (Model.PostCollections.Count > 0)
     {
@@ -58,14 +73,9 @@
                 @if (pc.Post != null)
                 {
                     <div class="col-4">
-
-                        @* CARD PRINCIPAL *@
                         <div class="ratio ratio-1x1 border-0 rounded-0 overflow-hidden position-relative shadow-sm bg-light post-card-hover">
 
-                            @* HEADER CARD (SUS) *@
                             <div class="position-absolute top-0 start-0 w-100 p-2 d-flex justify-content-between align-items-start" style="z-index: 30; pointer-events: none;">
-
-                                @* ELEMENT DREAPTA: Iconita Tip *@
                                 <div>
                                     @if (!string.IsNullOrEmpty(pc.Post.VideoUrl))
                                     {
@@ -81,7 +91,6 @@
                                     }
                                 </div>
 
-                                @* ELEMENT STANGA: Buton Stergere *@
                                 <div style="pointer-events: auto;">
                                     @if ((Model.UserId == ViewBag.UserCurent || ViewBag.EsteAdministrator))
                                     {
@@ -89,8 +98,8 @@
                                             <input type="hidden" name="postId" value="@pc.PostId" />
                                             <input type="hidden" name="collectionId" value="@Model.CollectionId" />
 
-                                            <button type="submit" class="btn btn-sm btn-dark bg-opacity-25 border-0 rounded-circle text-white d-flex align-items-center justify-content-center hover-danger"
-                                                    style="width: 30px; height: 30px; backdrop-filter: blur(2px);"
+                                            <button type="submit" class="btn btn-sm btn-dark bg-opacity-25 border-0 rounded-circle text-white d-flex align-items-center justify-content-center hover-delete shadow-sm"
+                                                    style="width: 30px; height: 30px; backdrop-filter: blur(4px);"
                                                     title="Elimină din colecție"
                                                     onclick="return confirm('Elimini postarea din colecție?');">
                                                 <i class="bi bi-x-lg" style="font-size: 0.8rem;"></i>
@@ -100,33 +109,27 @@
                                 </div>
                             </div>
 
-                            @* LINK + CONTINUT *@
                             <a href="/Posts/Show/@pc.PostId" class="text-decoration-none d-block w-100 h-100 user-select-none">
-
-                                @* OVERLAY LA HOVER (JOS) *@
                                 <div class="hover-overlay p-3">
                                     <div class="d-flex align-items-end justify-content-between w-100 h-100">
-                                        @* Autor *@
                                         <div class="d-flex align-items-center text-truncate" style="max-width: 60%;">
-                                            <img src="@(pc.Post.Author?.ProfilePictureUrl)"
-                                                 class="rounded-circle border border-1 border-white"
+                                            <img src="@(!string.IsNullOrEmpty(pc.Post.Author?.ProfilePictureUrl) ? pc.Post.Author.ProfilePictureUrl : "/images/default-profile.png")"
+                                                 class="rounded-circle border border-1 border-white shadow-sm"
                                                  alt="User"
                                                  style="width: 30px; height: 30px; object-fit: cover; flex-shrink: 0;">
-                                            <span class="text-white ms-2 fw-bold text-truncate text-shadow" style="font-size: 1rem;">
-                                                @(pc.Post.Author?.FullName)
+                                            <span class="text-white ms-2 fw-bold text-truncate text-shadow small">
+                                                @(pc.Post.Author?.FullName ?? "Unknown")
                                             </span>
                                         </div>
-                                        @* Data *@
                                         <div class="text-white text-end text-shadow" style="max-width: 40%;">
-                                            <div style="font-size: 0.65rem; opacity: 0.8; line-height: 1;">Adăugat la:</div>
-                                            <div class="fw-bold" style="font-size: 0.8rem;">
+                                            <div style="font-size: 0.65rem; opacity: 0.9; line-height: 1;">Adăugat:</div>
+                                            <div class="fw-bold" style="font-size: 0.75rem;">
                                                 @pc.AddedDate.ToString("dd MMM")
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                @* VISUAL CONTENT *@
                                 @if (!string.IsNullOrEmpty(pc.Post.ImageUrl))
                                 {
                                     <img src="@pc.Post.ImageUrl" class="w-100 h-100" style="object-fit: cover;" alt="Post Image">
@@ -141,7 +144,7 @@
                                 {
                                     <div class="d-flex flex-column align-items-center justify-content-center h-100 p-3 text-center bg-white">
                                         <i class="bi bi-quote fs-1 text-muted opacity-25 mb-1"></i>
-                                        <small class="fw-bold text-dark text-break fst-italic font-georgia">
+                                        <small class="fw-bold text-dark text-break fst-italic font-georgia px-2">
                                             @{
                                                 var rawHtml = pc.Post.TextContent ?? "";
                                                 var plainText = System.Text.RegularExpressions.Regex.Replace(rawHtml, "<.*?>", " ").Trim();
@@ -161,77 +164,72 @@
     else
     {
         @* ================================================================================= *@
-        @* 3. EMPTY STATE MODERN (Designul nou pentru colecție goală)                       *@
+        @* 3. EMPTY STATE                                                                   *@
         @* ================================================================================= *@
-        <div class="empty-state-container text-center py-5 mt-4 rounded-4 bg-light bg-opacity-50 border border-dashed">
+        <div class="text-center py-5 mt-4 rounded-4 bg-light border border-dashed">
             <div class="mb-4 d-inline-block position-relative">
                 <div class="bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center"
                      style="width: 100px; height: 100px;">
-                    <i class="bi bi-journal-bookmark text-primary opacity-75" style="font-size: 3rem;"></i>
+                    <i class="bi bi-journal-bookmark opacity-50" style="font-size: 3rem; color: #B13079;"></i>
                 </div>
             </div>
-
             <h3 class="fw-bold text-dark mb-2">Colecția este goală</h3>
-            <p class="text-muted mb-4" style="max-width: 400px; margin: 0 auto;">
-                Încă nu ai adăugat nimic aici. Explorează feed-ul pentru a salva postări.
+            <p class="text-muted mb-4 small" style="max-width: 400px; margin: 0 auto;">
+                Începe să îți organizezi postările salvate creând prima ta colecție chiar acum.
             </p>
-
-            <a href="/" class="btn btn-primary rounded-pill px-5 py-2 fw-bold shadow-sm transition-transform">
+            <a href="/" class="btn btn-primary rounded-pill px-5 py-2 fw-bold shadow-sm">
                 Explorează Feed-ul
             </a>
         </div>
     }
 </div>
 
-@* STILURI CSS *@
+@* ================================================================================= *@
+@* 4. STILURI CSS                                                                   *@
+@* ================================================================================= *@
 <style>
-    /* Stiluri Generale */
-    .tracking-wide {
-        letter-spacing: 0.05em;
+    /* STIL BUTON EDITARE */
+    .btn-action {
+        background-color: #fff;
+        border: 1px solid #dee2e6;
+        color: #495057;
+        transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
     }
 
-    /* Butoane Soft UI (Pentru Header) */
-    .btn-soft-secondary {
-        background-color: #f1f5f9;
-        color: #475569;
-        border: 1px solid transparent;
-        transition: all 0.2s ease;
-    }
-
-        .btn-soft-secondary:hover {
-            background-color: #e2e8f0;
-            color: #1e293b;
-            transform: translateY(-1px);
+        .btn-action:hover {
+            background-color: #f8f9fa;
+            color: #B13079;
+            border-color: #B13079;
         }
 
-    .btn-soft-danger {
-        background-color: #fef2f2;
-        color: #dc2626;
-        border: 1px solid transparent;
-        transition: all 0.2s ease;
+    /* STIL BUTON ȘTERGERE */
+    .btn-action-danger {
+        background-color: #fff;
+        border: 1px solid #dee2e6;
+        color: #dc3545;
+        transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
     }
 
-        .btn-soft-danger:hover {
-            background-color: #fee2e2;
-            color: #b91c1c;
-            transform: translateY(-1px);
+        .btn-action-danger:hover {
+            background-color: #fff5f5;
+            color: #b02a37;
+            border-color: #dc3545;
         }
 
-    /* Stiluri Originale Grid (Păstrate) */
-    .post-card-hover {
-        transform: translateZ(0);
-    }
-
+    /* Alte stiluri */
     .hover-overlay {
         position: absolute;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.4);
+        background-color: rgba(0, 0, 0, 0.5);
         opacity: 0;
         transition: opacity 0.2s ease-in-out;
         z-index: 10;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
     }
 
     .post-card-hover:hover .hover-overlay {
@@ -239,8 +237,7 @@
     }
 
     .drop-shadow-icon {
-        filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8));
-        color: #fff !important;
+        filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.6));
     }
 
     .text-shadow {
@@ -249,30 +246,20 @@
 
     .font-georgia {
         font-family: 'Georgia', serif;
-        line-height: 1.3;
+        line-height: 1.4;
     }
 
-    .hover-danger {
-        transition: all 0.2s ease;
+    .hover-delete {
+        transition: background-color 0.2s ease, opacity 0.2s ease;
     }
 
-        .hover-danger:hover {
+        .hover-delete:hover {
             background-color: #dc3545 !important;
             opacity: 1 !important;
-            transform: scale(1.1);
         }
 
-    /* Stiluri Empty State */
     .border-dashed {
         border-style: dashed !important;
-        border-color: #cbd5e1 !important;
+        border-color: #dee2e6 !important;
     }
-
-    .transition-transform {
-        transition: transform 0.2s;
-    }
-
-        .transition-transform:hover {
-            transform: translateY(-2px);
-        }
 </style>
