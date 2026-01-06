@@ -6,169 +6,166 @@
 
 <div class="container py-4">
 
-    @* HEADER *@
-    <div class="d-flex align-items-center mb-4 px-2">
-        <h4 class="fw-bold mb-0 me-2">Postări apreciate</h4>
-        <i class="bi bi-heart-fill text-danger"></i>
-        <small class="text-muted ms-auto">@Model.Count aprecieri</small>
+    @* --- 0. BUTON ÎNAPOI --- *@
+    <div class="mb-4">
+        <a href="javascript:history.back()" class="btn btn-sm btn-light rounded-pill px-3 fw-bold text-muted border-0 shadow-sm">
+            <i class="bi bi-arrow-left me-1"></i> Înapoi la profil
+        </a>
     </div>
 
+    @* --- 1. HEADER (DESIGN NOU) --- *@
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-end align-items-md-center mb-5 pb-3 border-bottom gap-3">
+        
+        @* Stânga: Titlu și Descriere *@
+        <div>
+            <h2 class="fw-bold mb-1">Postări apreciate</h2>
+            <p class="text-muted mb-0 small">Aici găsești tot conținutul care ți-a plăcut.</p>
+        </div>
+
+        @* Dreapta: Număr aprecieri *@
+        <div>
+            <span class="badge bg-light text-dark border rounded-pill px-3 py-2 shadow-sm">
+                <i class="bi bi-heart-fill text-danger me-1"></i>
+                <span class="fw-bold">@Model.Count</span> aprecieri
+            </span>
+        </div>
+    </div>
+
+    @* --- 2. GRID POSTĂRI --- *@
     @if (Model.Any())
     {
-        <div class="likes-grid">
+        <div class="row g-1 mb-4">
             @foreach (var post in Model)
             {
-                <a asp-controller="Posts" asp-action="Show" asp-route-id="@post.PostId" class="post-item-link">
-                    <div class="post-thumbnail shadow-sm">
+                <div class="col-4">
+                    <a asp-controller="Posts" asp-action="Show" asp-route-id="@post.PostId" class="text-decoration-none user-select-none">
 
-                        @* LOGICA DE AFISARE IN FUNCTIE DE TIPUL POSTARII *@
+                        <div class="ratio ratio-1x1 border-0 rounded-0 overflow-hidden position-relative shadow-sm bg-light post-card-hover">
 
-                        @if (!string.IsNullOrEmpty(post.ImageUrl))
-                        {
-                            @* CAZUL 1: IMAGINE *@
-                            <img src="@post.ImageUrl" alt="Post Image" class="w-100 h-100 object-fit-cover" />
-                            <div class="type-indicator">
-                                <i class="bi bi-image"></i>
+                            @* ICONITE TIP (PERMANENTE - STANGA SUS) *@
+                            <div class="position-absolute" style="top: 11px; left: 10px; z-index: 20;">
+                                @if (!string.IsNullOrEmpty(post.VideoUrl))
+                                {
+                                    <i class="bi bi-camera-reels-fill text-white fs-5 drop-shadow-icon"></i>
+                                }
+                                else if (!string.IsNullOrEmpty(post.ImageUrl))
+                                {
+                                    <i class="bi bi-image-fill text-white fs-5 drop-shadow-icon"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-file-text-fill text-white fs-5 drop-shadow-icon"></i>
+                                }
                             </div>
-                        }
-                        else if (!string.IsNullOrEmpty(post.VideoUrl))
-                        {
-                            @* CAZUL 2: VIDEO *@
-                            <video class="w-100 h-100 object-fit-cover" muted>
-                                <source src="@post.VideoUrl" type="video/mp4">
-                            </video>
-                            @* Iconita Play peste video *@
-                            <div class="video-overlay">
-                                <i class="bi bi-play-circle-fill"></i>
-                            </div>
-                        }
-                        else
-                        {
-                            @* CAZUL 3: DOAR TEXT *@
-                            <div class="text-preview p-3 d-flex align-items-center justify-content-center text-center h-100 bg-light">
-                                <span class="small text-dark fw-medium text-truncate-3">
-                                    @* Curatam tagurile HTML daca e cazul sau afisam textul brut *@
-                                    @Html.Raw(post.TextContent?.Length > 50 ? post.TextContent.Substring(0, 50) + "..." : post.TextContent)
-                                </span>
-                            </div>
-                            <div class="type-indicator">
-                                <i class="bi bi-card-text"></i>
-                            </div>
-                        }
 
-                        @* HOVER OVERLAY (Arata autorul cand pui mouse-ul) *@
-                        <div class="hover-overlay">
-                            <span class="small text-white fw-bold">
-                                <i class="bi bi-person-fill me-1"></i>@post.Author?.FullName
-                            </span>
+                            @* OVERLAY HOVER (AUTOR - DREAPTA SUS) *@
+                            <div class="hover-overlay p-3">
+                                <div class="d-flex align-items-center justify-content-end w-100 text-truncate">
+                                    <span class="text-white me-3 fw-bold text-truncate text-shadow text-end" style="font-size: 1rem;">
+                                        @post.Author.FullName
+                                    </span>
+                                    <img src="@(!string.IsNullOrEmpty(post.Author.ProfilePictureUrl) ? post.Author.ProfilePictureUrl : "/images/default-profile.png")"
+                                         class="rounded-circle border border-1 border-white"
+                                         alt="User"
+                                         style="width: 30px; height: 30px; object-fit: cover; flex-shrink: 0;">
+                                </div>
+                            </div>
+
+                            @* CONTINUTUL POSTARII *@
+                            @if (!string.IsNullOrEmpty(post.ImageUrl))
+                            {
+                                <img src="@post.ImageUrl" class="w-100 h-100" style="object-fit: cover;" alt="Post Image">
+                            }
+                            else if (!string.IsNullOrEmpty(post.VideoUrl))
+                            {
+                                <video class="w-100 h-100" style="object-fit: cover;" muted>
+                                    <source src="@post.VideoUrl" type="video/mp4">
+                                </video>
+                            }
+                            else
+                            {
+                                
+                                    var rawHtml = post.TextContent ?? "";
+                                    var plainText = System.Text.RegularExpressions.Regex.Replace(rawHtml, "<.*?>", " ").Trim();
+                                    var previewText = plainText.Length > 70 ? plainText.Substring(0, 70) + "..." : plainText;
+                                
+                                <div class="d-flex flex-column align-items-center justify-content-center h-100 p-3 text-center bg-white">
+                                    <i class="bi bi-quote fs-1 text-muted opacity-25 mb-1"></i>
+                                    <small class="fw-bold text-dark text-break fst-italic px-2" style="font-family: 'Georgia', serif; line-height: 1.3;">
+                                        @previewText
+                                    </small>
+                                </div>
+                            }
+
                         </div>
-                    </div>
-                </a>
+                    </a>
+                </div>
             }
         </div>
     }
     else
     {
-        @* EMPTY STATE *@
-        <div class="text-center py-5 mt-5">
-            <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                <i class="bi bi-heart text-muted opacity-50" style="font-size: 2.5rem;"></i>
+        @* --- 3. EMPTY STATE --- *@
+        <div class="text-center py-5 mt-4 rounded-4 bg-light border border-dashed">
+            <div class="mb-4 d-inline-block position-relative">
+                <div class="bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center" 
+                     style="width: 100px; height: 100px; background-color: #FBF1F7;">
+                    <i class="bi bi-heart text-danger opacity-75" style="font-size: 3rem;"></i>
+                </div>
             </div>
             <h5 class="fw-bold text-dark">Nu ai aprecieri</h5>
             <p class="text-muted small">Apasă pe inimioară la postările care îți plac.</p>
-            <a asp-controller="Posts" asp-action="Index" class="btn btn-primary btn-sm rounded-pill px-4 fw-bold">
-                Explorează
+            <a asp-controller="Posts" asp-action="Index" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">
+                Explorează Feed-ul
             </a>
         </div>
     }
 </div>
 
+@* STILURI CSS *@
 <style>
-    /* GRID SYSTEM (Identic cu cel de la colectii pentru consistenta) */
-    .likes-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr); /* 3 coloane pe mobil (stil Instagram) */
-        gap: 3px; /* Spatiu foarte mic intre ele (stil Instagram) */
-    }
-
-    .post-item-link {
-        display: block;
-        text-decoration: none;
-    }
-
-    /* Patratul Postarii */
-    .post-thumbnail {
-        position: relative;
-        width: 100%;
-        aspect-ratio: 1 / 1;
-        background-color: #f8f9fa;
-        overflow: hidden;
-        /* Pe desktop punem colturi rotunjite, pe mobil lasam patrat complet pt efect de grid */
-        border-radius: 0;
-    }
-
-   
-
-    .post-thumbnail:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
-    }
-
-    }
-
-    .object-fit-cover {
-        object-fit: cover;
-    }
-
-    /* Indicator tip (Imagine/Text) colt dreapta sus */
-    .type-indicator {
-        position: absolute;
-        top: 8px;
-        right: 8px;
-        color: white;
-        text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-        font-size: 1.1rem;
-    }
-
-    /* Video Play Icon Centrat */
-    .video-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: rgba(0,0,0,0.2);
-        color: white;
-        font-size: 2.5rem;
-    }
-
-    /* Text preview style */
-    .text-truncate-3 {
-        display: -webkit-box;
-        -webkit-line-clamp: 4;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
-
-    /* Hover Overlay (Darken + Info) */
+    /* Overlay-ul negru pentru hover */
     .hover-overlay {
         position: absolute;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0,0,0,0.3);
         display: flex;
-        align-items: flex-end;
-        padding: 10px;
+        align-items: flex-start;
+        justify-content: flex-end;
+        background: rgba(0, 0, 0, 0.4);
         opacity: 0;
-        transition: opacity 0.2s ease;
+        transition: opacity 0.2s ease-in-out;
+        z-index: 10;
+        padding: 1rem;
     }
 
-    .post-thumbnail:hover .hover-overlay {
+    .post-card-hover:hover .hover-overlay {
         opacity: 1;
+        cursor: pointer;
+    }
+
+    .drop-shadow-icon {
+        filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8));
+        color: #fff !important;
+    }
+
+    .text-shadow {
+        text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+    }
+
+    .font-georgia {
+        font-family: 'Georgia', serif;
+        line-height: 1.3;
+    }
+
+    .post-card-hover {
+        transform: translateZ(0);
+    }
+
+    .border-dashed {
+        border-style: dashed !important;
+        border-color: #dee2e6 !important;
     }
 </style>

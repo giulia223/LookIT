@@ -17,6 +17,9 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.R
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
 
+//inregistrare serviciu pentru analiza de comentariu
+builder.Services.AddScoped<IModerationService,ModerationService>();
+
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("RequireAdministratorRole",
@@ -24,6 +27,7 @@ builder.Services.AddAuthorization(options =>
 });
 
 builder.Services.AddScoped<ISentimentAnalysisService, SentimentAnalysisService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

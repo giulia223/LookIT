@@ -1,0 +1,108 @@
+﻿@model LookIT.Models.Message
+@using Microsoft.AspNetCore.Identity
+@using System.Security.Claims
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    bool userExists = Model.User != null;
+
+    string profilePic = userExists
+    && !string.IsNullOrEmpty(Model.User.ProfilePictureUrl) ? Model.User.ProfilePictureUrl : "/images/unknown_person.jpg";
+
+    string displayName = userExists ? Model.User.FullName : "Utilizator șters";
+}
+
+<div class="card-body position-relative">
+    <div class="position-absolute top-0 end-0 mt-3 me-3">
+        <form method="post" asp-controller="Messages" asp-action="Report" asp-route-Id="@Model.MessageId"
+              onsubmit="return confirm('Raportezi acest mesaj pentru conținut inadecvat?');">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-link p-0 text-muted opacity-50 report-hover-btn"
+                    data-bs-toggle="tooltip" title="Raportează mesajul">
+                <i class="bi bi-flag-fill fs-6"></i>
+            </button>
+        </form>
+    </div>
+
+    <div class="d-flex align-items-center mb-2">
+
+        <div class="rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+            @if (userExists)
+            {
+                <a asp-controller="Profile" asp-action="Details" asp-route-userId="@Model.UserId" class="text-decoration-none">
+                    <img src="@profilePic" class="rounded-circle border-0 shadow-sm" style="width:40px;height:40px;object-fit:cover;" />
+                </a>
+            }
+            else
+            {
+                <img src="@profilePic" class="rounded-circle border-0 opacity-75" style="width:40px;height:40px;object-fit:cover; cursor: default;" />
+            }
+        </div>
+
+        @* --- ZONA NUME si DATA --- *@
+        <div>
+            @if (userExists)
+            {
+                <a asp-controller="Profile" asp-action="Details" asp-route-userId="@Model.UserId" class="text-decoration-none">
+                    <h6 class="mb-0 fw-bold" style="color: #B13079;">@displayName</h6>
+                </a>
+            }
+            else
+            {
+                <h6 class="mb-0 fw-bold text-muted fst-italic">@displayName</h6>
+            }
+
+            <small class="text-muted" style="font-size: 0.75rem;">@Model.Date.ToString("dd MMM, HH:mm")</small>
+        </div>
+    </div>
+
+    @* --- CONTINUT MESAJ --- *@
+    <div class="message-content py-2">
+        <div style="font-size: 0.95rem; color: #4b2c35;">@Html.Raw(Model.TextContent)</div>
+    </div>
+
+    @if (Model.ImageUrl != null)
+    {
+        <img src="@Model.ImageUrl" alt="Post Image" class="rounded-3 w-100 border-0 mb-2 shadow-sm" style="height: auto; max-height: 600px; object-fit: contain;" />
+    }
+
+    @if (Model.VideoUrl != null)
+    {
+        <div class="mt-2 mb-2">
+            <video controls preload="metadata" class="w-100 rounded-3 border-0 shadow-sm" style="max-height: 600px; background-color: #000;">
+                <source src="@Model.VideoUrl" type="video/mp4">
+            </video>
+        </div>
+    }
+
+    @* --- BUTOANE ACTIUNI --- *@
+    @{
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var isAdmin = User.IsInRole("Administrator");
+    }
+
+    @if (currentUserId != null && (Model.UserId == currentUserId || isAdmin))
+    {
+
+        <div class="border-top mt-2 pt-2 d-flex justify-content-end gap-2" style="border-color: rgba(177, 48, 121, 0.08) !important;">
+
+            @* Buton Editare *@
+            <a class="btn btn-discard px-3 py-1"
+               asp-controller="Messages"
+               asp-action="Edit"
+               asp-route-id="@Model.MessageId"
+               style="font-size: 0.75rem; border-radius: 8px !important;">
+                <i class="bi bi-pencil me-1"></i> Editează
+            </a>
+
+            @* Buton Ștergere *@
+            <form method="post" asp-controller="Messages" asp-action="DeleteMessage" asp-route-id="@Model.MessageId"
+                  onsubmit="return confirm('Sigur vrei să ștergi acest mesaj?');">
+                <button class="btn btn-discard px-3 py-1" type="submit"
+                        style="font-size: 0.75rem; color: #dc3545 !important; border-radius: 8px !important;">
+                    <i class="bi bi-trash3 me-1"></i> Șterge
+                </button>
+            </form>
+        </div>
+    }
+</div>

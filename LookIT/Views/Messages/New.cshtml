@@ -1,159 +1,115 @@
-﻿
-
-@using Microsoft.AspNetCore.Identity
+﻿@using Microsoft.AspNetCore.Identity
 @using LookIT.Models
 @inject UserManager<ApplicationUser> UserManager
 @model LookIT.Models.Message
 
-<div style="background-color: #f0f2f5; min-height: 100vh; padding-top: 50px; padding-bottom: 50px;">
+@{
+    ViewData["Title"] = "Creează un mesaj";
+}
+
+<div class="py-5">
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-6 col-lg-5">
+            <div class="col-lg-10 col-xl-8">
 
-                @* Mesaj de alertă *@
                 @if (ViewBag.message != null)
                 {
-                    <div class="alert rounded-3 text-center mb-4 shadow-sm"
-                         style="background-color: #90C67F; color: white; border: none; padding: 1rem;">
-                        @ViewBag.message
+                    <div class="alert shadow-sm text-center mb-4">
+                        <i class="bi bi-check-circle-fill me-2"></i> @ViewBag.message
                     </div>
                 }
 
-                @* Cardul Formularului *@
-                <div class="card border-0 shadow-sm" style="border-radius: 12px; overflow: hidden;">
+                <div class="card border-0 shadow-sm rounded-4 lookit-card-form overflow-visible">
 
-                    @* Header Card *@
-                    <div class="card-header border-0 bg-white pt-4 pb-0 px-4 text-center">
-                        <h3 class="fw-bold" style="color: #845763;">Create New Message</h3>
-                        <p class="text-muted small">Scrie un mesaj</p>
-                        <hr style="color: #ddd;" />
+                    <div class="card-header bg-white border-bottom py-3 px-4 d-flex justify-content-between align-items-center">
+                        <h5 class="fw-bold mb-0 lookit-title">Trimite Mesaj Nou</h5>
+                        
                     </div>
 
                     <div class="card-body p-4">
                         <form asp-controller="Messages" asp-action="New" method="post" enctype="multipart/form-data">
-                            <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+                            <div asp-validation-summary="ModelOnly" class="text-danger mb-3 small"></div>
                             <input type="hidden" asp-for="GroupId" />
-                            @* Input Content Mesaj *@
-                            <div class="form-group mb-3">
-                                <label asp-for="TextContent" class="form-label fw-bold" style="color: #4b4f56;">Continut mesaj</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light border-end-0" style="border-radius: 8px 0 0 8px;">
-                                       
-                                    </span>
-                                    <textarea asp-for="TextContent" class="form-control summernote"></textarea>
-                                    
-                                </div>
+
+                            <div class="mb-4">
+                                <label asp-for="TextContent" class="form-label fw-bold lookit-title small text-uppercase">Conținut mesaj</label>
+                                <textarea asp-for="TextContent" class="form-control summernote border-0 shadow-none"
+                                          placeholder="Scrie mesajul tău aici..."></textarea>
                                 <span asp-validation-for="TextContent" class="text-danger small"></span>
                             </div>
-                            <div class="form-group mb-3">
-                                <label class="form-label fw-bold">Încarcă Imaginea</label>
 
-                                <input type="file" name="Image" id="imageInput" class="form-control" accept="image/*" />
-                                <small class="text-muted">Formate acceptate: jpg, jpeg, png, gif.</small>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold lookit-title small text-uppercase">Adaugă în mesajul tău</label>
+                                <div class="row g-2">
 
-                                <div id="imagePreviewContainer" class="mt-3 d-none text-center bg-light p-2 rounded">
-                                    <p class="mb-1 text-muted small">Previzualizare imagine:</p>
-                                    <img id="imagePreview" src="#" alt="Image Preview" class="img-fluid rounded border" style="max-height: 300px;" />
+                                    <div class="col-6 position-relative">
+                                        <input type="file" name="Image" id="imageInput"
+                                               class="position-absolute top-0 start-0 w-100 h-100 opacity-0 cursor-pointer"
+                                               accept="image/*" style="z-index: 10;" />
+                                        <div class="lookit-upload-box shadow-sm text-center">
+                                            <i class="bi bi-image-fill fs-3 d-block"></i>
+                                            <span class="small fw-bold">Foto</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-6 position-relative">
+                                        <input type="file" name="Video" id="videoInput"
+                                               class="position-absolute top-0 start-0 w-100 h-100 opacity-0 cursor-pointer"
+                                               accept="video/*" style="z-index: 10;" />
+                                        <div class="lookit-upload-box shadow-sm text-center">
+                                            <i class="bi bi-camera-video-fill fs-3 d-block"></i>
+                                            <span class="small fw-bold">Video</span>
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
 
-                            <div class="form-group mb-3">
-                                <label class="form-label fw-bold">Încarcă Video</label>
-
-                                <input type="file" name="Video" id="videoInput" class="form-control" accept="video/*" />
-                                <small class="text-muted">Formate acceptate: MP4, WebM, etc.</small>
-
-                                <div id="videoPreviewContainer" class="mt-3 d-none text-center bg-light p-2 rounded">
-                                    <p class="mb-1 text-muted small">Previzualizare video:</p>
-                                    <video id="videoPreview" controls class="w-100 rounded border" style="max-height: 300px;">
-                                        Your browser does not support the video tag.
-                                    </video>
+                            <div id="imagePreviewContainer" class="mb-3 d-none position-relative">
+                                <div class="lookit-current-media text-center position-relative">
+                                    <img id="imagePreview" src="#" class="img-fluid rounded-3" style="max-height: 350px;" />
+                                    <button type="button" id="removeImage" class="btn btn-light rounded-circle position-absolute top-0 end-0 m-2 shadow-sm border-0">
+                                        <i class="bi bi-trash3-fill text-danger"></i>
+                                    </button>
                                 </div>
                             </div>
 
-                            @* Butoane Acțiune *@
-                            <div class="d-grid gap-2">
-                                <button type="submit" class="btn btn-lg shadow-sm"
-                                        style="background-color: #E491A6; border: none; color: white; font-weight: 600; border-radius: 8px;">
-                                    Send Message
+                            <div id="videoPreviewContainer" class="mb-3 d-none position-relative">
+                                <div class="lookit-current-media text-center position-relative">
+                                    <video id="videoPreview" controls class="w-100 rounded-3" style="max-height: 350px;"></video>
+                                    <button type="button" id="removeVideo" class="btn btn-light rounded-circle position-absolute top-0 end-0 m-2 shadow-sm border-0" style="z-index: 20;">
+                                        <i class="bi bi-trash3-fill text-danger"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-3 mt-4">
+                                <button type="submit" class="btn btn-primary-lookit btn-lg py-3">
+                                    <i class="bi bi-send-fill me-2"></i> Trimite Mesaj
                                 </button>
 
-                                <a href="/Groups/Show/@Model.GroupId" class="btn btn-link text-decoration-none text-muted small">
-                                    Cancel and go back
+                                <a href="/Groups/Show/@Model.GroupId" class="btn-discard-lookit text-center py-2">
+                                    Renunță
                                 </a>
                             </div>
+
                         </form>
                     </div>
                 </div>
-
-              
-
             </div>
         </div>
     </div>
 </div>
 
 <style>
-    /* Efect de focus pentru input-uri */
-    .form-control:focus {
-        background-color: #fff !important;
-        border-color: #E491A6;
-        box-shadow: 0 0 0 0.25rem rgba(228, 145, 166, 0.25);
+ 
+    .card {
+        overflow: visible !important;
     }
 
-    .input-group-text {
-        border-color: #dee2e6;
+    .cursor-pointer {
+        cursor: pointer;
     }
 </style>
 
-@section Scripts{
-    <script>
-        $('.summernote').summernote({
-            height: 200,
-            disableDragAndDrop: true,
-            placeholder: 'Scrie mesajul tău aici...',
-            // Definim fonturile exact ca în imaginea ta
-            fontNames: ['Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Helvetica', 'Impact', 'Tahoma', 'Times New Roman', 'Verdana'],
-            toolbar: [
-                ['style', ['style']],
-                ['font', ['bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript', 'clear']],
-                ['fontname', ['fontname']],
-                ['fontsize', ['fontsize']],
-                ['color', ['color']],
-                ['para', ['ul', 'ol', 'paragraph', 'height']],
-                ['table', ['table']],
-                ['insert', ['link', 'hr']], // Am eliminat 'picture' și 'video'
-                ['view', ['fullscreen', 'codeview', 'help']]
-            ]
-        });
-
-        const imageInput = document.getElementById('imageInput');
-            const videoInput = document.getElementById('videoInput');
-
-            const imgContainer = document.getElementById('imagePreviewContainer');
-            const imgPreview = document.getElementById('imagePreview');
-
-            const vidContainer = document.getElementById('videoPreviewContainer');
-            const vidPreview = document.getElementById('videoPreview');
-
-            imageInput.addEventListener('change', function() {
-                const file = this.files[0];
-                if (file) {
-                    imgPreview.src = URL.createObjectURL(file);
-                    imgContainer.classList.remove('d-none');
-                } else {
-                    imgContainer.classList.add('d-none');
-                }
-            });
-
-            videoInput.addEventListener('change', function() {
-                const file = this.files[0];
-                if (file) {
-                    vidPreview.src = URL.createObjectURL(file);
-                    vidContainer.classList.remove('d-none');
-                } else {
-                    vidContainer.classList.add('d-none');
-                }
-            });
-    </script>
-}

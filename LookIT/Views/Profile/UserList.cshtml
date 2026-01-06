@@ -1,37 +1,118 @@
 ﻿@model List<LookIT.Models.ApplicationUser>
 
-<div class="container mt-4" style="max-width: 600px;">
-    <h4 class="mb-3">@ViewData["Title"]</h4>
-    <hr />
+<div class="container py-4" style="max-width: 900px;">
 
-    @if (!Model.Any())
+    @* --- 1. HEADER (Buton Înapoi + Titlu + Contor) --- *@
+    <div class="mb-4 d-flex align-items-center">
+        <a href="javascript:history.back()" class="btn btn-light rounded-circle shadow-sm d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+            <i class="bi bi-arrow-left"></i>
+        </a>
+
+        <div>
+            <h4 class="fw-bold mb-0">@ViewData["Title"]</h4>
+            @if (Model.Any())
+            {
+                <p class="text-muted small mb-0">Listă cu @Model.Count utilizatori.</p>
+            }
+        </div>
+    </div>
+
+    @if (Model.Any())
     {
-        <div class="text-center text-muted mt-5">
-            Nu există utilizatori în această listă.
+        @* --- 2. LISTA DE UTILIZATORI (Stil Card Mare cu Rânduri) --- *@
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+            <div class="card-body p-0">
+                @foreach (var user in Model)
+                {
+                    <div class="user-list-item d-flex align-items-center justify-content-between p-3 border-bottom">
+
+                        @* INFO UTILIZATOR (Stânga) *@
+                        <div class="d-flex align-items-center flex-grow-1 overflow-hidden">
+                            <a asp-controller="Profile" asp-action="Details" asp-route-userId="@user.Id" class="flex-shrink-0">
+                                <img src="@(!string.IsNullOrEmpty(user.ProfilePictureUrl) ? user.ProfilePictureUrl : "/images/default-profile.png")"
+                                     class="rounded-circle border me-3"
+                                     style="width: 56px; height: 56px; object-fit: cover;"
+                                     alt="@user.FullName">
+                            </a>
+
+                            <div class="d-flex flex-column text-truncate">
+                                <a asp-controller="Profile" asp-action="Details" asp-route-userId="@user.Id"
+                                   class="text-decoration-none text-dark">
+                                    <h6 class="fw-bold mb-0 text-truncate">@user.FullName</h6>
+                                </a>
+                                <small class="text-muted text-truncate">
+                                    @if (!string.IsNullOrEmpty(user.Description))
+                                    {
+                                        <span class="d-inline-block text-truncate" style="max-width: 300px; vertical-align: bottom;">
+                                            @user.Description
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span>Utilizator LookIT</span>
+                                    }
+                                </small>
+                            </div>
+                        </div>
+
+                        @* BUTON ACȚIUNE (Dreapta) *@
+                        <div class="ms-3">
+                            <a asp-controller="Profile" asp-action="Details" asp-route-userId="@user.Id"
+                               class="btn btn-light border rounded-pill btn-sm fw-bold px-4 action-btn text-nowrap">
+                                Vezi profil
+                            </a>
+                        </div>
+
+                    </div>
+                }
+            </div>
         </div>
     }
     else
     {
-        <ul class="list-group list-group-flush">
-            @foreach (var user in Model)
-            {
-                <li class="list-group-item d-flex align-items-center py-3 border-0">
-                    <a asp-action="Details" asp-route-userId="@user.Id" class="d-flex align-items-center text-decoration-none text-dark">
-                        <img src="@user.ProfilePictureUrl"
-                             class="rounded-circle me-3 border"
-                             style="width: 45px; height: 45px; object-fit: cover;">
+        @* --- 3. EMPTY STATE (Cerc Roz) --- *@
+        <div class="text-center py-5 bg-white border-0 shadow-sm rounded-4 mt-2">
 
-                        <div>
-                            <div class="fw-bold">@user.FullName</div>
-                        </div>
-                    </a>
+            <div class="mb-4 d-inline-block">
+                <div class="rounded-circle d-flex align-items-center justify-content-center"
+                     style="width: 100px; height: 100px; background-color: #FBF1F7;">
+                    <i class="bi bi-people" style="font-size: 3rem; color: #B13079;"></i>
+                </div>
+            </div>
 
-                </li>
-            }
-        </ul>
+            <h5 class="fw-bold text-dark">Lista este goală</h5>
+            <p class="text-muted small mb-0">Nu există utilizatori de afișat în această categorie.</p>
+        </div>
+    }
+</div>
+
+@* --- 4. STILURI CSS --- *@
+<style>
+    /* Eliminăm bordura de la ultimul element pentru aspect curat */
+    .user-list-item:last-child {
+        border-bottom: none !important;
     }
 
-    <div class="mt-3">
-        <a href="javascript:history.back()" class="btn btn-outline-secondary btn-sm">Înapoi</a>
-    </div>
-</div>
+    /* Efect subtil la hover pe rând - CULOARE ROZ PAL */
+    .user-list-item {
+        transition: background-color 0.2s ease;
+        background-color: #fff;
+    }
+
+        .user-list-item:hover {
+            background-color: #FBF1F7 !important; /* Roz pal subtil la hover */
+        }
+
+    /* Stil butoane */
+    .action-btn {
+        background-color: #f8f9fa;
+        color: #333;
+        transition: all 0.2s ease;
+    }
+
+        .action-btn:hover {
+            background-color: #e9ecef;
+            border-color: #dee2e6;
+            color: #B13079; /* Magenta la hover */
+        }
+</style>

@@ -1,5 +1,103 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿
+
 @{
+    ViewBag.Title = "Mesaje Raportate";
 }
+
+<div class="py-5">
+    <div class="container">
+        @* --- HEADER --- *@
+        <div class="text-center mb-5">
+            <div class="mb-3">
+                <i class="bi bi-exclamation-triangle-fill lookit-title" style="font-size: 3rem;"></i>
+            </div>
+            <h2 class="fw-bold lookit-title">Mesaje Raportate</h2>
+            <p class="text-muted">Analizează conținutul raportat de utilizatori și ia măsuri de moderare.</p>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-xl-9">
+
+                @if (ViewBag.Count == 0)
+                {
+                    <div class="text-center py-5 bg-white rounded-4 shadow-sm">
+                        <i class="bi bi-shield-check text-success opacity-25" style="font-size: 5rem;"></i>
+                        <h4 class="text-muted mt-3">Nu există mesaje raportate în acest moment.</h4>
+                        <p class="text-muted small">Comunitatea este în siguranță!</p>
+                    </div>
+                }
+                else
+                {
+                    @foreach (var msg in ViewBag.Messages)
+                    {
+                        
+                        <div class="card mb-4 border-0 shadow-sm rounded-4 overflow-hidden">
+                            @* --- BARA SUPERIOARA (Sursa Mesajului) --- *@
+                            <div class="card-header bg-light border-0 py-2 px-3 d-flex justify-content-between align-items-center">
+                                <span class="small fw-bold lookit-title">
+                                    <i class="bi bi-grid-fill me-1"></i> Grup: @msg.Group?.GroupName
+                                </span>
+                                <span class="badge rounded-pill bg-danger bg-opacity-10 text-danger small">
+                                    <i class="bi bi-flag-fill me-1"></i> Raportat
+                                </span>
+                            </div>
+
+                            <div class="card-body p-4">
+                                @* --- INFO UTILIZATOR --- *@
+                                <div class="d-flex align-items-center mb-3">
+                                    <img src="@(string.IsNullOrEmpty(msg.User?.ProfilePictureUrl) ? "/images/unknown_person.jpg" : msg.User.ProfilePictureUrl)"
+                                         class="rounded-circle shadow-sm me-3" style="width: 45px; height: 45px; object-fit: cover;" />
+                                    <div>
+                                        <h6 class="mb-0 fw-bold">@msg.User?.FullName</h6>
+                                        <small class="text-muted">Postat la: @msg.Date.ToString("dd MMM, HH:mm")</small>
+                                    </div>
+                                </div>
+
+                                @* --- CONTINUT MESAJ --- *@
+                                <div class="p-3 rounded-3 mb-3" style="background-color: #FDF2F7; border: 1px solid rgba(177, 48, 121, 0.05);">
+                                    <div class="mb-2" style="font-size: 1rem; color: #4b2c35;">
+                                        @Html.Raw(msg.TextContent)
+                                    </div>
+
+                                    @if (!string.IsNullOrEmpty(msg.ImageUrl))
+                                    {
+                                        <img src="@msg.ImageUrl" class="rounded-3 w-100 mt-2 shadow-sm" style="max-height: 300px; object-fit: contain;" />
+                                    }
+                                    @if (!string.IsNullOrEmpty(msg.VideoUrl))
+                                    {
+                                        <video controls class="w-100 rounded-3 mt-2 shadow-sm" style="max-height: 300px; background: #000;">
+                                            <source src="@msg.VideoUrl" type="video/mp4">
+                                        </video>
+                                    }
+                                </div>
+
+                                @* --- BUTOANE ACTIUNE --- *@
+                                <div class="d-flex gap-2 pt-3 border-top" style="border-color: rgba(177, 48, 121, 0.1) !important;">
+
+                                    @* Buton Iartă / Ignoră (Soft Pink) *@
+                                    <form asp-controller="Messages" asp-action="ClearReport" asp-route-Id="@msg.MessageId" method="post" class="flex-fill">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-discard w-100 py-2 fw-bold">
+                                            <i class="bi bi-hand-thumbs-up me-1"></i> Păstrează mesajul
+                                        </button>
+                                    </form>
+
+                                    @* Buton Șterge definitiv (Vibrant Magenta/Red) *@
+                                    <form asp-controller="Messages" asp-action="DeleteReportMessage" asp-route-Id="@msg.MessageId" method="post" class="flex-fill">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-primary w-100 py-2 fw-bold"
+                                                style="background-color: #dc3545 !important; border: none !important;"
+                                                onclick="return confirm('ATENȚIE! Mesajul va fi șters definitiv de pe platformă.');">
+                                            <i class="bi bi-trash3 me-1"></i> Șterge Mesajul
+                                        </button>
+                                    </form>
+
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>

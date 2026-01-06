@@ -157,7 +157,7 @@ namespace LookIT.Data
 
            //din motive de siguranta pentru formarea ciclurilor, vom sterge manual legaturile dintre colectii si postari salvate
            //atunci cand stergem una dintre aceste entitati
-           //am gestionat cazul in care sterg o postare -> rebuie sa sterg legaturile
+           //am gestionat cazul in care sterg o postare -> trebuie sa sterg legaturile
             modelBuilder.Entity<PostCollection>()
                 .HasOne(postCollection => postCollection.Post)
                 .WithMany(post => post.PostCollections)
@@ -166,7 +166,7 @@ namespace LookIT.Data
 
             //din motive de siguranta pentru formarea ciclurilor, vom sterge manual legaturile dintre colectii si postari salvate
             //atunci cand stergem una dintre aceste entitati
-            //am gestionat cazul in care sterg o colecti -> trebuie sa sterg legaturile
+            //am gestionat cazul in care sterg o colectie -> trebuie sa sterg legaturile
             modelBuilder.Entity<PostCollection>()
                 .HasOne(postCollection => postCollection.Collection)
                 .WithMany(collection => collection.PostCollections)

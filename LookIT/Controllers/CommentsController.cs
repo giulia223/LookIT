@@ -4,14 +4,16 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using LookIT.Services;
 
 namespace LookIT.Controllers
 {
-    public class CommentsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager) : Controller
+    public class CommentsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IModerationService moderationService) : Controller
     {
         private readonly ApplicationDbContext db = context;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly RoleManager<IdentityRole> _roleManager = roleManager;
+        private readonly IModerationService _moderationService = moderationService;
 
         //stergerea unui comentariu asociat unei postari din baza de date
         //se poate sterge coemntariul doar de catre useruii cu rolul de Administrator 
@@ -78,7 +80,7 @@ namespace LookIT.Controllers
 
         [HttpPost]
         [Authorize(Roles="User,Administrator")]
-        public IActionResult Edit(int Id, Comment requestComment)
+        public async Task<IActionResult> Edit(int Id, Comment requestComment)
         {
             Comment? comment = db.Comments.Find(Id);
 
@@ -93,13 +95,30 @@ namespace LookIT.Controllers
                 {
                     if (ModelState.IsValid)
                     {
-                        comment.Content = requestComment.Content;
 
+                        var moderationResult = await _moderationService.CheckContentAsync(requestComment.Content);
+
+                        if (moderationResult.Success)
+                        {
+                            if (moderationResult.IsFlagged is true)
+                            {
+                                ModelState.AddModelError("Content", $"Comentariul nu fost editat deoarece incalca regulile comunitatii: {moderationResult.Reason}");
+
+                                //ne asiguram ca comentariul pastreaza id-ul corect pentru a se intoarce in view ul de editare
+                                requestComment.CommentId = Id;
+                                return View(requestComment);
+                            }
+
+                            comment.IsFlagged = moderationResult.IsFlagged;
+                            comment.FlagCategory = "Safe";
+                        }
+
+                        comment.Content = requestComment.Content;
                         comment.DateModified = DateTime.Now;
 
                         db.SaveChanges();
 
-                        return Redirect("/Posts/Show/" + comment.PostId);
+                        return RedirectToAction("Show", "Posts", new { id = comment.PostId});
                     }
                     else
                     {
@@ -113,9 +132,6 @@ namespace LookIT.Controllers
                     return RedirectToAction("Index", "Posts");
                 }
             }
-        }
-
-        
-        
+        } 
     }
 }

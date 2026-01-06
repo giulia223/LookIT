@@ -1,0 +1,149 @@
+﻿@page
+@using Microsoft.AspNetCore.Http.Features
+@model TwoFactorAuthenticationModel
+@{
+    ViewData["Title"] = "Autentificare în doi pași (2FA)";
+    ViewData["ActivePage"] = ManageNavPages.TwoFactorAuthentication;
+}
+
+<div class="row justify-content-start">
+    <div class="col-md-10 col-lg-8">
+
+        @* Card container *@
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body p-4">
+
+                <h4 class="fw-bold mb-3">@ViewData["Title"]</h4>
+                <partial name="_StatusMessage" for="StatusMessage" />
+
+                @{
+                    var consentFeature = HttpContext.Features.Get<ITrackingConsentFeature>();
+                    @if (consentFeature?.CanTrack ?? true)
+                    {
+                        @* --- STATUS GENERAL 2FA --- *@
+                        <div class="d-flex align-items-center mb-4">
+                            <span class="me-2 fw-bold text-muted small">STATUS:</span>
+                            @if (Model.Is2faEnabled)
+                            {
+                                <span class="badge bg-success rounded-pill px-3 py-2">
+                                    <i class="bi bi-shield-check me-1"></i> ACTIVAT
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary rounded-pill px-3 py-2">
+                                    <i class="bi bi-shield-x me-1"></i> DEZACTIVAT
+                                </span>
+                            }
+                        </div>
+
+                        @if (Model.Is2faEnabled)
+                        {
+                            @* --- ZONA DE AVERTISMENTE CODURI --- *@
+                            if (Model.RecoveryCodesLeft == 0)
+                            {
+                                <div class="alert alert-danger border-0 shadow-sm rounded-3 mb-4">
+                                    <div class="d-flex">
+                                        <i class="bi bi-exclamation-octagon-fill fs-4 me-3"></i>
+                                        <div>
+                                            <strong>Nu mai ai coduri de recuperare.</strong>
+                                            <p class="mb-0 small">Trebuie să <a asp-page="./GenerateRecoveryCodes" class="fw-bold text-danger">generezi un nou set</a> înainte de a te putea autentifica folosind un cod de recuperare.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            else if (Model.RecoveryCodesLeft == 1)
+                            {
+                                <div class="alert alert-danger border-0 shadow-sm rounded-3 mb-4">
+                                    <div class="d-flex">
+                                        <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
+                                        <div>
+                                            <strong>Ți-a mai rămas un singur cod de recuperare.</strong>
+                                            <p class="mb-0 small">Poți <a asp-page="./GenerateRecoveryCodes" class="fw-bold text-danger">genera un set nou</a>.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            else if (Model.RecoveryCodesLeft <= 3)
+                            {
+                                <div class="alert alert-warning border-0 shadow-sm rounded-3 mb-4">
+                                    <div class="d-flex">
+                                        <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
+                                        <div>
+                                            <strong>Mai ai doar @Model.RecoveryCodesLeft coduri de recuperare.</strong>
+                                            <p class="mb-0 small">Ar trebui să <a asp-page="./GenerateRecoveryCodes" class="fw-bold text-dark">generezi un set nou</a>.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+
+                            @* --- ACȚIUNI PRINCIPALE (Butoane) --- *@
+                            <div class="d-grid gap-2 mb-4">
+                                @if (Model.IsMachineRemembered)
+                                {
+                                    <form method="post" style="display: inline-block">
+                                        <button type="submit" class="btn btn-outline-secondary rounded-pill w-100 fw-bold">
+                                            <i class="bi bi-browser-chrome me-2"></i> Uită acest browser
+                                        </button>
+                                    </form>
+                                }
+
+                                <a asp-page="./Disable2fa" class="btn btn-danger rounded-pill fw-bold">
+                                    <i class="bi bi-power me-2"></i> Dezactivează 2FA
+                                </a>
+
+                                <a asp-page="./GenerateRecoveryCodes" class="btn btn-outline-secondary rounded-pill fw-bold">
+                                    <i class="bi bi-arrow-repeat me-2"></i> Resetează codurile de recuperare
+                                </a>
+                            </div>
+                        }
+
+                        <hr class="my-4 text-muted opacity-25">
+
+                        @* --- APLICAȚIE DE AUTENTIFICARE --- *@
+                        <h5 class="fw-bold mb-3 text-muted small text-uppercase">
+                            <i class="bi bi-phone me-1"></i> Aplicație de autentificare
+                        </h5>
+
+                        <div class="d-grid">
+                            @if (!Model.HasAuthenticator)
+                            {
+                                <a id="enable-authenticator" asp-page="./EnableAuthenticator" class="btn btn-primary rounded-pill py-2 fw-bold shadow-sm">
+                                    <i class="bi bi-qr-code-scan me-2"></i> Adaugă aplicație de autentificare
+                                </a>
+                            }
+                            else
+                            {
+                                <div class="d-flex gap-2 flex-column flex-sm-row">
+                                    <a id="enable-authenticator" asp-page="./EnableAuthenticator" class="btn btn-primary rounded-pill w-100 fw-bold shadow-sm">
+                                        <i class="bi bi-gear-fill me-2"></i> Configurează aplicația
+                                    </a>
+                                    <a id="reset-authenticator" asp-page="./ResetAuthenticator" class="btn btn-outline-danger rounded-pill w-100 fw-bold">
+                                        <i class="bi bi-arrow-counterclockwise me-2"></i> Resetează aplicația
+                                    </a>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        @* --- MESAJ COOKIES --- *@
+                        <div class="alert alert-danger border-0 shadow-sm rounded-3">
+                            <div class="d-flex">
+                                <i class="bi bi-cookie fs-4 me-3"></i>
+                                <div>
+                                    <strong>Politica de confidențialitate și cookie-uri nu a fost acceptată.</strong>
+                                    <p class="mb-0 small">Trebuie să accepți politica înainte de a putea activa autentificarea în doi pași.</p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

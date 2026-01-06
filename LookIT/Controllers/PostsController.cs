@@ -7,16 +7,19 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.Json;
 using System.Threading.Tasks;
+using LookIT.Services;
 
 
 namespace LookIT.Controllers
 {
-    public class PostsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IWebHostEnvironment env, ISentimentAnalysisService sentimentService) : Controller
+    public class PostsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IWebHostEnvironment env, ISentimentAnalysisService sentimentService, IModerationService moderationSerivce) : Controller
     {
         private readonly ApplicationDbContext db = context;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly RoleManager<IdentityRole> _roleManager = roleManager;
         private readonly IWebHostEnvironment _env = env;
+        private readonly IModerationService _moderationService = moderationService;
+
         private readonly ISentimentAnalysisService _sentimentService = sentimentService;
 
         //au acces la aceasta metoda atat utilizatorii inregistrati, cat si neinregistrati si administratorii
@@ -227,7 +230,7 @@ namespace LookIT.Controllers
 
         [Authorize(Roles ="User,Administrator")]
         [HttpPost]
-        public IActionResult Show([FromForm] Comment comment)
+        public async Task<IActionResult> Show([FromForm] Comment comment)
         {
             //data la care a fost postat comentariul
             comment.Date = DateTime.Now;
@@ -239,6 +242,24 @@ namespace LookIT.Controllers
             //anumit numar de caractere)
             if (ModelState.IsValid)
             {
+                //analizam continutul comentariului folosing OpenAI API
+
+                var moderationResult = await _moderationService.CheckContentAsync(comment.Content);
+
+                if (moderationResult.Success)
+                {
+                    if (moderationResult.IsFlagged is true)
+                    {
+                        TempData["message"] = $"Comentariul nu a fost postat deoarece incalca regulile comunitatii: {moderationResult.Reason}";
+                        TempData["messageType"] = "alert-danger";
+
+                        return RedirectToAction("Show", new { IDataTokensMetadata = comment.PostId });
+                    }
+
+                    comment.IsFlagged = moderationResult.IsFlagged;
+                    comment.FlagCategory = "Safe";
+                }
+
                 db.Comments.Add(comment);
                 db.SaveChanges();
                 return Redirect("/Posts/Show/" + comment.PostId);
@@ -461,7 +482,7 @@ namespace LookIT.Controllers
                     // Actualizam textul din input
                     post.TextContent = requestPost.TextContent;
 
-                    // --- AICI INSERAM ANALIZA SENTIMENTULUI ---
+                    // ---  ANALIZA SENTIMENTULUI ---
                     // Verificam daca avem continut de analizat (text sau imagine noua)
                     if (!string.IsNullOrWhiteSpace(post.TextContent))
                     {
@@ -482,7 +503,6 @@ namespace LookIT.Controllers
                            
                         }
                     }
-                    // ------------------------------------------
 
                     // daca am ales o poza, o vom modifica
                     if (Image != null && Image.Length > 0)
@@ -826,7 +846,6 @@ namespace LookIT.Controllers
 
             return Json(new { success = true, isLiked = isLikedNow, count = newCount });
         }
-
 
         //conditiile de afisare pentru butoanele de editare si steregere
         //butoanele sunt aflate in view-uri

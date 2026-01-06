@@ -29,5 +29,17 @@ namespace LookIT.Models
 
         //proprietatea de navigatie - un comentariu apartine unei postari
         public virtual Post? Post { get; set; }
+
+        //campuri noi pentru analiza comentariului
+        //indica daca AI-ul a marcat comentariul ca fiind nepotrivit
+        //true = continut perisuclos/interizis -> se blocheaza publicarea lui
+        //false = continut sigur
+        public bool? IsFlagged  { get; set; }
+
+        //motivul pentru care a fost marcat ca si nesigur, ex : hate speech, violcenta, sexual
+        public string? FlagCategory { get; set; }
+
+        //data si ora la care s-a efectuat analiza
+        public DateTime? ModeratedAt { get; set; }
     }
 }

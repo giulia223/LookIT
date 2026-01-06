@@ -28,13 +28,15 @@
                                      class="rounded-circle border border-3 border-light shadow-sm"
                                      style="width: 100px; height: 100px; object-fit: cover;" />
 
-                                @* Butonul de upload suprapus *@
-                                <label for="Input_ProfilePicture" class="position-absolute bottom-0 end-0 bg-white border shadow-sm rounded-circle p-2 cursor-pointer" style="cursor: pointer; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
-                                    <i class="bi bi-camera-fill text-primary" style="font-size: 0.9rem;"></i>
+                                @* Butonul de upload: Cerc alb cu iconiță Magenta *@
+                                <label for="Input_ProfilePicture"
+                                       class="position-absolute bottom-0 end-0 bg-white border shadow-sm rounded-circle p-2"
+                                       style="cursor: pointer; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="bi bi-camera-fill" style="font-size: 0.95rem; color: #B13079;"></i>
                                 </label>
                             </div>
 
-                            @* Input ascuns - ID-ul generat de ASP este de obicei Input_ProfilePicture *@
+                            @* Input ascuns *@
                             <input asp-for="Input.ProfilePicture" class="d-none" accept="image/*" onchange="previewProfileImage(this)" />
                             <span asp-validation-for="Input.ProfilePicture" class="text-danger small d-block mt-1"></span>
                         </div>
@@ -46,7 +48,7 @@
                                 <span class="input-group-text bg-light border-0 rounded-start-3 ps-3">
                                     <i class="bi bi-person text-muted"></i>
                                 </span>
-                                <input asp-for="Input.FullName" class="form-control bg-light border-0 rounded-end-3 py-2" placeholder="Numele tău" />
+                                <input asp-for="Input.FullName" class="form-control custom-input-bg border-0 rounded-end-3 py-2" placeholder="Numele tău" />
                             </div>
                             <span asp-validation-for="Input.FullName" class="text-danger small ms-1"></span>
                         </div>
@@ -58,7 +60,7 @@
                                 <span class="input-group-text bg-light border-0 rounded-start-3 ps-3">
                                     <i class="bi bi-envelope text-muted"></i>
                                 </span>
-                                <input asp-for="Input.Email" class="form-control bg-light border-0 rounded-end-3 py-2" placeholder="Email" />
+                                <input asp-for="Input.Email" class="form-control custom-input-bg border-0 rounded-end-3 py-2" placeholder="Email" />
                             </div>
                             <span asp-validation-for="Input.Email" class="text-danger small ms-1"></span>
                         </div>
@@ -66,7 +68,7 @@
                         @* --- INPUT: DESCRIERE --- *@
                         <div class="mb-3">
                             <label class="form-label small text-muted fw-bold ms-1">DESCRIERE</label>
-                            <textarea asp-for="Input.Description" class="form-control bg-light border-0 rounded-3 p-3" placeholder="Zi-ne ceva despre tine (opțional)..." style="height: 80px"></textarea>
+                            <textarea asp-for="Input.Description" class="form-control custom-input-bg border-0 rounded-3 p-3" placeholder="Zi-ne ceva despre tine (opțional)..." style="height: 80px"></textarea>
                             <span asp-validation-for="Input.Description" class="text-danger small ms-1"></span>
                         </div>
 
@@ -74,10 +76,11 @@
                         <div class="mb-3">
                             <label class="form-label small text-muted fw-bold ms-1">PAROLA</label>
                             <div class="input-group">
+                                @* Span-ul cu iconița trebuie să aibă și el custom-input-bg *@
                                 <span class="input-group-text bg-light border-0 rounded-start-3 ps-3">
                                     <i class="bi bi-lock text-muted"></i>
                                 </span>
-                                <input asp-for="Input.Password" class="form-control bg-light border-0 rounded-end-3 py-2" placeholder="Parolă" />
+                                <input asp-for="Input.Password" class="form-control custom-input-bg border-0 rounded-end-3 py-2" placeholder="Parolă" type="password" />
                             </div>
                             <span asp-validation-for="Input.Password" class="text-danger small ms-1"></span>
                         </div>
@@ -89,20 +92,22 @@
                                 <span class="input-group-text bg-light border-0 rounded-start-3 ps-3">
                                     <i class="bi bi-check2-circle text-muted"></i>
                                 </span>
-                                <input asp-for="Input.ConfirmPassword" class="form-control bg-light border-0 rounded-end-3 py-2" placeholder="Confirmă Parola" />
+                                <input asp-for="Input.ConfirmPassword" class="form-control custom-input-bg border-0 rounded-end-3 py-2" placeholder="Confirmă Parola" />
                             </div>
                             <span asp-validation-for="Input.ConfirmPassword" class="text-danger small ms-1"></span>
                         </div>
 
                         @* --- BUTON REGISTER --- *@
                         <div class="d-grid mb-3">
-                            <button id="registerSubmit" type="submit" class="btn btn-primary rounded-pill py-2 fw-bold shadow-sm">
+                            <button id="registerSubmit" type="submit"
+                                    class="btn rounded-pill py-2 fw-bold shadow-sm"
+                                    style="background-color: #B13079; color: white; border: none;">
                                 Înregistrează-te
                             </button>
                         </div>
 
                         <div class="text-center">
-                            <small class="text-muted">Ai deja un cont? <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl" class="text-decoration-none fw-bold">Autentifică-te</a></small>
+                            <small class="text-muted">Ai deja un cont? <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl" class="text-decoration-none fw-bold" style="color: #B13079;">Autentifică-te</a></small>
                         </div>
 
                     </form>
@@ -132,6 +137,8 @@
         </div>
     </div>
 </div>
+
+
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
