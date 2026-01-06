@@ -1,92 +1,271 @@
+﻿/* --- 1. CONFIGURĂRI GENERALE & LAYOUT --- */
 html {
-  font-size: 14px;
+    font-size: 14px;
+    position: relative;
+    min-height: 100%;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
+    html {
+        font-size: 16px;
+    }
 }
 
 body {
-  margin-bottom: 60px;
-}
-
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
-}
-
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
-}
-
-/* code adaugat de mine*/
-
-body {
-   
-    background-color: #F8F6F7;
+    /* Spațiu sus pentru bara de navigare (care e mai înaltă acum) */
+    padding-top: 90px;
+    /* Spațiu jos pentru footer */
     margin-bottom: 60px;
+    background-color: #f0f2f5;
 }
 
-.navbar.bg-white, .navbar {
-    background-color: #845763 !important;
-    border-color: #845763 !important;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15) !important;
-}
-
-.navbar-brand,
-.navbar-nav .nav-link,
-.navbar-light .navbar-nav .nav-link {
-    color: #92E4BA !important;
-    font-weight: 500;
-}
-
-    .navbar-light .navbar-nav .nav-link:hover,
-    .navbar-light .navbar-nav .nav-link:focus {
-        color: #90C67F !important;
-    }
-
-    .navbar-light .navbar-nav .nav-link.active {
-        color: #E491A6 !important;
-    }
-
-.navbar-toggler-icon {
-    filter: invert(1);
-    background-color: #92E4BA;
-}
-
+/* Footer fixat absolut jos */
 .footer {
-    background-color: #90C67F !important;
-    color: #845763 !important;
-    border-top: 1px solid #92E4BA !important;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    white-space: nowrap;
+    height: 60px;
+    line-height: 60px;
+    background-color: #fff;
+    border-top: 1px solid #dee2e6;
 }
 
-    .footer a {
-        color: #845763 !important;
-        font-weight: 500;
+/* --- 2. HEADER & NAVBAR (MAGENTA & LATĂ) --- */
+header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1030;
+    /* Culoarea ta originală */
+    background-color: #C74E92;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.navbar {
+    /* Padding mărit pentru a face bara mai lată/înaltă */
+    padding-top: 1rem !important;
+    padding-bottom: 1rem !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+}
+
+.navbar-brand img {
+    height: 42px;
+    width: auto;
+}
+
+/* --- 3. LINK-URI NAVIGARE --- */
+.navbar-nav .nav-link {
+    color: #EBA5CD !important; /* Roz pal original */
+    font-weight: 500;
+    padding: 8px 15px !important;
+    border-radius: 12px;
+    /* Tranziție pentru efectul de ridicare */
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    /* Admin Link - forțăm aceeași culoare */
+    .navbar-nav .nav-link.text-danger {
+        color: #EBA5CD !important;
     }
 
-        .footer a:hover {
-            color: #E491A6 !important;
+        /* Hover: Se fac albe și se ridică */
+        .navbar-nav .nav-link:hover,
+        .navbar-nav .nav-link.text-danger:hover {
+            background-color: rgba(255, 255, 255, 0.15) !important;
+            color: #ffffff !important;
+            transform: translateY(-3px);
         }
 
+    .navbar-nav .nav-link.active {
+        color: #ffffff !important;
+    }
 
-.truncate {
-    /* Required declarations: */
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -moz-box-orient: vertical;
-    /* Limit the text block to x lines */
-    -webkit-line-clamp: 5;
+.nav-icon {
+    font-size: 1.5rem;
+}
+
+/* --- 4. BUTONUL "CREEAZĂ" (Solid + Efect Ridicare) --- */
+.nav-link.btn-new-post {
+    background-color: #B13079 !important; /* Magenta LookIT */
+    color: #ffffff !important; /* Text Alb */
+    border-radius: 50rem !important;
+    padding: 8px 24px !important;
+    border: none !important;
+    box-shadow: none !important;
+    /* Aceeași tranziție ca la link-uri */
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+}
+
+a.nav-link.btn-new-post:hover {
+    background-color: #9c2869 !important; /* Mai închis la hover */
+    color: #ffffff !important;
+    /* Efect de ridicare */
+    transform: translateY(-3px) !important;
+}
+
+/* Anulează efectele pentru elementul din dreapta (Profilul) */
+.navbar-nav .nav-item.border-start-lg .nav-link:hover {
+    background-color: transparent !important;
+    transform: none !important;
+}
+
+    /* 2. Schimbă culoarea săgeții la hover pe profil */
+    /* Targetăm iconița sau clasa de dropdown-toggle */
+    .navbar-nav .nav-item.border-start-lg .nav-link:hover::after,
+    .navbar-nav .nav-item.border-start-lg .nav-link:hover .bi-chevron-down,
+    .navbar-nav .nav-item.border-start-lg .nav-link:hover i {
+        color: #9c2869 !important; /* Magenta închis */
+    }
+
+/* --- 5. SEARCH BAR (Alb pe fundal Roz) --- */
+.search-container {
+    background-color: #ffffff;
+    border-radius: 50rem;
+    padding: 0.2rem 1rem;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+    .search-container:focus-within {
+        background-color: #fff;
+        box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.3);
+    }
+
+.search-input {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    font-size: 0.95rem;
+    color: #333;
+}
+
+    .search-input:focus {
+        background: transparent !important;
+        box-shadow: none !important;
+        border: none !important;
+    }
+
+.search-icon {
+    color: #C74E92;
+}
+
+/* --- 6. FORMULARE & BUTTONS (Stilurile tale originale) --- */
+
+.input-group-text {
+    background-color: #f8f9fa !important;
+    border: none !important;
+    color: #adb5bd !important;
+}
+
+/* Placeholdere Gri (așa cum ai cerut) */
+.form-control::placeholder {
+    color: #6c757d !important;
+    opacity: 1;
+    font-size: 0.9rem !important;
+}
+
+.form-control {
+    font-size: 0.9rem !important;
+    transition: none !important;
+    border: none !important;
+}
+
+    /* Focus roz pal */
+    .form-control:focus,
+    .input-group-text:focus,
+    .btn:focus,
+    .form-check-input:focus {
+        border: none !important;
+        box-shadow: none !important;
+        outline: 0 !important;
+        background-color: #FBF1F7;
+    }
+
+.custom-input-bg {
+    background-color: #FBF1F7 !important;
+    border: none !important;
+}
+
+    input:-webkit-autofill,
+    .custom-input-bg:-webkit-autofill {
+        -webkit-box-shadow: 0 0 0px 1000px #FBF1F7 inset !important;
+        -webkit-text-fill-color: #212529 !important;
+        transition: background-color 5000s ease-in-out 0s;
+    }
+
+/* Butoane Globale (Magenta) */
+.btn-primary {
+    background-color: #B13079 !important;
+    border-color: #B13079 !important;
+    color: #ffffff !important;
+    border-radius: 50rem !important;
+    font-weight: bold;
+}
+
+    .btn-primary:hover,
+    .btn-primary:focus {
+        background-color: #8f2661 !important;
+        border-color: #8f2661 !important;
+    }
+
+    .btn-primary:active {
+        background-color: #6e1d4b !important;
+        border-color: #6e1d4b !important;
+    }
+
+    .btn-primary:focus {
+        box-shadow: 0 0 0 0.25rem rgba(177, 48, 121, 0.4) !important;
+    }
+
+    .btn-primary:disabled {
+        background-color: #B13079 !important;
+        border-color: #B13079 !important;
+        opacity: 0.65;
+    }
+
+/* Nav Pills (Meniu lateral) */
+.nav-pills .nav-link {
+    color: #495057 !important;
+    background-color: transparent;
+    font-weight: 500;
+    border-radius: 50rem !important;
+    padding: 10px 20px;
+    transition: all 0.2s ease-in-out;
+}
+
+    .nav-pills .nav-link:hover {
+        background-color: #FBF1F7 !important;
+        color: #DA74AE !important;
+    }
+
+    .nav-pills .nav-link.active {
+        background-color: #DA74AE !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 6px rgba(177, 48, 121, 0.25) !important;
+    }
+
+    .nav-pills .nav-link i {
+        font-size: 1.1rem;
+        vertical-align: text-bottom;
+    }
+
+/* Switch Custom */
+.form-check-input:checked {
+    background-color: #EAACCF;
+    border-color: #EAACCF;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23A93376'/%3e%3c/svg%3e");
+}
+
+.form-check-input:focus {
+    border-color: #EAACCF;
+    box-shadow: 0 0 0 0.25rem rgba(216, 123, 176, 0.25);
+}
+
+.form-check-input:checked:focus {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23A93376'/%3e%3c/svg%3e");
 }

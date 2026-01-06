@@ -11,8 +11,8 @@
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
 
                 <div class="card-header bg-white border-0 pt-4 pb-0 text-center">
-                    <div class="d-inline-flex align-items-center justify-content-center bg-light rounded-circle mb-3" style="width: 64px; height: 64px;">
-                        <i class="bi bi-folder-plus fs-2 text-primary"></i>
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 64px; height: 64px; background-color: #FBF1F7;">
+                        <i class="bi bi-folder-plus fs-2" style="color: #B13079;"></i>
                     </div>
                     <h4 class="fw-bold mb-1">Creează o colecție</h4>
                     <p class="text-muted small">Organizează-ți postările salvate într-un folder nou.</p>
@@ -24,28 +24,32 @@
                         @if (ViewBag.PostToSave != null)
                         {
                             <input type="hidden" name="PostToSave" value="@ViewBag.PostToSave" />
-                            <div class="alert alert-info">
-                                Această colecție va include automat postarea curentă după creare.
+                            <div class="alert alert-info border-0 rounded-3 shadow-sm mb-4">
+                                <i class="bi bi-info-circle-fill me-2"></i> Această colecție va include automat postarea curentă.
                             </div>
                         }
 
                         <div class="mb-4">
-                            <label asp-for="Name" class="form-label fw-semibold text-secondary small text-uppercase ls-1">Nume colecție</label>
+                            <label asp-for="Name" class="form-label small text-muted fw-bold ms-1">NUME COLECȚIE</label>
+
+                            @* AICI este schimbarea principală: folosim stilul standard din site.css *@
                             <div class="input-group">
-                                <span class="input-group-text bg-light border-end-0 rounded-start-pill ps-3 text-muted">
+                                <span class="input-group-text border-0 rounded-start-3 ps-3">
                                     <i class="bi bi-tag"></i>
                                 </span>
-                                <input asp-for="Name" class="form-control bg-light border-start-0 rounded-end-pill py-2" placeholder="ex: Idei Vacanță, Rețete, Design..." autocomplete="off" />
+                                <input asp-for="Name" class="form-control custom-input-bg border-0 rounded-end-3 py-2" placeholder="ex: Idei Vacanță, Rețete..." autocomplete="off" />
                             </div>
-                            <span asp-validation-for="Name" class="text-danger small mt-1 d-block"></span>
+
+                            <span asp-validation-for="Name" class="text-danger small mt-1 d-block ms-1"></span>
                         </div>
 
                         <div class="d-grid gap-2 mt-4">
-                            <button type="submit" class="btn btn-primary rounded-pill py-2 fw-bold shadow-sm transition-btn">
+                            @* Butonul este acum standard, fără clase extra de animație *@
+                            <button type="submit" class="btn btn-primary rounded-pill py-2 fw-bold shadow-sm">
                                 <i class="bi bi-plus-lg me-1"></i> Creează colecția
                             </button>
 
-                            <a asp-action="Index" class="btn btn-light rounded-pill py-2 text-muted fw-semibold transition-btn">
+                            <a href="javascript:history.back()" class="btn btn-outline-secondary rounded-pill py-2 fw-bold shadow-sm">
                                 Anulează
                             </a>
                         </div>
@@ -56,7 +60,7 @@
 
             <div class="text-center mt-3">
                 <p class="text-muted small">
-                    <i class="bi bi-lock-fill me-1"></i> Colecțiile tale sunt private, doar tu le poți vedea.
+                    <i class="bi bi-lock-fill me-1"></i> Colecțiile tale sunt private.
                 </p>
             </div>
 
@@ -69,37 +73,3 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
-
-<style>
-    .form-control:focus {
-        box-shadow: none;
-        background-color: #fff !important;
-        border-color: #dee2e6;
-    }
-
-        .form-control:focus + .input-group-text,
-        .input-group:focus-within .input-group-text,
-        .input-group:focus-within .form-control {
-            border-color: #0d6efd;
-            background-color: #fff !important;
-        }
-
-    .ls-1 {
-        letter-spacing: 1px;
-        font-size: 0.75rem;
-    }
-
-    .transition-btn {
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-        .transition-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.08) !important;
-        }
-
-    .btn-primary.transition-btn:hover {
-        background-color: #0b5ed7;
-        border-color: #0a58ca;
-    }
-</style>
