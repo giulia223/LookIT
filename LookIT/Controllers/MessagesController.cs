@@ -42,11 +42,12 @@ namespace LookIT.Controllers
         [Authorize(Roles = "Administrator")]
         public IActionResult Index()
         {
-            var messages = _context.Messages.Include(m => m.User).ToList();
-
+            var messages = _context.Messages.Include(m => m.User).Where(m => m.isReported == true).ToList();
+            ViewBag.Count = messages.Count();
             ViewBag.Messages = messages;
             return View();
         }
+
 
         //afisare mesajele unui grup
         [Authorize(Roles = "User,Administrator")]
@@ -534,6 +535,67 @@ namespace LookIT.Controllers
             TempData["messageType"] = "alert-danger";
            
             return RedirectToAction("Show", "Groups", new {Id = groupId});
+        }
+
+        //stergere mesaj 
+        [HttpPost]
+        [Authorize(Roles = "User,Administrator")]
+        public async Task<IActionResult> DeleteReportMessage(int Id)
+        {
+            SetAccessRights();
+            var msg = _context.Messages.Find(Id);
+            var groupId = msg.GroupId;
+            var userId = _userManager.GetUserId(User);
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (msg == null)
+            {
+                return NotFound();
+            }
+            if (msg.UserId != userId && !(await _userManager.IsInRoleAsync(currentUser, "Administrator")))
+            {
+                TempData["message"] = "Nu aveti dreptul sa stergeti un mesaj care nu va apartine.";
+                TempData["messageType"] = "alert-danger";
+                return RedirectToAction("Show", "Groups", new { Id = groupId });
+            }
+            //stergem fizic din wwwroot/images/posts imaginea, daca exista
+            if (!string.IsNullOrEmpty(msg.ImageUrl))
+            {
+                var imagePath = Path.Combine(_env.WebRootPath, msg.ImageUrl.TrimStart('/'));
+                if (System.IO.File.Exists(imagePath))
+                {
+                    System.IO.File.Delete(imagePath);
+                }
+            }
+
+            //stergem fizic din wwwroot/videos/posts videocliupl, daca exista
+            if (!string.IsNullOrEmpty(msg.VideoUrl))
+            {
+                var videoPath = Path.Combine(_env.WebRootPath, msg.VideoUrl.TrimStart('/'));
+                if (System.IO.File.Exists(videoPath))
+                {
+                    System.IO.File.Delete(videoPath);
+                }
+            }
+
+            _context.Messages.Remove(msg);
+            _context.SaveChanges();
+            TempData["message"] = "Mesaj sters.";
+            TempData["messageType"] = "alert-danger";
+
+            return RedirectToAction("Index", "Messages");
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Administrator")]
+        public IActionResult ClearReport(int Id)
+        {
+            SetAccessRights();
+            var msg = _context.Messages.Find(Id);
+            if (msg is null)
+                return NotFound();
+            msg.isReported = false;
+            _context.SaveChanges();
+            return RedirectToAction("Index", "Messages");
         }
 
         [HttpPost]

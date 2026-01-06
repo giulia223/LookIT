@@ -14,7 +14,7 @@
 
 <div class="card-body position-relative">
     <div class="position-absolute top-0 end-0 mt-3 me-3">
-        <form method="post" asp-controller="Messages" asp-action="Report" asp-route-id="@Model.MessageId"
+        <form method="post" asp-controller="Messages" asp-action="Report" asp-route-Id="@Model.MessageId"
               onsubmit="return confirm('Raportezi acest mesaj pentru conținut inadecvat?');">
             @Html.AntiForgeryToken()
             <button type="submit" class="btn btn-link p-0 text-muted opacity-50 report-hover-btn"
