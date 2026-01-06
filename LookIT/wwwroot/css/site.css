@@ -12,14 +12,21 @@ html {
 }
 
 body {
-    /* Spațiu sus pentru bara de navigare (care e mai înaltă acum) */
-    padding-top: 90px;
+    /* Spațiu sus pentru bara de navigare fixă */
+    padding-top: 100px;
     /* Spațiu jos pentru footer */
     margin-bottom: 60px;
-    background-color: #f0f2f5;
+    /* Fundal roz pal global - eliminat gri-ul #f0f2f5 */
+    background-color: #FFF5F8 !important;
+    color: #1c1e21;
 }
 
-/* Footer fixat absolut jos */
+/* Ne asigurăm că zonele 'bg-light' respectă tema roz */
+.bg-light {
+    background-color: #FDF2F7 !important;
+}
+
+/* Footer modernizat - eliminat border-ul gri */
 .footer {
     position: absolute;
     bottom: 0;
@@ -27,23 +34,25 @@ body {
     white-space: nowrap;
     height: 60px;
     line-height: 60px;
-    background-color: #fff;
-    border-top: 1px solid #dee2e6;
+    background-color: #ffffff;
+    /* Border magenta foarte fin în loc de gri */
+    border-top: 1px solid rgba(177, 48, 121, 0.1);
+    color: #B13079;
 }
 
-/* --- 2. HEADER & NAVBAR (MAGENTA & LATĂ) --- */
+/* --- 2. HEADER & NAVBAR (MAGENTA VIBRANT) --- */
 header {
     position: fixed;
     top: 0;
     width: 100%;
     z-index: 1030;
-    /* Culoarea ta originală */
-    background-color: #C74E92;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    /* Culoarea ta Magenta principala */
+    background-color: #C74E92 !important;
+    /* Umbră colorată pentru adâncime */
+    box-shadow: 0 2px 10px rgba(177, 48, 121, 0.2);
 }
 
 .navbar {
-    /* Padding mărit pentru a face bara mai lată/înaltă */
     padding-top: 1rem !important;
     padding-bottom: 1rem !important;
     background-color: transparent !important;
@@ -55,85 +64,72 @@ header {
     width: auto;
 }
 
-/* --- 3. LINK-URI NAVIGARE --- */
+/* --- 3. LINK-URI NAVIGARE (ROZ PAL PE FUNDAL MAGENTA) --- */
 .navbar-nav .nav-link {
-    color: #EBA5CD !important; /* Roz pal original */
-    font-weight: 500;
-    padding: 8px 15px !important;
-    border-radius: 12px;
-    /* Tranziție pentru efectul de ridicare */
+    color: #FDF2F7 !important; /* Roz pal pentru contrast */
+    font-weight: 600;
+    /* Am mărit padding-ul: 12px sus/jos și 22px stânga/dreapta */
+    padding: 12px 22px !important;
+    border-radius: 15px;
     transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 8px;
 }
 
-    /* Admin Link - forțăm aceeași culoare */
+    /* Admin Link - aceeași culoare ca restul, eliminat roșul de eroare */
     .navbar-nav .nav-link.text-danger {
-        color: #EBA5CD !important;
+        color: #FDF2F7 !important;
     }
 
-        /* Hover: Se fac albe și se ridică */
+        /* Hover: Se ridică și se luminează */
         .navbar-nav .nav-link:hover,
         .navbar-nav .nav-link.text-danger:hover {
-            background-color: rgba(255, 255, 255, 0.15) !important;
+            background-color: rgba(255, 255, 255, 0.2) !important;
             color: #ffffff !important;
             transform: translateY(-3px);
         }
 
     .navbar-nav .nav-link.active {
         color: #ffffff !important;
+        background-color: rgba(255, 255, 255, 0.1);
     }
 
-.nav-icon {
-    font-size: 1.5rem;
-}
-
-/* --- 4. BUTONUL "CREEAZĂ" (Solid + Efect Ridicare) --- */
+/* --- 4. BUTONUL "CREEAZĂ" (MAGENTA ÎNCHIS & EFECT GLOW) --- */
 .nav-link.btn-new-post {
     background-color: #B13079 !important; /* Magenta LookIT */
-    color: #ffffff !important; /* Text Alb */
+    color: #ffffff !important;
     border-radius: 50rem !important;
     padding: 8px 24px !important;
     border: none !important;
-    box-shadow: none !important;
-    /* Aceeași tranziție ca la link-uri */
-    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+    /* Efect de strălucire sub buton */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
 }
 
 a.nav-link.btn-new-post:hover {
-    background-color: #9c2869 !important; /* Mai închis la hover */
+    background-color: #9c2869 !important;
     color: #ffffff !important;
-    /* Efect de ridicare */
-    transform: translateY(-3px) !important;
+    transform: translateY(-4px) scale(1.05) !important;
+    box-shadow: 0 6px 15px rgba(177, 48, 121, 0.4) !important;
 }
-
-/* Anulează efectele pentru elementul din dreapta (Profilul) */
-.navbar-nav .nav-item.border-start-lg .nav-link:hover {
-    background-color: transparent !important;
-    transform: none !important;
-}
-
-    /* 2. Schimbă culoarea săgeții la hover pe profil */
-    /* Targetăm iconița sau clasa de dropdown-toggle */
-    .navbar-nav .nav-item.border-start-lg .nav-link:hover::after,
-    .navbar-nav .nav-item.border-start-lg .nav-link:hover .bi-chevron-down,
-    .navbar-nav .nav-item.border-start-lg .nav-link:hover i {
-        color: #9c2869 !important; /* Magenta închis */
-    }
-
-/* --- 5. SEARCH BAR (Alb pe fundal Roz) --- */
+/*AICIICICIICICIC*/
+/* --- 5. SEARCH BAR (Vibrant & Clean) --- */
 .search-container {
     background-color: #ffffff;
     border-radius: 50rem;
     padding: 0.2rem 1rem;
     transition: all 0.2s ease;
-    border: 1px solid transparent;
+    /* Înlocuit border transparent cu o tentă fină de Magenta */
+    border: 1px solid rgba(177, 48, 121, 0.1);
 }
 
     .search-container:focus-within {
         background-color: #fff;
-        box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.3);
+        /* Glow roz în loc de alb/gri la focus */
+        box-shadow: 0 0 0 4px rgba(177, 48, 121, 0.15);
+        border-color: #C74E92;
     }
 
 .search-input {
@@ -141,7 +137,8 @@ a.nav-link.btn-new-post:hover {
     border: none;
     box-shadow: none;
     font-size: 0.95rem;
-    color: #333;
+    /* Text închis la culoare pentru lizibilitate */
+    color: #4b2c35;
 }
 
     .search-input:focus {
@@ -151,102 +148,123 @@ a.nav-link.btn-new-post:hover {
     }
 
 .search-icon {
-    color: #C74E92;
+    color: #C74E92; /* Magenta original */
 }
 
-/* --- 6. FORMULARE & BUTTONS (Stilurile tale originale) --- */
+/* --- 6. FORMULARE & BUTTONS (Identitate LookIT) --- */
 
 .input-group-text {
-    background-color: #f8f9fa !important;
+    /* Fundal roz pal consistent */
+    background-color: #FDF2F7 !important;
     border: none !important;
-    color: #adb5bd !important;
+    /* Iconițele sunt Magenta vibrant */
+    color: #B13079 !important;
 }
 
-/* Placeholdere Gri (așa cum ai cerut) */
+    .input-group-text i {
+        color: #B13079 !important;
+    }
+
+/* Stil pentru textele ajutătoare (placeholdere) - acum sunt Magenta palid, nu gri */
 .form-control::placeholder {
-    color: #6c757d !important;
-    opacity: 1;
+    color: #B13079 !important;
+    opacity: 0.5;
     font-size: 0.9rem !important;
 }
 
 .form-control {
     font-size: 0.9rem !important;
-    transition: none !important;
+    transition: all 0.2s ease !important;
     border: none !important;
+    /* Fundal roz pal implicit pentru input-uri */
+    background-color: #FDF2F7 !important;
 }
 
-    /* Focus roz pal */
+    /* Starea de focus: input-ul devine alb pur pentru a ieși în evidență pe fundalul roz al paginii */
     .form-control:focus,
     .input-group-text:focus,
     .btn:focus,
     .form-check-input:focus {
         border: none !important;
-        box-shadow: none !important;
+        box-shadow: 0 0 0 0.25rem rgba(177, 48, 121, 0.1) !important;
         outline: 0 !important;
-        background-color: #FBF1F7;
+        background-color: #ffffff !important;
     }
 
 .custom-input-bg {
-    background-color: #FBF1F7 !important;
+    background-color: #FDF2F7 !important;
     border: none !important;
 }
 
+/* Autofill-ul de la browser (Chrome/Edge) să rămână roz, nu galben sau albastru */
     input:-webkit-autofill,
     .custom-input-bg:-webkit-autofill {
-        -webkit-box-shadow: 0 0 0px 1000px #FBF1F7 inset !important;
+        -webkit-box-shadow: 0 0 0px 1000px #FDF2F7 inset !important;
         -webkit-text-fill-color: #212529 !important;
         transition: background-color 5000s ease-in-out 0s;
     }
 
-/* Butoane Globale (Magenta) */
+/* --- BUTOANE GLOBALE (Magenta Vibrant) --- */
 .btn-primary {
     background-color: #B13079 !important;
-    border-color: #B13079 !important;
+    border: none !important;
     color: #ffffff !important;
     border-radius: 50rem !important;
-    font-weight: bold;
+    font-weight: 700;
+    /* Umbră discretă pentru adâncime */
+    box-shadow: 0 4px 10px rgba(177, 48, 121, 0.2) !important;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
 }
 
     .btn-primary:hover,
     .btn-primary:focus {
-        background-color: #8f2661 !important;
-        border-color: #8f2661 !important;
+        background-color: #922763 !important; /* Magenta un pic mai închis */
+        transform: translateY(-3px); /* Efect de ridicare */
+        box-shadow: 0 6px 15px rgba(177, 48, 121, 0.3) !important;
     }
+
+/*AICICIICCICIC*/
+    /* --- 6. CONTINUARE BUTTONS & NAV PILLS --- */
 
     .btn-primary:active {
         background-color: #6e1d4b !important;
-        border-color: #6e1d4b !important;
+        border: none !important;
+        transform: translateY(-1px) !important;
     }
 
     .btn-primary:focus {
+        /* Shadow magenta pentru focus, fără nuanțe de albastru default */
         box-shadow: 0 0 0 0.25rem rgba(177, 48, 121, 0.4) !important;
     }
 
     .btn-primary:disabled {
         background-color: #B13079 !important;
-        border-color: #B13079 !important;
-        opacity: 0.65;
+        opacity: 0.5;
+        cursor: not-allowed;
     }
 
-/* Nav Pills (Meniu lateral) */
+/* Nav Pills (Meniu lateral / Tab-uri) */
 .nav-pills .nav-link {
-    color: #495057 !important;
+    /* Textul nu mai este gri, ci Magenta închis pentru lizibilitate */
+    color: #843058 !important;
     background-color: transparent;
-    font-weight: 500;
+    font-weight: 600;
     border-radius: 50rem !important;
     padding: 10px 20px;
     transition: all 0.2s ease-in-out;
 }
 
     .nav-pills .nav-link:hover {
-        background-color: #FBF1F7 !important;
-        color: #DA74AE !important;
+        /* Fundal roz pal la hover */
+        background-color: #FDF2F7 !important;
+        color: #B13079 !important;
     }
 
     .nav-pills .nav-link.active {
-        background-color: #DA74AE !important;
+        /* Culoarea vibrantă LookIT pentru starea activă */
+        background-color: #B13079 !important;
         color: #ffffff !important;
-        box-shadow: 0 4px 6px rgba(177, 48, 121, 0.25) !important;
+        box-shadow: 0 4px 6px rgba(177, 48, 121, 0.3) !important;
     }
 
     .nav-pills .nav-link i {
@@ -254,18 +272,356 @@ a.nav-link.btn-new-post:hover {
         vertical-align: text-bottom;
     }
 
-/* Switch Custom */
+.nav-icon {
+    font-size: 1.5rem !important; /* Mărit de la 1.5rem pentru vizibilitate maximă */
+}
+
+/* --- 7. SWITCH CUSTOM (ROZ & MAGENTA) --- */
 .form-check-input:checked {
-    background-color: #EAACCF;
-    border-color: #EAACCF;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23A93376'/%3e%3c/svg%3e");
+    background-color: #DA74AE !important; /* Roz intens la check */
+    border-color: #DA74AE !important;
+    /* Cercul interior magenta */
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23B13079'/%3e%3c/svg%3e") !important;
 }
 
 .form-check-input:focus {
-    border-color: #EAACCF;
-    box-shadow: 0 0 0 0.25rem rgba(216, 123, 176, 0.25);
+    border-color: #DA74AE !important;
+    box-shadow: 0 0 0 0.25rem rgba(218, 116, 174, 0.25) !important;
 }
 
-.form-check-input:checked:focus {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23A93376'/%3e%3c/svg%3e");
+/* --- 8. EDIT GROUP & COMPONENTS --- */
+
+.lookit-card-form {
+    border-radius: 15px !important;
+    background-color: #ffffff !important;
+    /* Eliminat orice border gri, păstrăm doar shadow discret */
+    border: none !important;
+    box-shadow: 0 5px 15px rgba(177, 48, 121, 0.05) !important;
 }
+
+.lookit-title {
+    color: #B13079 !important;
+    font-weight: 700;
+}
+
+/* Textarea modernizat - fundal roz pal conform bg-light */
+.lookit-textarea {
+    background-color: #FDF2F7 !important;
+    border: 1px solid rgba(177, 48, 121, 0.1) !important;
+    border-radius: 12px !important;
+    padding: 12px !important;
+    resize: none;
+    color: #333;
+}
+
+    .lookit-textarea:focus {
+        background-color: #ffffff !important;
+        border-color: #B13079 !important;
+        outline: none !important;
+        box-shadow: 0 0 0 0.25rem rgba(177, 48, 121, 0.1) !important;
+    }
+
+/* Link-ul de abandonare (Fără gri) */
+.btn-discard {
+    /* Din gri în Magenta subtil */
+    background-color: #FDF2F7 !important; /* Roz pal fundal */
+    color: #B13079 !important; /* Text Magenta */
+    border: 1px solid rgba(177, 48, 121, 0.2) !important;
+    border-radius: 50rem !important;
+    font-weight: 700 !important;
+    padding: 10px 20px !important;
+    display: inline-block;
+    transition: all 0.3s ease !important;
+    text-decoration: none !important;
+}
+
+    .btn-discard:hover {
+        background-color: #B13079 !important; /* Devine Magenta plin */
+        color: white !important; /* Textul se face alb */
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 12px rgba(177, 48, 121, 0.2) !important;
+    }
+
+.lookit-card-info {
+    border-radius: 12px !important;
+    background-color: transparent;
+    /* Textul informativ devine un magenta închis/maroniu, nu gri sec */
+    color: #845763 !important;
+}
+
+/* --- INDEX GROUPS LAYOUT ---   AICIICICIICICICICIIICICCIC */
+
+/* Cardul de grup cu efectul de bordură Magenta la hover */
+
+/* --- 9. INDEX GROUPS & FEED LAYOUT --- */
+
+.group-card-index {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-left: 4px solid transparent !important;
+    border-radius: 15px !important;
+    background-color: #ffffff;
+    border: none !important;
+}
+
+    .group-card-index:hover {
+        transform: translateY(-2px);
+        /* Umbră discretă cu tentă de magenta în loc de gri sec */
+        box-shadow: 0 8px 20px rgba(177, 48, 121, 0.1) !important;
+        border-left-color: #B13079 !important; /* Magenta LookIT */
+    }
+
+/* Buton contur Magenta - Curățat */
+.btn-magenta-outline {
+    border: 2px solid #B13079 !important;
+    color: #B13079 !important;
+    background: transparent;
+    border-radius: 50px;
+    font-weight: 700;
+    transition: all 0.2s ease;
+}
+
+    .btn-magenta-outline:hover {
+        background-color: #B13079 !important;
+        color: #ffffff !important;
+        transform: scale(1.02);
+    }
+
+/* Sidebar & Sticky Layout */
+.sticky-sidebar {
+    top: 110px;
+}
+
+.lookit-sidebar-card {
+    border-radius: 15px !important;
+    background-color: #ffffff;
+    border: none !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* --- 10. STATUS BADGES & TITLES --- */
+
+.lookit-badge-status {
+    /* Folosim nuanța de Roz Pal definită anterior */
+    background-color: #FDF2F7 !important;
+    color: #B13079 !important;
+    border: 1px solid rgba(177, 48, 121, 0.15) !important;
+    font-weight: 700;
+    border-radius: 10px;
+}
+
+/* Titlul secțiunii de mesaje - Eliminat gri-ul #65676b */
+.lookit-feed-title {
+    color: #845763 !important; /* Un magenta închis/maroniu cald */
+    font-weight: 800;
+    margin-bottom: 1rem;
+    letter-spacing: -0.5px;
+}
+
+/* Card pentru grup privat / Stare goală */
+.lookit-card-empty {
+    border-radius: 1rem !important;
+    background-color: #ffffff;
+    padding: 3rem !important;
+    border: none !important;
+    box-shadow: 0 4px 20px rgba(177, 48, 121, 0.05);
+}
+
+/* Cereri în așteptare - Accent Magenta clar */
+.lookit-card-pending {
+    border-left: 5px solid #B13079 !important;
+    border-radius: 12px !important;
+    background-color: #ffffff;
+}
+
+/* Sidebar styling - Eliminat border-ul gri #efefef */
+.lookit-sidebar-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #B13079 !important;
+    border-bottom: 2px solid #FDF2F7; /* Linie roz pal în loc de gri */
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+/* --- 11. BUTON VIBRANT (DESIGN COMPACT) --- */
+.btn-lookit-action-vibrant {
+    /* Gradient Magenta -> Roz aprins */
+    background: linear-gradient(135deg, #B13079 0%, #D83B91 100%) !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 50px !important;
+    padding: 6px 16px !important;
+    font-size: 0.85rem !important;
+    font-weight: 700 !important;
+    display: inline-flex;
+    align-items: center;
+    box-shadow: 0 4px 12px rgba(177, 48, 121, 0.3) !important;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+}
+
+    .btn-lookit-action-vibrant:hover {
+        transform: translateY(-2px) scale(1.03);
+        box-shadow: 0 6px 15px rgba(177, 48, 121, 0.4) !important;
+        filter: brightness(1.1);
+    }
+
+    .btn-lookit-action-vibrant i {
+        font-size: 1rem;
+        margin-right: 5px;
+    }
+/* --- EDIT MESSAGE CUSTOM ---   AICIICIICICICIICICICIICIICICCICICI */
+
+/* --- 12. MEDIA UPLOAD & SUMMERNOTE CUSTOM --- */
+
+/* Cutia de upload pentru fișiere media (Imagine/Video) */
+.lookit-upload-box {
+    /* Folosim bordura Magenta cu opacitate mica în loc de gri */
+    border: 2px dashed rgba(177, 48, 121, 0.2) !important;
+    background-color: #FDF2F7 !important; /* Roz pal conform temei */
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: pointer;
+    color: #B13079 !important; /* Textul și iconițele devin Magenta */
+}
+
+    .lookit-upload-box:hover {
+        background-color: #FBF1F7 !important;
+        transform: translateY(-3px); /* Efect de ridicare la hover */
+        border-color: #B13079 !important;
+        box-shadow: 0 5px 15px rgba(177, 48, 121, 0.1);
+    }
+
+    .lookit-upload-box i {
+        font-size: 2rem;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+/* Container pentru media existentă (Previzualizare) */
+.lookit-current-media {
+    background-color: #ffffff;
+    /* Border magenta foarte fin */
+    border: 1px solid rgba(177, 48, 121, 0.15);
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Stil Summernote integrat în tema Roz/Magenta */
+.note-editor.note-frame {
+    /* Border magenta transparent în loc de griul default */
+    border: 1px solid rgba(177, 48, 121, 0.2) !important;
+    border-radius: 12px !important;
+    overflow: hidden;
+    background-color: #ffffff !important;
+}
+
+.note-toolbar {
+    /* Bara de unelte devine Roz Pal */
+    background-color: #FDF2F7 !important;
+    border-bottom: 1px solid rgba(177, 48, 121, 0.1) !important;
+    padding: 10px !important;
+}
+
+/* Stil pentru butoanele din toolbar-ul Summernote */
+.note-btn {
+    background-color: #ffffff !important;
+    border: 1px solid rgba(177, 48, 121, 0.1) !important;
+    color: #B13079 !important;
+    transition: all 0.2s;
+}
+
+    .note-btn:hover {
+        background-color: #B13079 !important;
+        color: #ffffff !important;
+    }
+
+/* Eliminăm bara de status de jos a editorului pentru un aspect mai curat */
+.note-statusbar {
+    display: none !important;
+}
+
+/* Eliminăm focusul albastru din editor */
+.note-editor.note-frame.focus {
+    border-color: #B13079 !important;
+    box-shadow: 0 0 0 0.2rem rgba(177, 48, 121, 0.1) !important;
+}
+
+/* Butonul principal de Salvare - Vibrant și Interactiv */
+.btn-primary-lookit {
+    background-color: #B13079 !important;
+    border: none !important;
+    color: white !important;
+    font-weight: 700 !important;
+    border-radius: 50rem !important;
+    padding: 12px 25px !important;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+    box-shadow: 0 4px 12px rgba(177, 48, 121, 0.3) !important;
+}
+
+    .btn-primary-lookit:hover {
+        background-color: #922763 !important;
+        transform: translateY(-4px) !important; /* Ridicare pronunțată */
+        box-shadow: 0 8px 20px rgba(177, 48, 121, 0.4) !important;
+    }
+
+/* Butonul de Anulare (Discard) - Roz Pal cu text Magenta */
+.btn-discard-lookit {
+    background-color: #FDF2F7 !important;
+    color: #B13079 !important;
+    border: 1px solid rgba(177, 48, 121, 0.2) !important;
+    border-radius: 50rem !important;
+    font-weight: 700 !important;
+    padding: 10px 20px !important;
+    text-decoration: none !important;
+    display: inline-block;
+    transition: all 0.3s ease !important;
+}
+
+    .btn-discard-lookit:hover {
+        background-color: #B13079 !important;
+        color: white !important;
+        transform: translateY(-2px);
+    }
+
+/* --- SCROLLBAR PERSONALIZAT LOOKIT --- */
+/* --- SIDEBAR & SCROLLBAR (ADD THESE) --- */
+
+/* 1. Titlul de deasupra listei de membri */
+.lookit-sidebar-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #B13079 !important; /* Magenta LookIT */
+    border-bottom: 2px solid #FDF2F7; /* Linie roz pal fină dedesubt */
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* 2. Scrollbar-ul personalizat */
+.scrollbar-lookit {
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: #B13079 #FDF2F7; /* Firefox */
+}
+
+    /* Scrollbar pentru Chrome, Edge, Safari */
+    .scrollbar-lookit::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .scrollbar-lookit::-webkit-scrollbar-track {
+        background: #FDF2F7 !important; /* Roz pal */
+        border-radius: 10px;
+    }
+
+    .scrollbar-lookit::-webkit-scrollbar-thumb {
+        background: #D83B91 !important; /* Roz-Magenta */
+        border-radius: 10px;
+    }
+
+        .scrollbar-lookit::-webkit-scrollbar-thumb:hover {
+            background: #B13079 !important; /* Magenta închis la hover */
+        }

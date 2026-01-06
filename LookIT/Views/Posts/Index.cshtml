@@ -76,8 +76,8 @@
 
                     <div class="mt-3">
                         <a asp-controller="Posts" asp-action="Show" asp-route-id="@post.PostId"
-                           class="btn btn-sm btn-primary">
-                            Vezi postarea >>
+                           class="btn btn-magenta-outline rounded-pill px-4 fw-bold">
+                            Vezi postarea 
                         </a>
                     </div>
 
@@ -170,6 +170,11 @@
 </div>
 
 <style>
+
+    :root {
+        --lookit-magenta: #B13079;
+        --lookit-pink-light: #FBF1F7;
+    }
     /* Resetăm stilurile default ale pagination */
     .pagination .page-item .page-link {
         border: none;
@@ -200,4 +205,28 @@
         opacity: 0.7;
         box-shadow: none !important;
     }
+
+    .btn-magenta {
+        background-color: var(--lookit-magenta);
+        color: white;
+        border: none;
+        transition: opacity 0.2s;
+    }
+
+        .btn-magenta:hover {
+            background-color: #922763;
+            color: white;
+        }
+
+    .btn-magenta-outline {
+        border: 2px solid var(--lookit-magenta);
+        color: var(--lookit-magenta);
+        background: transparent;
+    }
+
+        .btn-magenta-outline:hover {
+            background-color: var(--lookit-magenta);
+            color: white;
+        }
+
  </style>

@@ -29,5 +29,7 @@ namespace LookIT.Models
         //camp pentru analiza de sentiment
         public bool IsSafe { get; set; }
 
+        public bool isReported { get; set; } = false;
+
     }
 }

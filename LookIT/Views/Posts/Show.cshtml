@@ -194,18 +194,33 @@
                              alt="Me" />
 
                         <div class="flex-grow-1">
-                            <div class="d-flex align-items-center bg-light rounded-4 px-3 py-2 border">
+                            <div class="d-flex align-items-center bg-light rounded-pill px-3 py-2 border shadow-sm" style="background-color: #f0f2f5 !important;">
 
                                 @* --- MODIFICARE AICI: Am adăugat clasa 'comment-input-gray' --- *@
-                                <textarea class="form-control bg-transparent border-0 shadow-none p-0 me-2 comment-input-gray"
+                                @* <textarea class="form-control bg-transparent border-0 shadow-none p-0 me-2 comment-input-gray"
                                       name="Content" rows="1" placeholder="Scrie un comentariu..."
                                       style="resize: none; overflow-y: hidden; font-size: 0.9rem;"></textarea>
 
                                 <button class="btn btn-link text-primary p-0 text-decoration-none" type="submit">
                                     <i class="bi bi-send-fill"></i>
-                                </button>
+                                </button> *@
+                               
+                                    @* Inputul pentru comentariu *@
+                                    <textarea class="form-control bg-transparent border-0 shadow-none p-0 me-2 comment-input-gray flex-grow-1"
+                                          name="Content"
+                                          rows="1"
+                                          placeholder="Scrie un comentariu..."
+                                          style="resize: none; overflow-y: hidden; font-size: 0.9rem; color: #4b4f56;"></textarea>
+
+                                    @* Butonul de trimitere schimbat pe Magenta *@
+                                    <button class="btn btn-link p-0 text-decoration-none d-flex align-items-center"
+                                            type="submit"
+                                            style="color: #B13079; transition: transform 0.2s ease;">
+                                        <i class="bi bi-send-fill fs-5"></i>
+                                    </button>
+                                
                             </div>
-                            <div class="text-danger small mt-1 ms-2">
+                            <div class="text-danger small mt-1 ms-3">
                                 @Html.ValidationMessage("Content")
                             </div>
                         </div>
@@ -311,6 +326,25 @@
     .comment-input-gray::placeholder {
         color: #6c757d !important;
         opacity: 1;
+    }
+
+    /* Efect de mărire la hover pentru butonul de trimitere */
+    button[type="submit"]:hover {
+        transform: scale(1.1);
+        color: #922763 !important;
+    }
+
+    /* Stil pentru placeholder-ul gri */
+    .comment-input-gray::placeholder {
+        color: #8e8e8e !important;
+        font-style: italic;
+        opacity: 0.8;
+    }
+
+    /* Eliminăm orice outline albastru la focus */
+    .comment-input-gray:focus {
+        background-color: transparent !important;
+        box-shadow: none !important;
     }
 </style>
 

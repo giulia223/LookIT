@@ -536,6 +536,24 @@ namespace LookIT.Controllers
             return RedirectToAction("Show", "Groups", new {Id = groupId});
         }
 
+        [HttpPost]
+        [Authorize(Roles = "User,Administrator")]
+
+        public IActionResult Report(int Id)
+        {
+            SetAccessRights();
+            var msg = _context.Messages.Find(Id);
+            var groupId = msg.GroupId;
+            if (msg is null)
+                return NotFound();
+
+            var group = _context.Groups.Find(groupId);
+           // if (group.Members.Contains(GetUserId(User))) ;
+            msg.isReported = true;
+            _context.SaveChanges();
+            return RedirectToAction("Show", "Groups", new {Id = groupId});
+        }
+
         private void SetAccessRights()
         {
             ViewBag.EsteUser = false;
@@ -550,42 +568,7 @@ namespace LookIT.Controllers
             ViewBag.EsteAdministrator = User.IsInRole("Administrator");
         }
 
-        //private async Task<(bool IsSafe, string Reasons)> CheckContentRawAI(string text)
-        //{
-        //    try
-        //    {
-        //        var apiKey = _configuration["OpenAI:ApiKey"];
-        //        System.Diagnostics.Debug.WriteLine("Cheia mea este: " + _configuration["OpenAI:ApiKey"]);
-        //        using var client = new HttpClient();
-        //        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
-
-        //        var requestBody = new { input = text };
-        //        var jsonContent = new StringContent(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json");
-
-        //        var response = await client.PostAsync("https://api.openai.com/v1/moderations", jsonContent);
-
-        //        if (response.IsSuccessStatusCode)
-        //        {
-        //            var responseString = await response.Content.ReadAsStringAsync();
-        //            var data = JsonSerializer.Deserialize<OpenAIModerationResponse>(responseString);
-
-        //            var result = data.results.FirstOrDefault();
-        //            if (result != null && result.flagged)
-        //            {
-        //                // Luăm doar categoriile care au valoarea 'true'
-        //                var violations = result.categories.Where(c => c.Value).Select(c => c.Key);
-        //                return (false, string.Join(", ", violations));
-        //            }
-        //        }
-        //        return (true, "");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // Dacă pică netul sau API-ul OpenAI, lăsăm mesajul să treacă (fail-safe)
-        //        //return (true, "");
-        //        return (false, "Eroare tehnică AI: " + ex.Message);
-        //    }
-        //}
+       
         
     }
 }

@@ -326,6 +326,9 @@ namespace LookIT.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<bool>("isReported")
+                        .HasColumnType("bit");
+
                     b.HasKey("MessageId");
 
                     b.HasIndex("GroupId");

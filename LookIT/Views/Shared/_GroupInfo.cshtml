@@ -1,49 +1,54 @@
-﻿@* @model LookIT.Models.Group
+﻿@model LookIT.Models.Group
 @using Microsoft.AspNetCore.Identity
 @inject UserManager<ApplicationUser> UserManager
 
-<div class="card-body">
+<div class="group-header-lookit shadow-sm bg-white rounded-4 overflow-hidden border-0">
 
-    <h5 class="card-title" style="color: #845763; font-weight: bold;">@Model.GroupName</h5>
+    <div class="group-cover" style="height: 120px; background: linear-gradient(45deg, #B13079, #D83B91);"></div>
 
-    <div class="card-text">
-        <p><strong>Description: </strong> @Model.Description</p>
-    </div>
+    <div class="p-4 position-relative">
 
-    <div>
-        @if (Model.ModeratorId != null && UserManager.GetUserId(User) != null && Model.ModeratorId == UserManager.GetUserId(User))
-        {
-            <p> Moderator: You </p>
-        }
-        else
-        {
-            <p> Moderator: @Model.Moderator.FullName </p>
-        }
-    </div>
+        <h3 class="fw-bold mb-2 lookit-title" style="letter-spacing: -0.5px;">
+            @Model.GroupName
+        </h3>
 
-</div> *@
+        <p class="text-muted mb-3" style="font-size: 0.95rem; line-height: 1.5;">
+            <i class="bi bi-info-circle text-magenta opacity-50 me-1"></i> @Model.Description
+        </p>
 
-@model LookIT.Models.Group
-@using Microsoft.AspNetCore.Identity
-@inject UserManager<ApplicationUser> UserManager
+        <div class="d-flex align-items-center border-top pt-3 mt-2" style="border-color: rgba(177, 48, 121, 0.1) !important;">
+           
+            <span class="badge rounded-pill px-3 py-2" style="background-color: #FDF2F7; color: #B13079; border: 1px solid rgba(177, 48, 121, 0.15);">
+                <i class="bi bi-shield-check me-1"></i>
+                <span class="text-muted fw-normal">Moderator:</span>
 
-<div class="group-header-fb shadow-sm bg-white rounded">
-    <div class="group-cover" style="height: 150px; background: linear-gradient(to right, #92E4BA, #90C67F); border-radius: 0.5rem 0.5rem 0 0;"></div>
-    <div class="p-3">
-        <h2 class="fw-bold" style="color: #4b4f56;">@Model.GroupName</h2>
-        <p class="text-muted"><i class="bi bi-info-circle"></i> @Model.Description</p>
-        <div class="d-flex align-items-center border-top pt-2">
-            <span class="badge bg-light text-dark border">
-                <strong>Moderator:</strong>
-                @(Model.ModeratorId == UserManager.GetUserId(User) ? "You" : Model.Moderator.FullName)
+                @if (Model.ModeratorId == UserManager.GetUserId(User))
+                {
+                    <a asp-controller="Profile" asp-action="Details" asp-route-userId="@Model.ModeratorId" class="fw-bold text-decoration-none" style="color: #B13079;">
+                        Tu
+                    </a>
+                }
+                else
+                {
+                    <a asp-controller="Profile" asp-action="Details" asp-route-userId="@Model.ModeratorId" class="fw-bold text-decoration-none hover-underline" style="color: #B13079;">
+                        @Model.Moderator.FullName
+                    </a>
+                }
             </span>
         </div>
     </div>
 </div>
 
 <style>
-    .group-header-fb {
-        border: 1px solid #ddd;
-        margin-bottom: 20px;
+    .group-header-lookit {
+        transition: transform 0.2s ease;
+    }
+
+        .group-header-lookit:hover .group-cover {
+            filter: brightness(1.1);
+        }
+
+    .text-magenta {
+        color: #B13079 !important;
     }
 </style>
