@@ -301,6 +301,7 @@ namespace LookIT.Controllers
                     // Astfel va aparea eticheta gri pe site, in loc sa nu apara nimic.
                     post.SentimentLabel = "neutral";
                     post.SentimentConfidence = 0.0;
+                    Console.WriteLine("Eroare AI: " + result.ErrorMessage);
                 }
 
             }

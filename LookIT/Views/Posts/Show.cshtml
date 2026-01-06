@@ -62,9 +62,9 @@
         @* Am scos conditia de Admin ca sa vezi ca functioneaza *@
         @if (!string.IsNullOrEmpty(Model.SentimentLabel))
         {
-            string badgeClass = "bg-secondary"; // Default Neutru
-            string displayText = "Neutru";
+            string displayText = Model.SentimentLabel;
             string label = Model.SentimentLabel.ToLower();
+            string badgeClass = "bg-secondary"; // Default (Gri)
 
             if (label.Contains("positive"))
             {
