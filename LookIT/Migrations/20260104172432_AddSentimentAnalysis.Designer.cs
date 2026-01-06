@@ -4,6 +4,7 @@ using LookIT.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LookIT.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260104172432_AddSentimentAnalysis")]
+    partial class AddSentimentAnalysis
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -151,15 +154,6 @@ namespace LookIT.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("DateModified")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("FlagCategory")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool?>("IsFlagged")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("ModeratedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("PostId")
@@ -311,9 +305,6 @@ namespace LookIT.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<bool>("IsSafe")
-                        .HasColumnType("bit");
-
                     b.Property<string>("TextContent")
                         .HasMaxLength(5000)
                         .HasColumnType("nvarchar(max)");
@@ -325,9 +316,6 @@ namespace LookIT.Migrations
                     b.Property<string>("VideoUrl")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
-
-                    b.Property<bool>("isReported")
-                        .HasColumnType("bit");
 
                     b.HasKey("MessageId");
 

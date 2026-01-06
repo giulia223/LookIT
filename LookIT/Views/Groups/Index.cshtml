@@ -1,4 +1,4 @@
-﻿@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Identity
 @using LookIT.Models
 @inject UserManager<ApplicationUser> UserManager
 
@@ -24,9 +24,36 @@
 
 <div class="container mt-4">
     <div class="row">
-
         <div class="col-md-8">
             <h4 class="fw-bold mb-4 ps-1 text-dark">Explorează Comunități</h4>
+          
+        <div class="col-md-9">
+            @* --- INCEPUT BARA DE CAUTARE --- *@
+            <div class="mb-4">
+                <form method="get" action="/Groups/Index">
+                    <div class="input-group shadow-sm rounded bg-white p-1">
+                        <input type="text"
+                               class="form-control border-0 shadow-none"
+                               name="search"
+                               value="@ViewBag.SearchString"
+                               placeholder="Caută grupuri după nume sau descriere..."
+                               aria-label="Search"
+                               style="padding-left: 15px;">
+
+                        <button class="btn btn-light bg-white border-0" type="submit">
+                            <i class="bi bi-search" style="color: #845763; font-weight: bold;"></i>
+                        </button>
+
+                        @* Butonul de reset apare doar dacă am căutat ceva *@
+                        @if (!string.IsNullOrEmpty(ViewBag.SearchString))
+                        {
+                            <a href="/Groups/Index" class="btn btn-light bg-white border-0 text-danger" title="Sterge filtrele">
+                                <i class="bi bi-x-lg"></i>
+                            </a>
+                        }
+                    </div>
+                </form>
+            </div>
 
             @if (ViewBag.Groups != null && ViewBag.Groups.Count > 0)
             {

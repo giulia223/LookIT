@@ -86,13 +86,48 @@
                 </div>
             }
         </div>
+    
+       @* --- SENTIMENT ANALYSIS --- *@
+@if (User.IsInRole("Administrator") && !string.IsNullOrEmpty(Model.SentimentLabel))
+{
+        string badgeClass = "bg-secondary"; 
+        string displayText = "Neutru";
+        
+        if (Model.SentimentLabel == "positive")
+        {
+            badgeClass = "bg-success"; // Verde
+            displayText = "Pozitiv";
+        }
+        else if (Model.SentimentLabel == "negative")
+        {
+            badgeClass = "bg-danger"; // Roșu
+            displayText = "Negativ";
+        }
+    
 
-        @* CONTINUT *@
+    <div class="card mb-3 border-0 shadow-sm">
+        <div class="card-body py-2 d-flex align-items-center justify-content-between bg-light rounded">
+            <div>
+                <strong class="text-uppercase text-muted small">Analiză AI:</strong>
+                <span class="badge @badgeClass ms-2">@displayText</span>
+            </div>
+            
+            @if(Model.SentimentConfidence.HasValue)
+            {
+                <small class="text-muted">
+                    Încredere: @((Model.SentimentConfidence.Value * 100).ToString("0"))%
+                </small>
+            }
+        </div>
+    </div>
+}
+
+                @* CONTINUT *@
         @if (!string.IsNullOrEmpty(@Model.TextContent))
         {
             <div class="mb-2">@Html.Raw(Model.TextContent)</div>
         }
-
+        
         @if (@Model.ImageUrl != null)
         {
             <img src="@Model.ImageUrl" alt="Post Image" class="rounded-2 w-100 border mb-2" style="height: auto; max-height: 600px; object-fit: contain;" />
@@ -291,8 +326,13 @@
     .bookmark-container {
         position: relative;
         display: inline-block;
+
         padding-top: 10px;
         margin-top: -10px;
+
+/*         padding-bottom: 10px;
+        margin-bottom: -10px; */
+
     }
 
     .bookmark-dropdown {
@@ -352,7 +392,11 @@
     function toggleLike(postId) {
         let formData = new FormData();
         formData.append("Id", postId);
-        fetch('/Posts/LikePost', { method: 'POST', body: formData })
+
+        fetch('/Posts/LikePost', {
+            method: 'POST',
+            body: formData
+        })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
