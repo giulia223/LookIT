@@ -453,7 +453,7 @@ namespace LookIT.Controllers
                     // Actualizam textul din input
                     post.TextContent = requestPost.TextContent;
 
-                    // --- AICI INSERAM ANALIZA SENTIMENTULUI ---
+                    // ---  ANALIZA SENTIMENTULUI ---
                     // Verificam daca avem continut de analizat (text sau imagine noua)
                     if (!string.IsNullOrWhiteSpace(post.TextContent))
                     {
@@ -474,7 +474,6 @@ namespace LookIT.Controllers
                            
                         }
                     }
-                    // ------------------------------------------
 
                     // daca am ales o poza, o vom modifica
                     if (Image != null && Image.Length > 0)
