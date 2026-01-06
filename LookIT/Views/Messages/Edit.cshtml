@@ -4,166 +4,111 @@
 @model LookIT.Models.Message
 
 @{
-    ViewBag.Title = "Edit Message";
+    ViewData["Title"] = "Edit Message";
 }
 
-<div style="background-color: #f0f2f5; min-height: 100vh; padding-top: 50px; padding-bottom: 50px;">
+<div class="py-5">
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-8 col-lg-7">
+            <div class="col-lg-10 col-xl-8">
 
-                @* Mesaj de alertă din TempData sau ViewBag *@
                 @if (TempData["message"] != null)
                 {
-                    <div class="alert rounded-3 text-center mb-4 shadow-sm alert-danger" style="border: none; padding: 1rem;">
+                    <div class="alert bg-light text-center mb-4 shadow-sm p-3 border-0" style="color: #B13079; border-radius: 12px;">
+                        <i class="bi bi-info-circle-fill me-2"></i>
                         @TempData["message"]
                     </div>
                 }
 
-                @* Cardul Formularului *@
-                <div class="card border-0 shadow-sm" style="border-radius: 12px; overflow: hidden;">
+                <div class="card lookit-card-form border-0 shadow-sm rounded-4 overflow-visible">
 
-                    @* Header Card *@
-                    <div class="card-header border-0 bg-white pt-4 pb-0 px-4 text-center">
-                        <h3 class="fw-bold" style="color: #845763;">Edit Your Message</h3>
-                        <p class="text-muted small">Modifică conținutul mesajului tău</p>
-                        <hr style="color: #ddd;" />
+                    <div class="card-header bg-white border-bottom py-3 px-4 d-flex justify-content-between align-items-center">
+                        <h5 class="fw-bold mb-0 lookit-title">Editează Mesajul Tău</h5>
+                       
                     </div>
 
                     <div class="card-body p-4">
-                        @* Atenție: asp-route-id trebuie să fie ID-ul mesajului pentru ruterul de editare *@
                         <form asp-controller="Messages" asp-action="Edit" asp-route-id="@Model.MessageId" method="post" enctype="multipart/form-data">
-                            <div asp-validation-summary="All" class="text-danger mb-3"></div>
-                            @* Câmpuri ascunse necesare pentru Model Binding *@
+
+                            <div asp-validation-summary="ModelOnly" class="text-danger mb-3 small"></div>
                             <input type="hidden" asp-for="MessageId" />
                             <input type="hidden" asp-for="GroupId" />
 
-                            <div class="form-group mb-3">
-
-                                <label class="form-label fw-bold">Imagine</label>
-                                <input type="file" name="Image" id="imageInput" class="form-control" accept="image/*" />
-                                <small class="text-muted">Formate acceptate: jpg, jpeg, png, gif.</small>
-
-                                @if (!string.IsNullOrEmpty(Model.ImageUrl))
-                                {
-                                    <div id="currentImageContainer" class="mt-3 p-2 border rounded bg-light position-relative text-center">
-                                        <p class="mb-1 text-muted small">Imagine curentă</p>
-                                        <img src="@Model.ImageUrl" alt="Current Image" class="img-fluid rounded border mx-auto d-block" style="max-height: 300px;" />
-                                    </div>
-
-                                    <div class="form-check mt-2 d-inline-block text-start" id="deleteImage">
-                                        <input class="form-check-input border-danger" type="checkbox" name="DeleteImage" value="true" id="deleteImageCheck">
-                                        <label class="form-check-label text-danger fw-bold" for="deleteImageCheck">Sterge imaginea</label>
-                                    </div>
-                                }
-
-                                <div id="newImageContainer" class="mt-3 d-none p-2 border rounded bg-light position-relative text-center">
-                                    <p class="mb-1 text-muted small">Imagine nouă</p>
-                                    <img id="newImagePreview" src="#" class="img-fluid rounded mx-auto d-block" style="max-height: 300px;" />
-                                </div>
-
+                            <div class="mb-4">
+                                <label asp-for="TextContent" class="form-label fw-bold lookit-title small text-uppercase">Conținut mesaj</label>
+                                <textarea asp-for="TextContent" class="form-control summernote"></textarea>
                             </div>
 
-                            <div class="form-group mb-3">
-
-                                <label class="form-label fw-bold">Video</label>
-                                <input type="file" name="Video" id="videoInput" class="form-control" accept="video/*" />
-                                <small class="text-muted">Formate acceptate: MP4, WebM, etc.</small>
-
-                                @if (!string.IsNullOrEmpty(Model.VideoUrl))
-                                {
-                                    <div id="currentVideoContainer" class="mt-3 p-2 border rounded bg-light position-relative text-center">
-
-                                        <p class="mb-1 text-muted small">Video curent</p>
-                                        <video controls class="w-100 rounded border mx-auto d-block" style="max-height: 300px;">
-                                            <source src="@Model.VideoUrl" type="video/mp4">
-                                        </video>
+                            <div class="row mb-4">
+                                <div class="col-md-6 mb-3 mb-md-0">
+                                    <label class="form-label fw-bold lookit-title small text-uppercase">Imagine</label>
+                                    <div class="position-relative">
+                                        <input type="file" name="Image" id="imageInput" class="position-absolute top-0 start-0 w-100 h-100 opacity-0 cursor-pointer" style="z-index: 10;" accept="image/*" />
+                                        <div class="lookit-upload-box shadow-sm py-3 text-center rounded-3 bg-light">
+                                            <i class="bi bi-image fs-3 d-block mb-1 text-magenta"></i>
+                                            <span class="small fw-bold text-magenta">Schimbă Foto</span>
+                                        </div>
                                     </div>
-
-                                    <div class="form-check mt-2 d-inline-block text-start" id="deleteVideo" ">
-                                        <input class="form-check-input border-danger" type="checkbox" name="DeleteVideo" value="true" id="deleteVideoCheck">
-                                        <label class="form-check-label text-danger fw-bold" for="deleteVideoCheck">Sterge videoclip</label>
-                                    </div>
-                                }
-
-                                <div id="newVideoContainer" class="mt-3 d-none p-2 border rounded bg-light position-relative text-center">
-                                    <p class="mb-1 text-muted small">Video nou</p>
-                                    <video id="newVideoPreview" controls class="w-100 rounded mx-auto d-block" style="max-height: 300px;">
-                                        Your browser does not support the video tag.
-                                    </video>
                                 </div>
 
-                            </div>
-                            @* Input Content Mesaj *@
-                            <div class="form-group mb-3">
-                                <label asp-for="TextContent" class="form-label fw-bold" style="color: #4b4f56;">Conținut mesaj</label>
-                                <div class="bg-white">
-                                    <textarea asp-for="TextContent" class="form-control summernote"></textarea>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold lookit-title small text-uppercase">Video</label>
+                                    <div class="position-relative">
+                                        <input type="file" name="Video" id="videoInput" class="position-absolute top-0 start-0 w-100 h-100 opacity-0 cursor-pointer" style="z-index: 10;" accept="video/*" />
+                                        <div class="lookit-upload-box shadow-sm py-3 text-center rounded-3 bg-light">
+                                            <i class="bi bi-camera-video-fill fs-3 d-block mb-1 text-magenta"></i>
+                                            <span class="small fw-bold text-magenta">Schimbă Video</span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <span asp-validation-for="TextContent" class="text-danger small"></span>
                             </div>
 
-                            @* Butoane Acțiune *@
-                            <div class="d-grid gap-2">
-                                <button type="submit" class="btn btn-lg shadow-sm"
-                                        style="background-color: #845763; border: none; color: white; font-weight: 600; border-radius: 8px;">
-                                    Save Changes
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                                    {
+                                        <div id="currentImageContainer" class="bg-light text-center p-3 rounded-3 border-0 mb-3">
+                                            <p class="lookit-title small fw-bold text-uppercase mb-2">Imagine curentă</p>
+                                            <img src="@Model.ImageUrl" class="img-fluid rounded-3 shadow-sm mb-2" style="max-height: 200px;" />
+                                            <div class="form-check d-flex justify-content-center">
+                                                <input class="form-check-input border-danger me-2 shadow-none" type="checkbox" name="DeleteImage" value="true" id="delImg">
+                                                <label class="form-check-label text-danger fw-bold small" for="delImg">Șterge imaginea</label>
+                                            </div>
+                                        </div>
+                                    }
+                                    <div id="newImageContainer" class="d-none bg-light text-center p-3 rounded-3 mb-3">
+                                        <p class="lookit-title small fw-bold text-uppercase mb-2">Previzualizare Nouă</p>
+                                        <img id="newImagePreview" src="#" class="img-fluid rounded-3 shadow-sm" style="max-height: 200px;" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-3 mt-4">
+                                <button type="submit" class="btn btn-primary-lookit btn-lg py-3">
+                                    <i class="bi bi-check-circle-fill me-2"></i> Salvează Modificările
                                 </button>
 
-                                <a href="/Groups/Show/@Model.GroupId" class="btn btn-link text-decoration-none text-muted small">
-                                    Discard changes and go back
+                                <a href="/Groups/Show/@Model.GroupId" class="btn-discard-lookit text-center py-2">
+                                    Anulează și abandonează
                                 </a>
                             </div>
+
                         </form>
                     </div>
                 </div>
-
-                <div class="text-center mt-3">
-                    <small class="text-muted">Postat la: @Model.Date.ToString("dd/MM/yyyy HH:mm")</small>
-                </div>
-
             </div>
         </div>
     </div>
 </div>
 
 <style>
-    /* Stil pentru a integra Summernote mai bine în card */
-    .note-editor.note-frame {
-        border: 1px solid #dee2e6 !important;
-        border-radius: 8px !important;
+
+    .text-magenta {
+        color: #B13079 !important;
     }
 
-    .note-toolbar {
-        background-color: #f8f9fa !important;
-        border-bottom: 1px solid #dee2e6 !important;
-    }
-
-    .btn-lg:hover {
-        filter: brightness(0.9);
-        transition: 0.2s;
+    .lookit-card-form {
+        border-radius: 20px !important;
     }
 </style>
 
-@section Scripts{
-    <script>
-        $('.summernote').summernote({
-            height: 200,
-            disableDragAndDrop: true,
-            placeholder: 'Scrie mesajul tău aici...',
-            // Definim fonturile exact ca în imaginea ta
-            fontNames: ['Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Helvetica', 'Impact', 'Tahoma', 'Times New Roman', 'Verdana'],
-            toolbar: [
-                ['style', ['style']],
-                ['font', ['bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript', 'clear']],
-                ['fontname', ['fontname']],
-                ['fontsize', ['fontsize']],
-                ['color', ['color']],
-                ['para', ['ul', 'ol', 'paragraph', 'height']],
-                ['table', ['table']],
-                ['insert', ['link', 'hr']], // Am eliminat 'picture' și 'video'
-                ['view', ['fullscreen', 'codeview', 'help']]
-            ]
-        });
-    </script>
-}

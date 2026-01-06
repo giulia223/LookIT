@@ -153,6 +153,15 @@ namespace LookIT.Migrations
                     b.Property<DateTime?>("DateModified")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("FlagCategory")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("IsFlagged")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ModeratedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("PostId")
                         .HasColumnType("int");
 
@@ -302,6 +311,9 @@ namespace LookIT.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<bool>("IsSafe")
+                        .HasColumnType("bit");
+
                     b.Property<string>("TextContent")
                         .HasMaxLength(5000)
                         .HasColumnType("nvarchar(max)");
@@ -313,6 +325,9 @@ namespace LookIT.Migrations
                     b.Property<string>("VideoUrl")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool>("isReported")
+                        .HasColumnType("bit");
 
                     b.HasKey("MessageId");
 

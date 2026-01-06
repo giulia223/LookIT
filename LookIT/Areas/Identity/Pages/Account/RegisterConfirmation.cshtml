@@ -1,0 +1,70 @@
+﻿@page
+@model RegisterConfirmationModel
+@{
+    ViewData["Title"] = "Confirmare înregistrare";
+}
+
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+
+            @* Card container *@
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-body p-5 text-center">
+
+                    @* --- HEADER COMUN: ICONIȚĂ --- *@
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-4"
+                         style="width: 90px; height: 90px; background-color: #FBF1F7;">
+                        <i class="bi bi-envelope-check-fill fs-1" style="color: #B13079;"></i>
+                    </div>
+
+                    <h2 class="fw-bold mb-3">@ViewData["Title"]</h2>
+
+                    @{
+                        if (@Model.DisplayConfirmAccountLink)
+                        {
+                            @* --- SCENARIUL 1: DEVELOPMENT (Confirmare Manuală) --- *@
+                            <div class="alert alert-info border-0 rounded-3 shadow-sm text-start mb-4">
+                                <div class="d-flex">
+                                    <i class="bi bi-info-circle-fill fs-4 me-3 text-info"></i>
+                                    <div>
+                                        <strong>Notă pentru dezvoltator:</strong>
+                                        <p class="small mb-0 mt-1">
+                                            Această aplicație nu are configurat un expeditor real de emailuri.
+                                            În mod normal, utilizatorul ar primi un email, dar pentru testare, poți da click pe butonul de mai jos.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <p class="text-muted mb-4">Confirmă contul făcând click aici:</p>
+
+                            <a id="confirm-link" href="@Model.EmailConfirmationUrl" class="btn btn-primary rounded-pill w-100 py-3 fw-bold shadow-sm">
+                                <i class="bi bi-check-circle-fill me-2"></i> Confirmă Contul Acum
+                            </a>
+                        }
+                        else
+                        {
+                            @* --- SCENARIUL 2: PRODUCȚIE (Verifică Email) --- *@
+                            <p class="text-muted mb-4 fs-5">
+                                Te rugăm să îți verifici adresa de email pentru a confirma contul.
+                            </p>
+
+                            <p class="small text-muted mb-4">
+                                Dacă nu găsești emailul în <strong>Inbox</strong>, te rugăm să verifici și folderul de <strong>Spam</strong>.
+                            </p>
+
+                            <div class="d-grid gap-2">
+                                <a asp-page="/Index" class="btn btn-primary rounded-pill py-2 fw-bold shadow-sm">
+                                    <i class="bi bi-house-door-fill me-2"></i> Mergi la Pagina Principală
+                                </a>
+                            </div>
+                        }
+                    }
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

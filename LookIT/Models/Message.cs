@@ -26,5 +26,10 @@ namespace LookIT.Models
         public string? UserId { get; set; }
         public virtual ApplicationUser? User { get; set; }
 
+        //camp pentru analiza de sentiment
+        public bool IsSafe { get; set; }
+
+        public bool isReported { get; set; } = false;
+
     }
 }

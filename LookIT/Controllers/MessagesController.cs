@@ -1,6 +1,8 @@
 ﻿using Ganss.Xss;
+using Humanizer.Configuration;
 using LookIT.Data;
 using LookIT.Models;
+using LookIT.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -8,7 +10,12 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Hosting;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Json;
 using static System.Net.Mime.MediaTypeNames;
+using Message = LookIT.Models.Message;
 
 namespace LookIT.Controllers
 {
@@ -18,24 +25,29 @@ namespace LookIT.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IWebHostEnvironment _env;
+        private readonly IConfiguration _configuration;
+        private readonly ISentimentAnalysisService _sentimentService;
 
-        public MessagesController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IWebHostEnvironment env)
+        public MessagesController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IWebHostEnvironment env, IConfiguration configuration, ISentimentAnalysisService sentimentService)
         {
             _context = context;
             _userManager = userManager;
             _roleManager = roleManager;
             _env = env;
+            _configuration = configuration;
+            _sentimentService = sentimentService;
         }
 
         //afisare toate mesajele
         [Authorize(Roles = "Administrator")]
         public IActionResult Index()
         {
-            var messages = _context.Messages.Include(m => m.User).ToList();
-
+            var messages = _context.Messages.Include(m => m.User).Where(m => m.isReported == true).ToList();
+            ViewBag.Count = messages.Count();
             ViewBag.Messages = messages;
             return View();
         }
+
 
         //afisare mesajele unui grup
         [Authorize(Roles = "User,Administrator")]
@@ -170,15 +182,60 @@ namespace LookIT.Controllers
                 msg.VideoUrl = databaseFileName;
             }
 
+            //if (hasText)
+            //{
+            //    var aiCheck = await CheckContentGemini(msg.TextContent);
+
+            //    if (!aiCheck.IsSafe)
+            //    {
+            //        // Mesajul de eroare cerut
+            //        ModelState.AddModelError("TextContent",
+            //            $"Conținutul tău conține termeni nepotriviți (Detectat: {aiCheck.Reasons}). Te rugăm să reformulezi.");
+
+            //        return View(msg);
+            //    }
+
+            //}
+
             if (ModelState.IsValid)
             {
-                _context.Messages.Add(msg);
-                _context.SaveChanges();
-               
-                TempData["message"] = "Mesajul a fost trimis cu succes";
-                TempData["messageType"] = "alert-success";
 
-                return RedirectToAction("Show", "Groups", new {Id = msg.GroupId});
+                // Analizam sentimentul comentariului folosind OpenAI API
+                string cleanText = System.Text.RegularExpressions.Regex.Replace(msg.TextContent ?? "", "<.*?>", string.Empty);
+
+                var sentimentResult = await _sentimentService.AnalyzeSentimentAsync(cleanText);
+                if (sentimentResult.Success)
+                {
+                    if (sentimentResult.Label == "unsafe")
+                        msg.IsSafe = false;
+                    else
+                        msg.IsSafe = true;
+                    if (!msg.IsSafe)
+                    {
+                        ModelState.AddModelError("TextContent", "Conținutul tău a fost marcat ca nepotrivit. Te rugăm să reformulezi.");
+                        return View(msg);
+                    }
+                    else
+                    {
+                        _context.Messages.Add(msg);
+                        _context.SaveChanges();
+
+                        TempData["message"] = "Mesajul a fost trimis cu succes";
+                        TempData["messageType"] = "alert-success";
+
+                        return RedirectToAction("Show", "Groups", new { Id = msg.GroupId });
+                    }
+                }
+                else
+                {
+                    _context.Messages.Add(msg);
+                    _context.SaveChanges();
+
+                    TempData["message"] = "Mesajul a fost trimis cu succes";
+                    TempData["messageType"] = "alert-success";
+
+                    return RedirectToAction("Show", "Groups", new { Id = msg.GroupId });
+                }
             }
 
             else
@@ -377,10 +434,40 @@ namespace LookIT.Controllers
                             }
                         }
                         msg.TextContent = sanitizer.Sanitize(requestmsg.TextContent);
-                        TempData["message"] = "Mesajul a fost modificat";
-                        TempData["messageType"] = "alert-success";
-                        _context.SaveChanges();
-                        return RedirectToAction("Show", "Groups", new { Id = msg.GroupId });
+                        string cleanText = System.Text.RegularExpressions.Regex.Replace(msg.TextContent ?? "", "<.*?>", string.Empty);
+
+                        var sentimentResult = await _sentimentService.AnalyzeSentimentAsync(cleanText);
+                        if (sentimentResult.Success)
+                        {
+                            if (sentimentResult.Label == "unsafe")
+                                msg.IsSafe = false;
+                            else
+                                msg.IsSafe = true;
+                            if (!msg.IsSafe)
+                            {
+                                ModelState.AddModelError("TextContent", "Conținutul tău a fost marcat ca nepotrivit. Te rugăm să reformulezi.");
+                                return View(msg);
+                            }
+                            else
+                            {
+                                
+                                _context.SaveChanges();
+
+                                TempData["message"] = "Mesajul a fost modificat cu succes";
+                                TempData["messageType"] = "alert-success";
+
+                                return RedirectToAction("Show", "Groups", new { Id = msg.GroupId });
+                            }
+                        }
+                        else
+                        {
+                            _context.SaveChanges();
+                            TempData["message"] = "Mesajul a fost modificat";
+                            TempData["messageType"] = "alert-success";
+                            _context.SaveChanges();
+                            return RedirectToAction("Show", "Groups", new { Id = msg.GroupId });
+                        }
+                           
                     }
                     else
                     {
@@ -450,6 +537,85 @@ namespace LookIT.Controllers
             return RedirectToAction("Show", "Groups", new {Id = groupId});
         }
 
+        //stergere mesaj 
+        [HttpPost]
+        [Authorize(Roles = "User,Administrator")]
+        public async Task<IActionResult> DeleteReportMessage(int Id)
+        {
+            SetAccessRights();
+            var msg = _context.Messages.Find(Id);
+            var groupId = msg.GroupId;
+            var userId = _userManager.GetUserId(User);
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (msg == null)
+            {
+                return NotFound();
+            }
+            if (msg.UserId != userId && !(await _userManager.IsInRoleAsync(currentUser, "Administrator")))
+            {
+                TempData["message"] = "Nu aveti dreptul sa stergeti un mesaj care nu va apartine.";
+                TempData["messageType"] = "alert-danger";
+                return RedirectToAction("Show", "Groups", new { Id = groupId });
+            }
+            //stergem fizic din wwwroot/images/posts imaginea, daca exista
+            if (!string.IsNullOrEmpty(msg.ImageUrl))
+            {
+                var imagePath = Path.Combine(_env.WebRootPath, msg.ImageUrl.TrimStart('/'));
+                if (System.IO.File.Exists(imagePath))
+                {
+                    System.IO.File.Delete(imagePath);
+                }
+            }
+
+            //stergem fizic din wwwroot/videos/posts videocliupl, daca exista
+            if (!string.IsNullOrEmpty(msg.VideoUrl))
+            {
+                var videoPath = Path.Combine(_env.WebRootPath, msg.VideoUrl.TrimStart('/'));
+                if (System.IO.File.Exists(videoPath))
+                {
+                    System.IO.File.Delete(videoPath);
+                }
+            }
+
+            _context.Messages.Remove(msg);
+            _context.SaveChanges();
+            TempData["message"] = "Mesaj sters.";
+            TempData["messageType"] = "alert-danger";
+
+            return RedirectToAction("Index", "Messages");
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Administrator")]
+        public IActionResult ClearReport(int Id)
+        {
+            SetAccessRights();
+            var msg = _context.Messages.Find(Id);
+            if (msg is null)
+                return NotFound();
+            msg.isReported = false;
+            _context.SaveChanges();
+            return RedirectToAction("Index", "Messages");
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "User,Administrator")]
+
+        public IActionResult Report(int Id)
+        {
+            SetAccessRights();
+            var msg = _context.Messages.Find(Id);
+            var groupId = msg.GroupId;
+            if (msg is null)
+                return NotFound();
+
+            var group = _context.Groups.Find(groupId);
+           // if (group.Members.Contains(GetUserId(User))) ;
+            msg.isReported = true;
+            _context.SaveChanges();
+            return RedirectToAction("Show", "Groups", new {Id = groupId});
+        }
+
         private void SetAccessRights()
         {
             ViewBag.EsteUser = false;
@@ -464,5 +630,8 @@ namespace LookIT.Controllers
             ViewBag.EsteAdministrator = User.IsInRole("Administrator");
         }
 
+       
+        
     }
 }
+

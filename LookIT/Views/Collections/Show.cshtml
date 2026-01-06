@@ -1,130 +1,270 @@
-﻿@model LookIT.Models.Collection
+﻿    @model LookIT.Models.Collection
 
-<div class="container mt-4">
+    @{
+        ViewData["Title"] = Model.Name;
+    }
 
-    <div class="d-flex justify-content-between align-items-end mb-4">
-        <div>
-            <h1 class="fw-bold mb-0">@Model.Name</h1>
-            <p class="text-muted">@Model.PostCollections.Count postări salvate</p>
+    <div class="container mt-4 mb-5">
+
+        @* ================================================================================= *@
+        @* 0. BUTON ÎNAPOI                                                                  *@
+        @* ================================================================================= *@
+        @* AM MODIFICAT AICI: mb-3 în loc de mb-5 pentru distanță mai mică *@
+        <div class="mb-3">
+            <a asp-action="Index" asp-controller="Collections" class="btn btn-sm btn-light rounded-pill px-3 fw-bold text-muted border-0 shadow-sm">
+                <i class="bi bi-arrow-left me-1"></i> Înapoi la Colecții
+            </a>
         </div>
-        @if ((Model.UserId == ViewBag.UserCurent || ViewBag.EsteAdministrator) && Model.Name != "All Posts")
-        {
-            <div class="d-flex gap-2">
-                <a asp-action="Edit" asp-controller="Collections" asp-area="" asp-route-Id="@Model.CollectionId" class="btn btn-outline-secondary rounded-pill">
-                    Editeaza
-                    </a>
-                <form method="post" asp-controller="Collections" asp-action="Delete" asp-route-Id="@Model.CollectionId">
-                    <button type="submit" class="btn btn-outline-danger rounded-pill">Șterge</button>
-                </form>
-            </div>
-        }
-    </div>
 
-    <hr />
+        @* ================================================================================= *@
+        @* 1. HEADER                                                                        *@
+        @* ================================================================================= *@
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-end mb-4 border-bottom pb-4 gap-3">
 
-    @if (Model.PostCollections.Count > 0)
-    {
-        <div class="row">
-            @foreach (var pc in Model.PostCollections)
-            {
-                @if (pc.Post != null) // Verificare de siguranță
-                {
-                    <div class="col-md-4 mb-4">
-                        <div class="card h-100 border-0 shadow-sm position-relative overflow-hidden">
-
-                            <div class="position-absolute top-0 end-0 m-2" style="z-index: 10;">
-                                <form method="post" asp-controller="Posts" asp-action="RemoveFromCollection">
-                                    <input type="hidden" name="postId" value="@pc.PostId" />
-                                    <input type="hidden" name="collectionId" value="@Model.CollectionId" />
-
-                                    <button type="submit" class="btn btn-sm btn-light rounded-circle shadow text-danger d-flex align-items-center justify-content-center"
-                                            style="width: 30px; height: 30px; opacity: 0.9;"
-                                            title="Elimină din colecție"
-                                            onclick="return confirm('Elimini postarea din colecție?');">
-                                        <i class="bi bi-x-lg" style="font-size: 0.8rem;"></i>
-                                    </button>
-                                </form>
-                            </div>
-
-                            @* --- 2. ZONA DE CONȚINUT (Link către postare) --- *@
-                            <a href="/Posts/Show/@pc.PostId" class="text-decoration-none text-dark h-100 d-flex flex-column">
-
-                                @* LOGICA PRIORITARĂ: IMAGINE -> VIDEO -> TEXT *@
-
-                                @if (!string.IsNullOrEmpty(pc.Post.ImageUrl))
-                                {
-                                    @* CAZUL 1: Are Imagine *@
-                                    <div class="w-100 bg-light" style="height: 250px;">
-                                        <img src="@pc.Post.ImageUrl"
-                                             class="w-100 h-100"
-                                             alt="Post image"
-                                             style="object-fit: cover;">
-                                    </div>
-                                }
-                                else if (!string.IsNullOrEmpty(pc.Post.VideoUrl))
-                                {
-                                    @* CAZUL 2: Nu are Imagine, dar are Video *@
-                                    <div class="w-100 bg-black d-flex align-items-center justify-content-center" style="height: 250px;">
-                                        <video class="w-100 h-100" style="object-fit: cover;">
-                                            <source src="@pc.Post.VideoUrl">
-                                        </video>
-                                        @* Iconiță de Play peste video ca să știe userul că e video *@
-                                        <div class="position-absolute text-white">
-                                            <i class="bi bi-play-circle-fill fs-1 opacity-75"></i>
-                                        </div>
-                                    </div>
-                                }
-                                else
-                                {
-                                    @* CAZUL 3: Doar Text *@
-                                    <div class="card-body bg-light d-flex align-items-center justify-content-center p-4" style="height: 250px; overflow: hidden;">
-                                        <div class="text-center">
-                                            @* Afișăm un rezumat scurt al textului *@
-                                            <p class="card-text text-muted small">
-                                                @if (!string.IsNullOrEmpty(pc.Post.TextContent))
-                                                {
-                                                    @* Curățăm tag-urile HTML pentru preview și limităm lungimea *@
-                                                    var textSimplu = System.Text.RegularExpressions.Regex.Replace(pc.Post.TextContent, "<.*?>", String.Empty);
-                                                    @(textSimplu.Length > 150 ? textSimplu.Substring(0, 150) + "..." : textSimplu)
-                                                }
-                                                else
-                                                {
-                                                    <span class="fst-italic">Fără conținut</span>
-                                                }
-                                            </p>
-                                        </div>
-                                    </div>
-                                }
-
-                                <div class="card-footer bg-white border-top-0 py-2 d-flex justify-content-between align-items-center">
-
-                                    <div class="d-flex align-items-center" style="max-width: 60%;">
-                                        <img src="@(pc.Post.Author?.ProfilePictureUrl)" class="rounded-circle border me-2" style="width: 25px; height: 25px; object-fit: cover;">
-                                        <small class="text-truncate fw-bold text-muted">
-                                            @(pc.Post.Author?.FullName)
-                                        </small>
-                                    </div>
-
-                                    <div class="text-end" style="max-width: 40%;">
-                                        <small class="text-muted" style="font-size: 0.7rem;" title="Data salvării în colecție">
-                                            <i class="bi bi-calendar3 me-1"></i>@pc.AddedDate.ToString("dd MMM yyyy")
-                                        </small>
-                                    </div>
-
-                                </div>
-                            </a>
-
-                        </div>
+            @* Titlu și Iconiță *@
+            <div>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="d-flex align-items-center justify-content-center rounded-circle"
+                         style="width: 50px; height: 50px; background-color: #FBF1F7;">
+                        <i class="bi bi-bookmark-fill fs-4" style="color: #B13079;"></i>
                     </div>
-                }
+
+                    <div>
+                        @* AM MODIFICAT AICI: font-size 1.5rem (mai mic) *@
+                        <h1 class="fw-bold mb-0" style="font-size: 1.5rem;">@Model.Name</h1>
+
+                        @* AM MODIFICAT AICI: font-size 0.8rem (mai mic) *@
+                        <p class="text-muted mb-0 text-uppercase fw-bold tracking-wide" style="font-size: 0.8rem;">
+                            @Model.PostCollections.Count @(Model.PostCollections.Count == 1 ? "postare" : "postări")
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            @* Butoane Acțiuni *@
+            @if ((Model.UserId == ViewBag.UserCurent || ViewBag.EsteAdministrator) && Model.Name != "All Posts")
+            {
+                <div class="d-flex gap-2">
+                    @* Buton Editare *@
+                    <a asp-action="Edit" asp-controller="Collections" asp-route-Id="@Model.CollectionId"
+                       class="btn btn-action rounded-pill px-4 fw-bold shadow-sm">
+                        <i class="bi bi-pencil-square me-2"></i> Editează
+                    </a>
+
+                    @* Buton Ștergere *@
+                    <form method="post" asp-controller="Collections" asp-action="Delete" asp-route-Id="@Model.CollectionId">
+                        <button type="submit" class="btn btn-action-danger rounded-pill px-4 fw-bold shadow-sm"
+                                onclick="return confirm('Ești sigur că vrei să ștergi colecția? Postările vor rămâne salvate, dar colecția va dispărea.')">
+                            <i class="bi bi-trash3 me-2"></i> Șterge
+                        </button>
+                    </form>
+                </div>
             }
         </div>
-    }
+
+        @* ================================================================================= *@
+        @* 2. GRID POSTĂRI                                                                  *@
+        @* ================================================================================= *@
+        @if (Model.PostCollections.Count > 0)
+        {
+            <div class="row g-1">
+                @foreach (var pc in Model.PostCollections)
+                {
+                    @if (pc.Post != null)
+                    {
+                        <div class="col-4">
+                            <div class="ratio ratio-1x1 border-0 rounded-0 overflow-hidden position-relative shadow-sm bg-light post-card-hover">
+
+                                <div class="position-absolute top-0 start-0 w-100 p-2 d-flex justify-content-between align-items-start" style="z-index: 30; pointer-events: none;">
+                                    <div>
+                                        @if (!string.IsNullOrEmpty(pc.Post.VideoUrl))
+                                        {
+                                            <i class="bi bi-camera-reels-fill text-white fs-5 drop-shadow-icon"></i>
+                                        }
+                                        else if (!string.IsNullOrEmpty(pc.Post.ImageUrl))
+                                        {
+                                            <i class="bi bi-image-fill text-white fs-5 drop-shadow-icon"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-file-text-fill text-white fs-5 drop-shadow-icon"></i>
+                                        }
+                                    </div>
+
+                                    <div style="pointer-events: auto;">
+                                        @if ((Model.UserId == ViewBag.UserCurent || ViewBag.EsteAdministrator))
+                                        {
+                                            <form method="post" asp-controller="Posts" asp-action="RemoveFromCollection">
+                                                <input type="hidden" name="postId" value="@pc.PostId" />
+                                                <input type="hidden" name="collectionId" value="@Model.CollectionId" />
+
+                                                <button type="submit" class="btn btn-sm btn-dark bg-opacity-25 border-0 rounded-circle text-white d-flex align-items-center justify-content-center hover-delete shadow-sm"
+                                                        style="width: 30px; height: 30px; backdrop-filter: blur(4px);"
+                                                        title="Elimină din colecție"
+                                                        onclick="return confirm('Elimini postarea din colecție?');">
+                                                    <i class="bi bi-x-lg" style="font-size: 0.8rem;"></i>
+                                                </button>
+                                            </form>
+                                        }
+                                    </div>
+                                </div>
+
+                                <a href="/Posts/Show/@pc.PostId" class="text-decoration-none d-block w-100 h-100 user-select-none">
+                                    <div class="hover-overlay p-3">
+                                        <div class="d-flex align-items-end justify-content-between w-100 h-100">
+                                            <div class="d-flex align-items-center text-truncate" style="max-width: 60%;">
+                                                <img src="@(!string.IsNullOrEmpty(pc.Post.Author?.ProfilePictureUrl) ? pc.Post.Author.ProfilePictureUrl : "/images/default-profile.png")"
+                                                     class="rounded-circle border border-1 border-white shadow-sm"
+                                                     alt="User"
+                                                     style="width: 30px; height: 30px; object-fit: cover; flex-shrink: 0;">
+                                                <span class="text-white ms-2 fw-bold text-truncate text-shadow small">
+                                                    @(pc.Post.Author?.FullName ?? "Unknown")
+                                                </span>
+                                            </div>
+                                            <div class="text-white text-end text-shadow" style="max-width: 40%;">
+                                                <div style="font-size: 0.65rem; opacity: 0.9; line-height: 1;">Adăugat:</div>
+                                                <div class="fw-bold" style="font-size: 0.75rem;">
+                                                    @pc.AddedDate.ToString("dd MMM")
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    @if (!string.IsNullOrEmpty(pc.Post.ImageUrl))
+                                    {
+                                        <img src="@pc.Post.ImageUrl" class="w-100 h-100" style="object-fit: cover;" alt="Post Image">
+                                    }
+                                    else if (!string.IsNullOrEmpty(pc.Post.VideoUrl))
+                                    {
+                                        <video class="w-100 h-100" style="object-fit: cover;" muted>
+                                            <source src="@pc.Post.VideoUrl" type="video/mp4">
+                                        </video>
+                                    }
+                                    else
+                                    {
+                                        <div class="d-flex flex-column align-items-center justify-content-center h-100 p-3 text-center bg-white">
+                                            <i class="bi bi-quote fs-1 text-muted opacity-25 mb-1"></i>
+                                            <small class="fw-bold text-dark text-break fst-italic font-georgia px-2">
+                                                @{
+                                                    var rawHtml = pc.Post.TextContent ?? "";
+                                                    var plainText = System.Text.RegularExpressions.Regex.Replace(rawHtml, "<.*?>", " ").Trim();
+                                                    var previewText = plainText.Length > 60 ? plainText.Substring(0, 60) + "..." : plainText;
+                                                }
+                                                @previewText
+                                            </small>
+                                        </div>
+                                    }
+                                </a>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        }
     else
     {
-        <div class="text-center py-5">
-            <i class="bi bi-grid-3x3" style="font-size: 3rem; color: #dee2e6;"></i>
-            <p class="mt-3 text-muted">Această colecție este goală.</p>
+        @* ================================================================================= *@
+        @* 3. EMPTY STATE                                                                    *@
+        @* ================================================================================= *@
+        <div class="text-center py-5 mt-4 rounded-4 bg-light border border-dashed">
+            <div class="mb-4 d-inline-block position-relative">
+
+                @* MODIFICARE: background-color: #FBF1F7 (Roz pal) în loc de bg-white *@
+                <div class="rounded-circle shadow-sm d-flex align-items-center justify-content-center"
+                     style="width: 100px; height: 100px; background-color: #FBF1F7;">
+
+                    @* MODIFICARE: Am scos 'opacity-50' pentru ca Magenta să fie clară *@
+                    <i class="bi bi-journal-bookmark" style="font-size: 3rem; color: #B13079;"></i>
+                </div>
+
+            </div>
+            <h3 class="fw-bold text-dark mb-2">Colecția este goală</h3>
+            <p class="text-muted mb-4 small" style="max-width: 400px; margin: 0 auto;">
+                Începe să îți organizezi postările salvate creând prima ta colecție chiar acum.
+            </p>
+            <a href="/" class="btn btn-primary rounded-pill px-5 py-2 fw-bold shadow-sm">
+                Explorează Feed-ul
+            </a>
         </div>
     }
-</div>
+    </div>
+
+    @* ================================================================================= *@
+    @* 4. STILURI CSS                                                                   *@
+    @* ================================================================================= *@
+    <style>
+        /* STIL BUTON EDITARE */
+        .btn-action {
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            color: #495057;
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+        }
+
+            .btn-action:hover {
+                background-color: #f8f9fa;
+                color: #B13079;
+                border-color: #B13079;
+            }
+
+        /* STIL BUTON ȘTERGERE */
+        .btn-action-danger {
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            color: #dc3545;
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+        }
+
+            .btn-action-danger:hover {
+                background-color: #fff5f5;
+                color: #b02a37;
+                border-color: #dc3545;
+            }
+
+        /* Alte stiluri */
+        .hover-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        .post-card-hover:hover .hover-overlay {
+            opacity: 1;
+        }
+
+        .drop-shadow-icon {
+            filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.6));
+        }
+
+        .text-shadow {
+            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+        }
+
+        .font-georgia {
+            font-family: 'Georgia', serif;
+            line-height: 1.4;
+        }
+
+        .hover-delete {
+            transition: background-color 0.2s ease, opacity 0.2s ease;
+        }
+
+            .hover-delete:hover {
+                background-color: #dc3545 !important;
+                opacity: 1 !important;
+            }
+
+        .border-dashed {
+            border-style: dashed !important;
+            border-color: #dee2e6 !important;
+        }
+    </style>

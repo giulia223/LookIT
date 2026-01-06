@@ -1,0 +1,54 @@
+﻿@model LookIT.Models.Group
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
+
+<div class="group-header-lookit shadow-sm bg-white rounded-4 overflow-hidden border-0">
+
+    <div class="group-cover" style="height: 120px; background: linear-gradient(45deg, #B13079, #D83B91);"></div>
+
+    <div class="p-4 position-relative">
+
+        <h3 class="fw-bold mb-2 lookit-title" style="letter-spacing: -0.5px;">
+            @Model.GroupName
+        </h3>
+
+        <p class="text-muted mb-3" style="font-size: 0.95rem; line-height: 1.5;">
+            <i class="bi bi-info-circle text-magenta opacity-50 me-1"></i> @Model.Description
+        </p>
+
+        <div class="d-flex align-items-center border-top pt-3 mt-2" style="border-color: rgba(177, 48, 121, 0.1) !important;">
+           
+            <span class="badge rounded-pill px-3 py-2" style="background-color: #FDF2F7; color: #B13079; border: 1px solid rgba(177, 48, 121, 0.15);">
+                <i class="bi bi-shield-check me-1"></i>
+                <span class="text-muted fw-normal">Moderator:</span>
+
+                @if (Model.ModeratorId == UserManager.GetUserId(User))
+                {
+                    <a asp-controller="Profile" asp-action="Details" asp-route-userId="@Model.ModeratorId" class="fw-bold text-decoration-none" style="color: #B13079;">
+                        Tu
+                    </a>
+                }
+                else
+                {
+                    <a asp-controller="Profile" asp-action="Details" asp-route-userId="@Model.ModeratorId" class="fw-bold text-decoration-none hover-underline" style="color: #B13079;">
+                        @Model.Moderator.FullName
+                    </a>
+                }
+            </span>
+        </div>
+    </div>
+</div>
+
+<style>
+    .group-header-lookit {
+        transition: transform 0.2s ease;
+    }
+
+        .group-header-lookit:hover .group-cover {
+            filter: brightness(1.1);
+        }
+
+    .text-magenta {
+        color: #B13079 !important;
+    }
+</style>
