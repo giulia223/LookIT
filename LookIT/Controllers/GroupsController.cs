@@ -24,13 +24,27 @@ namespace LookIT.Controllers
 
 
         //afisare toate grupurile
-        public IActionResult Index()
+        public IActionResult Index(string? search)
         {
 
             int _perPage = 4;
-            var groups = _context.Groups.Include(g => g.Messages)
-                                    .Include(g => g.Moderator).ToList();
+            var groupsQuery = _context.Groups
+                        .Include(g => g.Messages)
+                        .Include(g => g.Moderator)
+                        .AsQueryable();
 
+            // 2. Logică de căutare (SEARCH)
+            if (!string.IsNullOrEmpty(search))
+            {
+                // Căutăm în Numele Grupului sau în Descriere (case-insensitive implicit în SQL)
+                groupsQuery = groupsQuery.Where(g => g.GroupName.Contains(search) || g.Description.Contains(search));
+            }
+
+            // Putem adăuga și o ordonare (de exemplu, cele mai noi grupuri primele)
+            groupsQuery = groupsQuery.OrderByDescending(g => g.Date);
+
+            // 3. Executăm query-ul
+            var groups = groupsQuery.ToList();
             //verificam de fiecare data numarul postarilor totale
             int totalItems = groups.Count();
 
@@ -59,9 +73,19 @@ namespace LookIT.Controllers
             //preluam numarul ultimei pagini
             ViewBag.lastPage = (int)Math.Ceiling((double)totalItems / _perPage);
             ViewBag.CurrentPage = currentPage;
+            //trimitem textul căutat înapoi în View ca să rămână scris în input
+            ViewBag.SearchString = search;
 
             //trimitem postarile cu ajutorul unui ViwBag  catre View0ul corespunzator
-            ViewBag.PaginationBaseUrl = "/Groups/Index/?page=";
+            if (!string.IsNullOrEmpty(search))
+            {
+                ViewBag.PaginationBaseUrl = "/Groups/Index/?search=" + search + "&page=";
+            }
+            else
+            {
+                ViewBag.PaginationBaseUrl = "/Groups/Index/?page=";
+            }
+
             ViewBag.Groups = paginatedGroups;
 
             return View();

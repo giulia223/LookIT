@@ -1,5 +1,6 @@
 using LookIT.Data;
 using LookIT.Models;
+using LookIT.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,6 +23,7 @@ builder.Services.AddAuthorization(options =>
          policy => policy.RequireRole("Administrator"));
 });
 
+builder.Services.AddScoped<ISentimentAnalysisService, SentimentAnalysisService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

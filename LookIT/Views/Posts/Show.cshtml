@@ -46,16 +46,50 @@
                     </span>
                 </a>
                 <small class="text-muted" style="font-size: 0.8rem;">
-                    @Model.Date.ToString("d MMMM HH:mm") 
+                    @Model.Date.ToString("d MMMM HH:mm")
                     <i class="bi bi-globe"></i>
                 </small>
             </div>
         </div>
 
-        @if (!string.IsNullOrEmpty(@Model.TextContent))
+       
+       
+       @* --- SENTIMENT ANALYSIS --- *@
+@if (User.IsInRole("Administrator") && !string.IsNullOrEmpty(Model.SentimentLabel))
+{
+   
+    
+        string badgeClass = "bg-secondary"; 
+        string displayText = "Neutru";
+        
+        if (Model.SentimentLabel == "positive")
         {
-            <div class="mb-2">@Html.Raw(Model.TextContent)</div>
+            badgeClass = "bg-success"; // Verde
+            displayText = "Pozitiv";
         }
+        else if (Model.SentimentLabel == "negative")
+        {
+            badgeClass = "bg-danger"; // Roșu
+            displayText = "Negativ";
+        }
+    
+
+    <div class="card mb-3 border-0 shadow-sm">
+        <div class="card-body py-2 d-flex align-items-center justify-content-between bg-light rounded">
+            <div>
+                <strong class="text-uppercase text-muted small">Analiză AI:</strong>
+                <span class="badge @badgeClass ms-2">@displayText</span>
+            </div>
+            
+            @if(Model.SentimentConfidence.HasValue)
+            {
+                <small class="text-muted">
+                    Încredere: @((Model.SentimentConfidence.Value * 100).ToString("0"))%
+                </small>
+            }
+        </div>
+    </div>
+}
 
         @if (@Model.ImageUrl != null)
         {
@@ -104,11 +138,9 @@
                 </div>
 
                 <div class="bookmark-container">
-                    
+
                     <div class="bookmark-trigger">
-                        
-                         <i class="bi bi-bookmark fs-4 cursor-pointer"></i>
-                        
+                        <i class="bi bi-bookmark fs-4 cursor-pointer"></i>
                     </div>
 
                     <div class="bookmark-dropdown shadow border rounded-3 p-2">
@@ -127,13 +159,11 @@
                                     <button type="submit" class="dropdown-item small rounded-2 d-flex justify-content-between align-items-center @(isInCollection ? "bg-light" : "")">
 
                                         <span>
-                                            @*daca este salvata, vom pune ocnita plina*@
                                             @if (isInCollection)
                                             {
                                                 <i class="bi bi-folder-fill text-primary me-2"></i>
                                                 <span class="fw-bold text-primary">@collection.Name</span>
                                             }
-                                            @*daca nu este salvata, vom pune iconita goala*@
                                             else
                                             {
                                                 <i class="bi bi-folder me-2"></i>
@@ -200,7 +230,7 @@
             </div>
         }
 
-        @if(Model.Comments.Count > 0)
+        @if (Model.Comments.Count > 0)
         {
             <div class="comments-list">
                 @foreach (var comment in Model.Comments)
@@ -231,8 +261,8 @@
                                             Editat la @(comment.DateModified.Value.Year == DateTime.Now.Year
                                                                             ? comment.DateModified.Value.ToString("d MMM HH:mm")
                                                                             : comment.DateModified.Value.ToString("d MMM yyyy HH:mm"))
-                                        </small>
-                                     }
+                            </small>
+                                                        }
                                 </div>
 
                                 <div class="text-break" style="font-size: 0.9rem;">
@@ -262,7 +292,7 @@
                                 }
                             </div>
                         </div>
-                        
+
                     </div>
                 }
             </div>
@@ -273,7 +303,7 @@
                 Inca nu există comentarii.
             </div>
         }
-        
+
     </div>
 </div>
 
@@ -283,7 +313,6 @@
         border: none;
         width: 100%;
         text-align: left;
-        /* Mărim padding-ul vertical de la 8px la 12px sau mai mult pentru spațiu */
         padding: 10px 16px;
         color: #212529;
         display: flex;
@@ -297,7 +326,6 @@
             color: #0d6efd;
         }
 
-    /* Adăugăm spațiu între formularele care conțin butoanele */
     .bookmark-dropdown form {
         margin-bottom: 5px;
     }
@@ -305,10 +333,11 @@
         .bookmark-dropdown form:last-of-type {
             margin-bottom: 0;
         }
+
     .bookmark-container {
         position: relative;
         display: inline-block;
-        padding-bottom: 10px; /* Creează o zonă invizibilă de legătură sub iconiță */
+        padding-bottom: 10px;
         margin-bottom: -10px;
     }
 
@@ -316,19 +345,18 @@
         display: none;
         position: absolute;
         right: 0;
-        bottom: 100%; /* Se deschide deasupra */
+        bottom: 100%;
         background-color: white;
         min-width: 200px;
         z-index: 1050;
-        margin-bottom: 2px; /* Micșorează distanța față de iconiță */
-        /* Adăugăm un "pseudo-element" pentru a umple spațiul gol */
+        margin-bottom: 2px;
     }
 
         .bookmark-dropdown::after {
             content: "";
             position: absolute;
             width: 100%;
-            height: 15px; /* Pod invizibil între meniu și iconiță */
+            height: 15px;
             bottom: -15px;
             left: 0;
             background: transparent;
@@ -344,7 +372,6 @@
         let formData = new FormData();
         formData.append("Id", postId);
 
-        //facem cerere catre server
         fetch('/Posts/LikePost', {
             method: 'POST',
             body: formData
@@ -352,12 +379,9 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                //gasim div urile corespunzatoare iconitei si a afisarii numaului de like uri prin id-uri sugestive ale
-                //elementelor
                 let icon = document.getElementById("like-icon-" + postId);
                 let countSpan = document.getElementById("like-count-" + postId);
 
-                //actualizam iconita (inima plina sau goala, dupa caz)
                 if (data.isLiked) {
                     icon.classList.remove("bi-heart", "text-dark");
                     icon.classList.add("bi-heart-fill", "text-danger");
@@ -366,7 +390,6 @@
                     icon.classList.add("bi-heart", "text-dark");
                 }
 
-               //actualizam numarul de like uri
                 countSpan.innerText = data.count;
             }
         })

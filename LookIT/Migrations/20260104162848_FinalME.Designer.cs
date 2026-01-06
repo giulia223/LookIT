@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LookIT.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251229135532_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20260104162848_FinalME")]
+    partial class FinalME
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -295,19 +295,27 @@ namespace LookIT.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MessageId"));
 
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("GroupId")
                         .HasColumnType("int");
 
+                    b.Property<string>("ImageUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("TextContent")
+                        .HasMaxLength(5000)
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("UserId")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("VideoUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.HasKey("MessageId");
 

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LookIT.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260102154141_UpdateMessages")]
-    partial class UpdateMessages
+    [Migration("20260104172432_AddSentimentAnalysis")]
+    partial class AddSentimentAnalysis
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -344,6 +344,15 @@ namespace LookIT.Migrations
                     b.Property<string>("ImageUrl")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime?>("SentimentAnalyzedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<double?>("SentimentConfidence")
+                        .HasColumnType("float");
+
+                    b.Property<string>("SentimentLabel")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TextContent")
                         .HasMaxLength(5000)
