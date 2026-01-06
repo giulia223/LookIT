@@ -5,7 +5,6 @@
 
 @{
     var loggedUser = await UserManager.GetUserAsync(User);
-
     var currentUserId = UserManager.GetUserId(User);
     bool isLiked = Model.Likes.Any(l => l.UserId == currentUserId);
     int likeCount = Model.Likes.Count;
@@ -31,6 +30,7 @@
 <div class="card mb-3 mx-auto border-0 shadow-sm" style="max-width: 600px;">
     <div class="card-body p-3">
 
+        @* --- HEADER (User & Data) --- *@
         <div class="d-flex align-items-center mb-3">
             <a asp-controller="Profile" asp-action="Details" asp-route-userId="@Model.AuthorId" asp-area="" class="text-decoration-none">
                 <img src="@Model.Author.ProfilePictureUrl"
@@ -52,45 +52,46 @@
             </div>
         </div>
 
-       
-       
-       @* --- SENTIMENT ANALYSIS --- *@
-@if (User.IsInRole("Administrator") && !string.IsNullOrEmpty(Model.SentimentLabel))
-{
-   
-    
-        string badgeClass = "bg-secondary"; 
-        string displayText = "Neutru";
-        
-        if (Model.SentimentLabel == "positive")
+        @* --- AFISARE TEXT (Aceasta lipsea la tine!) --- *@
+        @if (!string.IsNullOrEmpty(Model.TextContent))
         {
-            badgeClass = "bg-success"; // Verde
-            displayText = "Pozitiv";
+            <div class="mb-2 text-break" style="white-space: pre-wrap;">@Html.Raw(Model.TextContent)</div>
         }
-        else if (Model.SentimentLabel == "negative")
-        {
-            badgeClass = "bg-danger"; // Roșu
-            displayText = "Negativ";
-        }
-    
 
-    <div class="card mb-3 border-0 shadow-sm">
-        <div class="card-body py-2 d-flex align-items-center justify-content-between bg-light rounded">
-            <div>
-                <strong class="text-uppercase text-muted small">Analiză AI:</strong>
-                <span class="badge @badgeClass ms-2">@displayText</span>
-            </div>
-            
-            @if(Model.SentimentConfidence.HasValue)
+        @* --- SENTIMENT ANALYSIS --- *@
+        @* Am scos conditia de Admin ca sa vezi ca functioneaza *@
+        @if (!string.IsNullOrEmpty(Model.SentimentLabel))
+        {
+            string badgeClass = "bg-secondary"; // Default Neutru
+            string displayText = "Neutru";
+            string label = Model.SentimentLabel.ToLower();
+
+            if (label.Contains("positive"))
             {
-                <small class="text-muted">
-                    Încredere: @((Model.SentimentConfidence.Value * 100).ToString("0"))%
-                </small>
+                badgeClass = "bg-success";
+                displayText = "Pozitiv";
             }
-        </div>
-    </div>
-}
+            else if (label.Contains("negative"))
+            {
+                badgeClass = "bg-danger";
+                displayText = "Negativ";
+            }
 
+            <div class="card mb-2 border-0 shadow-sm bg-light">
+                <div class="card-body py-2 d-flex align-items-center justify-content-between">
+                    <div>
+                        <strong class="text-uppercase text-muted small">Analiză AI:</strong>
+                        <span class="badge @badgeClass ms-2">@displayText</span>
+                    </div>
+                    @if (Model.SentimentConfidence.HasValue && Model.SentimentConfidence > 0)
+                    {
+                        <small class="text-muted">Încredere: @((Model.SentimentConfidence.Value * 100).ToString("0"))%</small>
+                    }
+                </div>
+            </div>
+        }
+
+        @* --- IMAGINI SI VIDEO --- *@
         @if (@Model.ImageUrl != null)
         {
             <img src="@Model.ImageUrl" alt="Post Image" class="rounded-2 w-100 border mb-2" style="height: auto; max-height: 600px; object-fit: contain;" />
@@ -105,6 +106,7 @@
             </div>
         }
 
+        @* --- BUTOANE LIKE/EDIT/DELETE --- *@
         @if (ViewBag.EsteUser == true || ViewBag.EsteAdministrator == true)
         {
             <div class="d-flex justify-content-between align-items-center mt-3 px-1">
@@ -138,7 +140,6 @@
                 </div>
 
                 <div class="bookmark-container">
-
                     <div class="bookmark-trigger">
                         <i class="bi bi-bookmark fs-4 cursor-pointer"></i>
                     </div>
@@ -148,16 +149,13 @@
                         @if (ViewBag.UserCollections != null)
                         {
                             var savedIds = ViewBag.SavedCollectionIds as List<int> ?? new List<int>();
-
                             @foreach (var collection in ViewBag.UserCollections)
                             {
                                 var isInCollection = savedIds.Contains(collection.CollectionId);
-
                                 <form method="post" asp-controller="Posts" asp-action="AddToCollection">
                                     <input type="hidden" name="PostId" value="@Model.PostId" />
                                     <input type="hidden" name="CollectionId" value="@collection.CollectionId" />
                                     <button type="submit" class="dropdown-item small rounded-2 d-flex justify-content-between align-items-center @(isInCollection ? "bg-light" : "")">
-
                                         <span>
                                             @if (isInCollection)
                                             {
@@ -170,12 +168,10 @@
                                                 <span>@collection.Name</span>
                                             }
                                         </span>
-
                                         @if (isInCollection)
                                         {
                                             <i class="bi bi-check-lg text-primary"></i>
                                         }
-
                                     </button>
                                 </form>
                             }
@@ -194,7 +190,6 @@
 
 <div class="card mb-4 mx-auto border-0 shadow-sm" style="max-width: 600px;">
     <div class="card-body p-3">
-
         <h6 class="text-muted mb-3 ps-1">Comentarii</h6>
 
         @if (ViewBag.EsteUser || ViewBag.EsteAdministrator)
@@ -202,13 +197,11 @@
             <div class="mb-4">
                 <form method="post" asp-controller="Posts" asp-action="Show">
                     <input type="hidden" name="PostId" value="@Model.PostId" />
-
                     <div class="d-flex gap-2 align-items-start">
                         <img src="@loggedUser?.ProfilePictureUrl"
                              class="rounded-circle border"
                              style="width: 32px; height: 32px; object-fit: cover;"
                              alt="Me" />
-
                         <div class="flex-grow-1">
                             <div class="d-flex align-items-center bg-light rounded-4 px-3 py-2 border">
                                 <textarea class="form-control bg-transparent border-0 shadow-none p-0 me-2"
@@ -216,7 +209,6 @@
                                       rows="1"
                                       placeholder="Scrie un comentariu..."
                                       style="resize: none; overflow-y: hidden; font-size: 0.9rem;"></textarea>
-
                                 <button class="btn btn-link text-primary p-0 text-decoration-none" type="submit">
                                     <i class="bi bi-send-fill"></i>
                                 </button>
@@ -244,7 +236,6 @@
                                      style="width: 32px; height: 32px; object-fit: cover;" />
                             </a>
                         </div>
-
                         <div class="flex-grow-1">
                             <div class="bg-light rounded-4 px-3 py-2 d-inline-block border" style="min-width: 220px; max-width: 100%;">
                                 <div class="d-flex align-items-center justify-content-between mb-1">
@@ -253,7 +244,6 @@
                                             @(comment.User.FullName ?? "Utilizator necunoscut")
                                         </span>
                                     </a>
-
                                     @if (comment.DateModified.HasValue)
                                     {
                                         <small class="text-muted ms-4" style="font-size: 0.7rem;"
@@ -264,25 +254,20 @@
                             </small>
                                                         }
                                 </div>
-
                                 <div class="text-break" style="font-size: 0.9rem;">
                                     @comment.Content
                                 </div>
                             </div>
-
-                            @* Bara de acțiuni de sub comentariu *@
                             <div class="d-flex align-items-center gap-3 ms-2 mt-1">
                                 <small class="text-muted" style="font-size: 0.75rem;">
                                     @comment.Date.ToString(comment.Date.Year == DateTime.Now.Year ? "d MMM HH:mm" : "d MMM yyyy HH:mm")
                                 </small>
-
                                 @if (comment.UserId == ViewBag.UserCurent || ViewBag.EsteAdministrator == true)
                                 {
                                     <a class="text-decoration-none text-secondary fw-bold" style="font-size: 0.75rem;"
                                        asp-controller="Comments" asp-action="Edit" asp-route-id="@comment.CommentId">
                                         Editează
                                     </a>
-
                                     <form method="post" asp-controller="Comments" asp-action="Delete" asp-route-id="@comment.CommentId" class="d-inline">
                                         <button class="btn btn-link text-danger text-decoration-none fw-bold p-0 border-0"
                                                 style="font-size: 0.75rem; line-height: 1;" type="submit">
@@ -292,7 +277,6 @@
                                 }
                             </div>
                         </div>
-
                     </div>
                 }
             </div>
@@ -303,7 +287,6 @@
                 Inca nu există comentarii.
             </div>
         }
-
     </div>
 </div>
 
@@ -395,4 +378,4 @@
         })
         .catch(error => console.error('Eroare:', error));
     }
-</script>
+</script>t>
