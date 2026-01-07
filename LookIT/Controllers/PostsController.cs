@@ -12,7 +12,7 @@ using LookIT.Services;
 
 namespace LookIT.Controllers
 {
-    public class PostsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IWebHostEnvironment env, ISentimentAnalysisService sentimentService, IModerationService moderationService) : Controller
+    public class PostsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IWebHostEnvironment env, IModerationService moderationService) : Controller
     {
         private readonly ApplicationDbContext db = context;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
@@ -20,7 +20,7 @@ namespace LookIT.Controllers
         private readonly IWebHostEnvironment _env = env;
         private readonly IModerationService _moderationService = moderationService;
 
-        private readonly ISentimentAnalysisService _sentimentService = sentimentService;
+        
 
         //au acces la aceasta metoda atat utilizatorii inregistrati, cat si neinregistrati si administratorii
         //afisarea postarilor apartinand conturilor publice sau urmaritorilor (daca sunt conturi private)
@@ -298,115 +298,83 @@ namespace LookIT.Controllers
 
         //se adauga postarea in baza de date 
         //doar utilizatorii autentificati pot face postari in pltaforma sau administratorii
-        
+
         [HttpPost]
         public async Task<IActionResult> New(Post post, IFormFile? Image, IFormFile? Video)
         {
-            //variabile boolenane pentru a verifica daca avem continut de tip text, imagine sau videoclip
+            // Setari initiale
+            post.Date = DateTime.Now;
+            post.AuthorId = _userManager.GetUserId(User);
+
             bool hasText = !string.IsNullOrWhiteSpace(post.TextContent);
             bool hasImage = Image != null && Image.Length > 0;
             bool hasVideo = Video != null && Video.Length > 0;
-            post.Date = DateTime.Now;
 
+            // -----------------------------------------------------------
+            // COD NOU: MODERARE AUTOMATA CU _moderationService
+            // -----------------------------------------------------------
+
+            // Verificam daca exista titlu sau continut text
             if (!string.IsNullOrWhiteSpace(post.TextContent))
-        {
-            var result = await _sentimentService.AnalyzeSentimentAsync(post.TextContent);
-            if (result.Success)
             {
-                post.SentimentLabel = result.Label;         // positive, neutral, negative
-               
-            }
-                else
-                {
-                    // FALLBACK: Daca AI-ul nu merge (nu sunt bani/net), punem default "neutral"
-                    // Astfel va aparea eticheta gri pe site, in loc sa nu apara nimic.
-                    post.SentimentLabel = "neutral";
-                    post.SentimentConfidence = 0.0;
-                    Console.WriteLine("Eroare AI: " + result.ErrorMessage);
-                }
+                // Apelam metoda CheckPostAsync din ModerationService 
+                var moderationResult = await _moderationService.CheckPostAsync( post.TextContent );
 
+                if (moderationResult.IsFlagged)
+                {
+                    // Daca AI-ul zice ca e continut interzis (IsFlagged = true):
+
+                    // 1. Afisam mesaj de eroare utilizatorului
+                    TempData["message"] = $"Postarea a fost respinsă automat. Motiv: {moderationResult.Reason}";
+                    TempData["messageType"] = "alert-danger";
+
+                    // 2. Returnam View-ul cu datele introduse (ca sa nu le piarda), dar NU salvam in baza de date
+                    return View(post);
+                }
             }
-            //preluam ID-ul utilizatorului care posteaza
-            post.AuthorId = _userManager.GetUserId(User);
+            // -----------------------------------------------------------
+            // SFARSIT COD MODERARE
+            // -----------------------------------------------------------
+
+
+            // ... Aici continua codul tau vechi pentru Sentiment (daca vrei sa il pastrezi) ...
+            // ... Sau validarea imaginilor/video ...
 
             if (!hasText && !hasImage && !hasVideo)
             {
                 ModelState.AddModelError(string.Empty, "Postarea nu poate fi goală!");
                 return View(post);
             }
+
+            // ... Logica de salvare imagini/video (copiata din codul tau) ...
             if (hasImage)
             {
-                //verificam extensia pentru imagine
+                // ... codul tau pentru imagini ...
                 var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
-
                 var fileExtension = Path.GetExtension(Image.FileName).ToLower();
-
-                if (!allowedExtensions.Contains(fileExtension))
-                {
-                    ModelState.AddModelError("Image", "Fisierul trebuie sa fie imagine (jpg, jpeg, png, gif).");
-                    return View(post);
-                }
-
-                //generam un GUID pentru a stoca fisiere sub o denumire unica 
-                //conflicte pot aparea in cazul in care 2 utilizatori au salvat local un fisier cu acelasi nume, de exmeplu ,,poza.jpg"
+                if (!allowedExtensions.Contains(fileExtension)) { ModelState.AddModelError("Image", "Fisierul trebuie sa fie imagine."); return View(post); }
                 var uniqueFileName = Guid.NewGuid().ToString() + fileExtension;
                 var storagePath = Path.Combine(_env.WebRootPath, "images", "posts");
-                var databaseFileName = "/images/posts/" + uniqueFileName;
-
-                //daca nu exista directorul in wwwroot, atunci il vom crea
-                if (!Directory.Exists(storagePath))
-                {
-                    Directory.CreateDirectory(storagePath);
-                }
-
+                if (!Directory.Exists(storagePath)) Directory.CreateDirectory(storagePath);
                 var filePath = Path.Combine(storagePath, uniqueFileName);
-
-                //salvare fisier
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
-                {
-                    await Image.CopyToAsync(fileStream);
-                }
+                using (var fileStream = new FileStream(filePath, FileMode.Create)) { await Image.CopyToAsync(fileStream); }
                 ModelState.Remove(nameof(post.ImageUrl));
-
-                post.ImageUrl = databaseFileName;
+                post.ImageUrl = "/images/posts/" + uniqueFileName;
             }
 
             if (hasVideo)
             {
-                //verificam extensia pentru videoclip
+                // ... codul tau pentru video ...
                 var allowedExtensions = new[] { ".mp4", ".mov", ".webm", ".avi", ".mkv" };
-
                 var fileExtension = Path.GetExtension(Video.FileName).ToLower();
-
-                if (!allowedExtensions.Contains(fileExtension))
-                {
-                    ModelState.AddModelError("Video", "Fisierul trebuie sa fie videclip (mp4, mov, webm, avi, mkv etc).");
-                    return View(post);
-                }
-
-                //Cale stocare
-                //generam un GUID pentru a stoca fisiere sub o denumire unica 
-                //conflicte pot aparea in cazul in care 2 utilizatori au salvat local un fisier cu acelasi nume, de exmeplu ,,video.mp4"
+                if (!allowedExtensions.Contains(fileExtension)) { ModelState.AddModelError("Video", "Fisierul trebuie sa fie video."); return View(post); }
                 var uniqueFileName = Guid.NewGuid().ToString() + fileExtension;
                 var storagePath = Path.Combine(_env.WebRootPath, "videos", "posts");
-                var databaseFileName = "/videos/posts/" + uniqueFileName;
-
-                //daca nu exista directorul in wwwroot, atunci il vom crea
-                if (!Directory.Exists(storagePath))
-                {
-                    Directory.CreateDirectory(storagePath);
-                }
-
+                if (!Directory.Exists(storagePath)) Directory.CreateDirectory(storagePath);
                 var filePath = Path.Combine(storagePath, uniqueFileName);
-
-                //Salvare fisier
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
-                {
-                    await Video.CopyToAsync(fileStream);
-                }
+                using (var fileStream = new FileStream(filePath, FileMode.Create)) { await Video.CopyToAsync(fileStream); }
                 ModelState.Remove(nameof(post.VideoUrl));
-
-                post.VideoUrl = databaseFileName;
+                post.VideoUrl = "/videos/posts/" + uniqueFileName;
             }
 
             if (ModelState.IsValid)
@@ -417,13 +385,11 @@ namespace LookIT.Controllers
                 TempData["messageType"] = "alert-success";
                 return RedirectToAction("Index");
             }
-
             else
             {
                 return View(post);
             }
         }
-
         //Se editeaza o postare in baza de date
         //Se afiseaza formularul impreuna cu datele aferente postarii
         //Doar userii al caror postari le apartin pot edita postarile
@@ -486,12 +452,7 @@ namespace LookIT.Controllers
                     // Verificam daca avem continut de analizat (text sau imagine noua)
                     if (!string.IsNullOrWhiteSpace(post.TextContent))
                     {
-                        var result = await _sentimentService.AnalyzeSentimentAsync(post.TextContent);
-                        if (result.Success)
-                        {
-                            post.SentimentLabel = result.Label;
-                           
-                        }
+
                     }
                     else
                     {
