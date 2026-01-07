@@ -112,12 +112,7 @@
                 <span class="badge @badgeClass ms-2">@displayText</span>
             </div>
             
-            @if(Model.SentimentConfidence.HasValue)
-            {
-                <small class="text-muted">
-                    Încredere: @((Model.SentimentConfidence.Value * 100).ToString("0"))%
-                </small>
-            }
+          
         </div>
     </div>
 }
@@ -163,11 +158,9 @@
                         @if (ViewBag.UserCollections != null)
                         {
                             var savedIds = ViewBag.SavedCollectionIds as List<int> ?? new List<int>();
-
                             @foreach (var collection in ViewBag.UserCollections)
                             {
                                 var isInCollection = savedIds.Contains(collection.CollectionId);
-
                                 <form method="post" asp-controller="Posts" asp-action="AddToCollection">
                                     <input type="hidden" name="PostId" value="@Model.PostId" />
                                     <input type="hidden" name="CollectionId" value="@collection.CollectionId" />
@@ -188,7 +181,6 @@
                                                 <span class="text-dark">@collection.Name</span>
                                             }
                                         </span>
-
                                         @if (isInCollection)
                                         {
                                             @* Bifă Magenta *@
@@ -221,13 +213,11 @@
             <div class="mb-4">
                 <form method="post" asp-controller="Posts" asp-action="Show">
                     <input type="hidden" name="PostId" value="@Model.PostId" />
-
                     <div class="d-flex gap-2 align-items-start">
                         <img src="@(!string.IsNullOrEmpty(loggedUser?.ProfilePictureUrl) ? loggedUser.ProfilePictureUrl : "/images/default-profile.png")"
                              class="rounded-circle border"
                              style="width: 32px; height: 32px; object-fit: cover;"
                              alt="Me" />
-
                         <div class="flex-grow-1">
                             @* Use class custom-comment-box (no inline style) so CSS controls colors *@
                             <div class="d-flex align-items-center rounded-pill px-3 py-2 shadow-sm custom-comment-box">
@@ -375,4 +365,4 @@
         })
         .catch(error => console.error('Eroare:', error));
     }
-</script>
+</script>t>

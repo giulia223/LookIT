@@ -12,8 +12,13 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LookIT.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
+<<<<<<<< HEAD:LookIT/Migrations/20260106204026_InitialMigration.Designer.cs
     [Migration("20260106204026_InitialMigration")]
     partial class InitialMigration
+========
+    [Migration("20260107085531_InitialCreate")]
+    partial class InitialCreate
+>>>>>>>> origin/master:LookIT/Migrations/20260107085531_InitialCreate.Designer.cs
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
