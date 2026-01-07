@@ -12,7 +12,7 @@ using LookIT.Services;
 
 namespace LookIT.Controllers
 {
-    public class PostsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IWebHostEnvironment env, ISentimentAnalysisService sentimentService, IModerationService moderationSerivce) : Controller
+    public class PostsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IWebHostEnvironment env, ISentimentAnalysisService sentimentService, IModerationService moderationService) : Controller
     {
         private readonly ApplicationDbContext db = context;
         private readonly UserManager<ApplicationUser> _userManager = userManager;

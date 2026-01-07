@@ -1,4 +1,6 @@
-﻿using System.Net.Http.Headers;
+﻿using System;
+using System.Linq;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -9,149 +11,91 @@ using Microsoft.Extensions.Configuration;
 
 namespace LookIT.Services
 {
-    // --- MODELELE (Copiate si adaptate din Curs) ---
-
-    // Rezultatul final pe care il folosim in Controller
+    // --- MODELELE DE DATE ---
     public class SentimentResult
     {
-        public string Label { get; set; } = "neutral"; // positive, neutral, negative
-        public double Confidence { get; set; } = 0.0;    // 0.0 - 1.0
+        public string Label { get; set; } = "neutral";
+        public double Confidence { get; set; } = 0.0;
         public bool Success { get; set; } = false;
         public string? ErrorMessage { get; set; }
     }
 
-    // Clase pentru deserializarea raspunsului OpenAI (interne)
-    public class OpenAiResponse
-    {
-        [JsonPropertyName("choices")]
-        public List<Choice>? Choices { get; set; }
-    }
-
-    public class Choice
-    {
-        [JsonPropertyName("message")]
-        public Message? Message { get; set; }
-    }
-
-    public class Message
-    {
-        [JsonPropertyName("content")]
-        public string? Content { get; set; }
-    }
-
-    public class SentimentResponse
-    {
-        [JsonPropertyName("label")]
-        public string? Label { get; set; }
-
-        [JsonPropertyName("confidence")]
-        public double Confidence { get; set; }
-    }
-
-    // --- INTERFATA ---
-    public interface ISentimentAnalysisService
+    // --- INTERFATA (RENAMED TO AVOID COLLISIONS) ---
+    // This local interface name avoids the duplicate definition error (CS0101).
+    // If you intended to implement the project's shared ISentimentAnalysisService, replace this local
+    // interface with that shared one (make sure the return type matches).
+    public interface ISentimentAnalysisServiceLocal
     {
         Task<SentimentResult> AnalyzeSentimentAsync(string text);
     }
 
-    // --- IMPLEMENTAREA SERVICIULUI ---
-    public class SentimentAnalysisService : ISentimentAnalysisService
+    // --- IMPLEMENTAREA ---
+    public class SentimentAnalysisServiceLocalImpl : ISentimentAnalysisServiceLocal
     {
-        private readonly HttpClient _httpClient;
-        private readonly string _apiKey;
-        private readonly ILogger<SentimentAnalysisService> _logger;
+        // Renamed private fields to avoid collisions with other symbols in the project
+        private readonly HttpClient _client;
+        private readonly string _openAiApiKey;
+        private readonly ILogger<SentimentAnalysisServiceLocalImpl> _loggerInstance;
 
-        public SentimentAnalysisService(IConfiguration configuration, ILogger<SentimentAnalysisService> logger)
+        public SentimentAnalysisServiceLocalImpl(IConfiguration configuration, ILogger<SentimentAnalysisServiceLocalImpl> logger)
         {
-            _httpClient = new HttpClient();
-            _logger = logger;
+            _client = new HttpClient();
+            _loggerInstance = logger ?? throw new ArgumentNullException(nameof(logger));
+            _openAiApiKey = configuration["OpenAI:ApiKey"] ?? throw new ArgumentNullException("OpenAI:ApiKey lipseste!");
 
-            // Verificam cheia exact ca in curs
-            _apiKey = configuration["OpenAI:ApiKey"] ?? throw new ArgumentNullException("OpenAI:ApiKey not configured");
-
-            // Configurare HttpClient
-            _httpClient.BaseAddress = new Uri("https://api.openai.com/v1/");
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
-            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _client.BaseAddress = new Uri("https://api.openai.com/v1/");
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _openAiApiKey);
         }
 
-        // Functie ajutatoare pentru curatarea HTML-ului (pastrata de la noi, vitala pentru editorul tau)
         private string StripHtml(string input)
         {
             if (string.IsNullOrEmpty(input)) return string.Empty;
-            var noTags = Regex.Replace(input, "<.*?>", " ");
-            return WebUtility.HtmlDecode(noTags).Trim();
+            return WebUtility.HtmlDecode(Regex.Replace(input, "<.*?>", " ")).Trim();
         }
 
         public async Task<SentimentResult> AnalyzeSentimentAsync(string text)
         {
             try
-            {// 1. DEBUG: Scriem in Output ca a inceput
-                System.Diagnostics.Debug.WriteLine($"[AI START] Analizam textul: {text}");
-                // Curatam textul inainte de a-l trimite
+            {
                 string cleanText = StripHtml(text);
+                if (string.IsNullOrWhiteSpace(cleanText)) return new SentimentResult { Success = false };
 
-                if (string.IsNullOrWhiteSpace(cleanText))
-                {
-                    return new SentimentResult { Success = false, ErrorMessage = "Empty text" };
-                }
-
-                // Construim prompt-ul exact ca in curs
-                var systemPrompt = @"You are a sentiment analysis assistant. Analyze the sentiment of the given text and respond ONLY with a JSON object in this exact format:
-                {""label"": ""positive|neutral|negative"", ""confidence"": 0.0-1.0}
-                Rules:
-                - label must be exactly one of: positive, neutral, negative
-                - confidence must be a number between 0.0 and 1.0
-                - Do not include any other text, only the JSON object";
-
-                var userPrompt = $"Analyze the sentiment of this comment: \"{cleanText}\"";
-
-                // Request Body
                 var requestBody = new
                 {
                     model = "gpt-4o-mini",
                     messages = new[]
                     {
-                        new { role = "system", content = systemPrompt },
-                        new { role = "user", content = userPrompt }
+                        new { role = "system", content = "Classify text as: 'positive', 'neutral', or 'negative'. JSON format: {\"label\": \"...\", \"confidence\": 0.9}" },
+                        new { role = "user", content = cleanText }
                     },
-                    temperature = 0.1, // Temperatura mica pentru rezultate consistente
+                    temperature = 0.1,
                     max_tokens = 50
                 };
-                var jsonContent = JsonSerializer.Serialize(requestBody);
-                var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-                // 2. Trimitem cererea
-                var response = await _httpClient.PostAsync("chat/completions", content);
-                var responseContent = await response.Content.ReadAsStringAsync();
-
-                // 3. DEBUG: Scriem ce a raspuns OpenAI in consola
-                System.Diagnostics.Debug.WriteLine($"[AI RESPONSE] Cod: {response.StatusCode}");
-                System.Diagnostics.Debug.WriteLine($"[AI BODY] {responseContent}");
+                var content = new StringContent(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json");
+                var response = await _client.PostAsync("chat/completions", content);
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    // --- TRUC DE DEBUG ---
-                    // Returnam Success = TRUE dar punem EROAREA in Label ca sa o vezi pe site!
-                    return new SentimentResult
-                    {
-                        Success = true,
-                        Label = $"ERR: {response.StatusCode}", // Aici va scrie eroarea pe site (ex: ERR: Unauthorized)
-                        Confidence = 0.0
-                    };
+                    _loggerInstance.LogError($"Eroare OpenAI: {response.StatusCode}");
+                    return new SentimentResult { Success = false, ErrorMessage = response.StatusCode.ToString() };
                 }
 
-                var openAiResponse = JsonSerializer.Deserialize<OpenAiResponse>(responseContent);
-                var assistantMessage = openAiResponse?.Choices?.FirstOrDefault()?.Message?.Content;
+                var responseContent = await response.Content.ReadAsStringAsync();
 
-                // Curatare JSON
-                if (!string.IsNullOrEmpty(assistantMessage))
+                // FOLOSIM CLASELE TALE REDENUMITE (Sentiment...)
+                var openAiResponse = JsonSerializer.Deserialize<SentimentOpenAiResponse>(responseContent);
+                var messageContent = openAiResponse?.Choices?.FirstOrDefault()?.Message?.Content;
+
+                if (!string.IsNullOrEmpty(messageContent))
                 {
-                    assistantMessage = assistantMessage.Replace("```json", "").Replace("```", "").Trim();
+                    messageContent = messageContent.Replace("```json", "").Replace("```", "").Trim();
                 }
 
                 var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                var sentimentData = JsonSerializer.Deserialize<SentimentResponse>(assistantMessage ?? "{}", options);
+
+                // Use the renamed DTO to avoid collisions with other SentimentResponse types in the project
+                var sentimentData = JsonSerializer.Deserialize<ParsedSentimentResponse>(messageContent ?? "{}", options);
 
                 return new SentimentResult
                 {
@@ -162,16 +106,39 @@ namespace LookIT.Services
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"[AI EXCEPTION] {ex.Message}");
-                // Afisam exceptia pe site
-                return new SentimentResult
-                {
-                    Success = true,
-                    Label = "EXCEPTIE",
-                    Confidence = 0.0,
-                    ErrorMessage = ex.Message
-                };
+                _loggerInstance.LogError(ex, "Eroare critica in serviciul de sentiment.");
+                return new SentimentResult { Success = false, ErrorMessage = ex.Message };
             }
         }
+    }
+
+    // --- CLASE INTERNE REDENUMITE (SPECIFICE TIE) ---
+    // Le-am pus prefixul "Sentiment" ca sa nu se bata cu cele ale colegei
+
+    public class SentimentOpenAiResponse
+    {
+        [JsonPropertyName("choices")]
+        public List<SentimentChoice>? Choices { get; set; }
+    }
+
+    public class SentimentChoice
+    {
+        [JsonPropertyName("message")]
+        public SentimentMessage? Message { get; set; }
+    }
+
+    public class SentimentMessage
+    {
+        [JsonPropertyName("content")]
+        public string? Content { get; set; }
+    }
+
+    // Renamed DTO to ParsedSentimentResponse to avoid ambiguity with other SentimentResponse definitions
+    public class ParsedSentimentResponse
+    {
+        [JsonPropertyName("label")]
+        public string? Label { get; set; }
+        [JsonPropertyName("confidence")]
+        public double Confidence { get; set; }
     }
 }

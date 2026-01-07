@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace LookIT.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -241,7 +241,10 @@ namespace LookIT.Migrations
                     TextContent = table.Column<string>(type: "nvarchar(max)", maxLength: 5000, nullable: true),
                     ImageUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     VideoUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    AuthorId = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true)
+                    AuthorId = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    SentimentLabel = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SentimentConfidence = table.Column<double>(type: "float", nullable: true),
+                    SentimentAnalyzedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -291,7 +294,9 @@ namespace LookIT.Migrations
                     ImageUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     VideoUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     GroupId = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true)
+                    UserId = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    IsSafe = table.Column<bool>(type: "bit", nullable: false),
+                    isReported = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -320,7 +325,10 @@ namespace LookIT.Migrations
                     DateModified = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Content = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    PostId = table.Column<int>(type: "int", nullable: false)
+                    PostId = table.Column<int>(type: "int", nullable: false),
+                    IsFlagged = table.Column<bool>(type: "bit", nullable: true),
+                    FlagCategory = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ModeratedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {

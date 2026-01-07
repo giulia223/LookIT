@@ -112,12 +112,7 @@
                 <span class="badge @badgeClass ms-2">@displayText</span>
             </div>
             
-            @if(Model.SentimentConfidence.HasValue)
-            {
-                <small class="text-muted">
-                    Încredere: @((Model.SentimentConfidence.Value * 100).ToString("0"))%
-                </small>
-            }
+          
         </div>
     </div>
 }
