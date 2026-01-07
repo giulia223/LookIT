@@ -12,7 +12,7 @@ using LookIT.Services;
 
 namespace LookIT.Controllers
 {
-    public class PostsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IWebHostEnvironment env, ISentimentAnalysisService sentimentService, IModerationService moderationSerivce) : Controller
+    public class PostsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IWebHostEnvironment env, ISentimentAnalysisService sentimentService, IModerationService moderationService) : Controller
     {
         private readonly ApplicationDbContext db = context;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
@@ -316,8 +316,16 @@ namespace LookIT.Controllers
                 post.SentimentLabel = result.Label;         // positive, neutral, negative
                
             }
+                else
+                {
+                    // FALLBACK: Daca AI-ul nu merge (nu sunt bani/net), punem default "neutral"
+                    // Astfel va aparea eticheta gri pe site, in loc sa nu apara nimic.
+                    post.SentimentLabel = "neutral";
+                    post.SentimentConfidence = 0.0;
+                    Console.WriteLine("Eroare AI: " + result.ErrorMessage);
+                }
 
-        }
+            }
             //preluam ID-ul utilizatorului care posteaza
             post.AuthorId = _userManager.GetUserId(User);
 
