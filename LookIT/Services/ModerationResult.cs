@@ -8,48 +8,66 @@ using Microsoft.Extensions.Logging;
 
 namespace LookIT.Services
 {
-    // Clasa pentru rezultatul moderarii
+    //clasa pentru rezultatul analizei comentariului
     public class ModerationResult
+
     {
+
+        //ne va intoarce true daca comentariul este intezis , false altfel
+
         public bool IsFlagged { get; set; }
+
+        //motivul blocarii publicarii comentariului
+
         public string? Reason { get; set; }
+
+        //ne spune daca apelul catre AI a reusit sau nu
+
         public bool Success { get; set; }
+
+        //mesajul de eroare tehnica (daca exista)
+
         public string? ErrorMessage { get; set; }
+
     }
 
-    // Interfata sistemului
+   //interfata sistemului pentru dependency injection
     public interface IModerationService
     {
-        // Metoda veche pentru comentarii sau texte simple
+        // Metoda  pentru comentarii 
         Task<ModerationResult> CheckContentAsync(string text);
 
-        // --- METODA NOUA PENTRU POSTARI ---
+        // Metoda pentru postari
         Task<ModerationResult> CheckPostAsync(string content);
     }
 
-    // Implementarea serviciului
+    //implementarea serviciului de analiza a comentariului folsing OpenAi API
     public class ModerationService : IModerationService
     {
         private readonly HttpClient _httpClient;
         private readonly string _apiKey;
         private readonly ILogger<ModerationService> _logger;
+        //constructorul serviciului
 
         public ModerationService(IConfiguration configuration, ILogger<ModerationService> logger)
         {
             _httpClient = new HttpClient();
+            //luam cheia din appsettings.json
             _apiKey = configuration["OpenAI:ApiKey"] ?? throw new ArgumentNullException("OpenAI:ApiKey not configured");
             _logger = logger;
-
+            //configurare HttpClient pentru OpenAI API
             _httpClient.BaseAddress = new Uri("https://api.openai.com/v1/");
+            //setam cheia de autorizare (Bearer sk-..)
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
+            //setam faptul ca trimitem/primim JSON
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
-        // Metoda noua care verifica o Postare completa (Titlu + Continut)
+        // Metoda noua care verifica o Postare completa (Continut)
         public async Task<ModerationResult> CheckPostAsync( string content)
         {
-            // Combinam titlul si continutul pentru a face un singur apel la AI (economie de bani)
-            // Punem etichete ca AI-ul sa stie care e titlul si care e continutul
+           
+            
             string combinedText = $"[CONTENT START] {content} [CONTENT END]";
 
             // Refolosim logica de baza de la CheckContentAsync
@@ -61,18 +79,27 @@ namespace LookIT.Services
         {
             try
             {
-                // Construim prompt-ul exact ca in cerinta ta
+                //construim prompt-ul pentru analiza de continut al comentariului
                 var systemPrompt = @"You are a content moderation assistant. Analyze the given text for: profanity,
-                                     hate speech, racism, homophobia, sexual content or violence. Respond ONLY with a JSON
-                                     object in this exact format:
-                                     {""isFlagged"" : true/false, ""category"": ""reason_or_null""}
-                                     
-                                     Rules:
-                                     -isFlagged: true if the text violates any rules, false otherwise.
-                                     -category: if flagged, put the reason (e.g. 'Hate Speech', 'Violence'). If safe, do not include any other text.";
 
+                                       hate speech, racism, homophobia, sexual content or violence.Respond ONLY with a JSON
+
+                                       object in this exact format:
+
+                                       {""isFlagged"" : true/false, ""category"": ""reason_or_null""}
+
+                                        
+
+                                       Rules:
+
+                                       -isFlagged: true is the text violates any rules, false otherwise.
+
+                                       -category: if flagged, put the reason (e.g. 'Hate Speech', 'Violence'). If safe, do
+
+                                       -not include any other text.";
+                //definim User Prompt (comentariul de verificat)
                 var userPrompt = $"Analyze the content of this text: \"{text}\"";
-
+                //construim request-ul pentru OpenAi API
                 var requestBody = new
                 {
                     model = "gpt-4o-mini",
@@ -88,7 +115,7 @@ namespace LookIT.Services
                 var jsonContent = JsonSerializer.Serialize(requestBody);
                 var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
                 _logger.LogInformation("Sending moderation request to OpenAI API");
-
+                //trimitem request-ul catre OpenAI API
                 var response = await _httpClient.PostAsync("chat/completions", content);
                 var responseContent = await response.Content.ReadAsStringAsync();
 
@@ -102,7 +129,7 @@ namespace LookIT.Services
                     };
                 }
 
-                // Parsam raspunsul (Folosim clasele interne definite jos)
+                //parsam raspunsul dat de OpenA
                 var openAiResponse = JsonSerializer.Deserialize<ModerationOpenAiResponse>(responseContent);
                 var assistantMessage = openAiResponse?.Choices?.FirstOrDefault()?.Message?.Content;
 
@@ -114,7 +141,7 @@ namespace LookIT.Services
                 // Curatam JSON-ul
                 assistantMessage = assistantMessage.Replace("```json", "").Replace("```", "").Trim();
                 _logger.LogInformation("OpenAI response: {Response}", assistantMessage);
-
+                //parsam JSON ul din raspunsul asistentului
                 var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
                 var moderationData = JsonSerializer.Deserialize<ModerationResponse>(assistantMessage, options);
 
@@ -122,7 +149,9 @@ namespace LookIT.Services
                 {
                     return new ModerationResult { Success = false, ErrorMessage = "Failed to parse API response" };
                 }
+                //validam si normalizam raspunsul bazat pe analiza comentariului
 
+                //returnam rezultatul
                 return new ModerationResult
                 {
                     Success = true,
