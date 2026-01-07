@@ -5,18 +5,17 @@
 @inject UserManager<ApplicationUser> UserManager
 
 @{
-    // Obtinem utilizatorul curent pentru a-i accesa poza
     var user = await UserManager.GetUserAsync(User);
 }
 
-<ul class="navbar-nav">
+@* Am adaugat clasele d-flex si align-items-center pentru aliniere verticala perfecta *@
+<ul class="navbar-nav d-flex align-items-center">
 
-   
     @if (SignInManager.IsSignedIn(User))
     {
-        @* DROPDOWN CU AVATAR *@
         <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle d-flex align-items-center gap-2 p-0 ms-2" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            @* Am scos ms-2 si am pus o clasa de centrare *@
+            <a class="nav-link dropdown-toggle d-flex align-items-center gap-2 p-0" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 @if (user != null && !string.IsNullOrEmpty(user.ProfilePictureUrl))
                 {
                     <img src="@user.ProfilePictureUrl" alt="Profile" class="rounded-circle border" style="width: 32px; height: 32px; object-fit: cover;">
@@ -30,23 +29,17 @@
             </a>
 
             <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3 mt-2" aria-labelledby="navbarDropdown">
-                @* Link catre Profilul Public *@
                 <li>
                     <a class="dropdown-item d-flex align-items-center gap-2 py-2" asp-controller="Profile" asp-action="Details" asp-route-userId="@UserManager.GetUserId(User)">
                         <i class="bi bi-person-circle text-muted"></i> Profilul meu
                     </a>
                 </li>
-
-                @* Link catre Setari (Identity) - Optional, il avem si pe profil acum *@
                 <li>
                     <a class="dropdown-item d-flex align-items-center gap-2 py-2" asp-area="Identity" asp-page="/Account/Manage/Index">
                         <i class="bi bi-gear text-muted"></i> Setări
                     </a>
                 </li>
-
                 <li><hr class="dropdown-divider"></li>
-
-                @* Logout *@
                 <li>
                     <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Posts", new { area = "" })">
                         <button type="submit" class="dropdown-item d-flex align-items-center gap-2 py-2 text-danger">
@@ -59,11 +52,18 @@
     }
     else
     {
-        <li class="nav-item">
-            <a class="nav-link text-dark fw-medium" asp-area="Identity" asp-page="/Account/Login">Autentificare</a>
+        @* Folosim d-flex si aici pentru a asigura alinierea *@
+        <li class="nav-item d-flex align-items-center">
+            <a class="nav-link text-light fw-medium" asp-area="Identity" asp-page="/Account/Login">Autentificare</a>
         </li>
-        <li class="nav-item">
-            <a class="btn btn-primary btn-sm rounded-pill px-3 ms-2 fw-bold" asp-area="Identity" asp-page="/Account/Register">Înregistrare</a>
+        <li class="nav-item d-flex align-items-center">
+            @* Am scos ms-2 care putea impinge butonul si am pus o margine mai controlata *@
+            <a class="btn btn-primary btn-sm rounded-pill px-3 ms-2 fw-bold d-inline-flex align-items-center"
+               asp-area="Identity" asp-page="/Account/Register"
+               style="height: 32px;">
+                @* Am setat inaltimea egala cu cea a avatarului pentru consistenta *@
+                Înregistrare
+            </a>
         </li>
     }
 </ul>

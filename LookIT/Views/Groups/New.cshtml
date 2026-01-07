@@ -10,50 +10,58 @@
 
                 @if (ViewBag.message != null)
                 {
-                    <div class="alert bg-light text-center mb-4 shadow-sm p-3" style="color: #B13079; border-radius: 12px;">
+                    @* Alertă neutră cu accent magenta *@
+                    <div class="alert text-center mb-4 shadow-sm p-3 border-0" style="background-color: #FDF2F7; color: #B13079; border-radius: 12px;">
                         <i class="bi bi-info-circle-fill me-2"></i>
                         @ViewBag.message
                     </div>
                 }
 
-                <div class="card border-0 shadow-sm lookit-card-form">
+                @* Card Alb Pur cu design minimalist *@
+                <div class="card lookit-card-form border-0 shadow-sm" style="background-color: #ffffff; border-radius: 15px;">
 
                     <div class="card-header border-0 bg-white pt-4 pb-0 px-4 text-center">
-                        <h3 class="fw-bold lookit-title">Create New Group</h3>
+                        <h3 class="fw-bold" style="color: #1c1e21;">Creează un nou grup</h3>
                         <p class="text-muted small">Începe o comunitate nouă și invită-ți prietenii.</p>
-                        <hr class="opacity-10" />
+                        <hr style="border-top: 1px solid #E4E6EB; opacity: 1;" />
                     </div>
 
                     <div class="card-body p-4">
                         <form asp-controller="Groups" asp-action="New" method="post">
 
+                            @* Input Nume Grup *@
                             <div class="form-group mb-3">
-                                <label asp-for="GroupName" class="form-label fw-bold text-dark">Group Name</label>
+                                <label asp-for="GroupName" class="form-label fw-bold ms-1" style="color: #1c1e21; font-size: 0.9rem;">Numele Grupului</label>
                                 <div class="input-group">
-                                    <span class="input-group-text border-0" style="border-radius: 12px 0 0 12px;">
+                                    <span class="input-group-text border-0 custom-addon">
                                         <i class="bi bi-people"></i>
                                     </span>
-                                    <input asp-for="GroupName" class="form-control bg-light"
+                                    <input asp-for="GroupName" class="form-control custom-input"
                                            placeholder="Ex: Pasionați de Tehnologie"
                                            style="border-radius: 0 12px 12px 0; padding: 12px;" />
                                 </div>
-                                <span asp-validation-for="GroupName" class="text-danger small"></span>
+                                <span asp-validation-for="GroupName" class="text-danger small ms-1"></span>
                             </div>
 
+                            @* Input Descriere *@
                             <div class="form-group mb-4">
-                                <label asp-for="Description" class="form-label fw-bold text-dark">Description</label>
-                                <textarea asp-for="Description" class="form-control bg-light lookit-textarea" rows="4"
-                                          placeholder="Despre ce este acest grup?"></textarea>
-                                <span asp-validation-for="Description" class="text-danger small"></span>
+                                <label asp-for="Description" class="form-label fw-bold ms-1" style="color: #1c1e21; font-size: 0.9rem;">Descriere</label>
+                                <textarea asp-for="Description" class="form-control lookit-textarea custom-input"
+                                          rows="4"
+                                          placeholder="Despre ce este acest grup?"
+                                          style="border-radius: 12px; padding: 12px;"></textarea>
+                                <span asp-validation-for="Description" class="text-danger small ms-1"></span>
                             </div>
 
+                            @* Butoane Acțiune *@
                             <div class="d-grid gap-2">
-                                <button type="submit" class="btn btn-primary btn-lg shadow-sm py-2">
-                                    Create Group
+                                <button type="submit" class="btn btn-primary btn-lg py-2 shadow-sm"
+                                        style="background-color: #B13079; border: none; font-weight: 700; border-radius: 50rem;">
+                                    Creează grup
                                 </button>
 
-                                <a asp-controller="GroupMembers" asp-action="Show" class="btn-discard text-center text-decoration-none mt-2">
-                                    Cancel and go back
+                                <a asp-controller="GroupMembers" asp-action="Show" class="btn-discard text-decoration-none">
+                                    Renunță
                                 </a>
                             </div>
                         </form>
@@ -62,7 +70,7 @@
 
                 <div class="text-center mt-4">
                     <p class="text-muted small">
-                        <i class="bi bi-shield-check text-magenta"></i> Vei deveni automat moderatorul acestui grup.
+                        <i class="bi bi-shield-check" style="color: #B13079;"></i> Vei deveni automat moderatorul acestui grup.
                     </p>
                 </div>
 
@@ -70,3 +78,63 @@
         </div>
     </div>
 </div>
+
+<style>
+    /* Stil pentru input-uri (Gri la repaus, Alb la focus) */
+    .custom-input {
+        background-color: #F0F2F5 !important;
+        border: 1px solid #E4E6EB !important;
+        color: #1c1e21 !important;
+        transition: all 0.2s ease-in-out !important;
+    }
+
+        .custom-input:focus {
+            background-color: #ffffff !important;
+            border-color: #B13079 !important;
+            box-shadow: 0 0 0 0.2rem rgba(177, 48, 121, 0.1) !important;
+            outline: none !important;
+        }
+
+    /* Stil pentru iconița laterală */
+    .custom-addon {
+        background-color: #F0F2F5 !important;
+        border: 1px solid #E4E6EB !important;
+        border-right: none !important;
+        color: #8d949e;
+        border-radius: 12px 0 0 12px !important;
+        transition: all 0.2s ease;
+    }
+
+    .input-group:focus-within .custom-addon {
+        background-color: #ffffff !important;
+        border-color: #B13079 !important;
+        color: #B13079 !important;
+    }
+
+    /* Buton Renunță - Gri care devine roz pal la hover */
+    .btn-discard {
+        text-align: center;
+        margin-top: 0.5rem;
+        color: #8d949e;
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: block;
+        padding: 8px;
+        border-radius: 50rem;
+        transition: all 0.2s ease;
+    }
+
+        .btn-discard:hover {
+            color: #B13079;
+            background-color: #FDF2F7;
+        }
+
+    .lookit-textarea {
+        resize: none;
+    }
+
+    .form-control::placeholder {
+        color: #8d949e;
+        opacity: 0.7;
+    }
+</style>

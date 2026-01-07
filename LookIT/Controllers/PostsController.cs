@@ -12,7 +12,7 @@ using LookIT.Services;
 
 namespace LookIT.Controllers
 {
-    public class PostsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IWebHostEnvironment env, ISentimentAnalysisService sentimentService, IModerationService moderationSerivce) : Controller
+    public class PostsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IWebHostEnvironment env, IModerationService moderationService) : Controller
     {
         private readonly ApplicationDbContext db = context;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
@@ -20,7 +20,6 @@ namespace LookIT.Controllers
         private readonly IWebHostEnvironment _env = env;
         private readonly IModerationService _moderationService = moderationService;
 
-        private readonly ISentimentAnalysisService _sentimentService = sentimentService;
 
         //au acces la aceasta metoda atat utilizatorii inregistrati, cat si neinregistrati si administratorii
         //afisarea postarilor apartinand conturilor publice sau urmaritorilor (daca sunt conturi private)
@@ -308,16 +307,16 @@ namespace LookIT.Controllers
             bool hasVideo = Video != null && Video.Length > 0;
             post.Date = DateTime.Now;
 
-            if (!string.IsNullOrWhiteSpace(post.TextContent))
-        {
-            var result = await _sentimentService.AnalyzeSentimentAsync(post.TextContent);
-            if (result.Success)
-            {
-                post.SentimentLabel = result.Label;         // positive, neutral, negative
+        //    if (!string.IsNullOrWhiteSpace(post.TextContent))
+        //{
+        //    var result = await _sentimentService.AnalyzeSentimentAsync(post.TextContent);
+        //    if (result.Success)
+        //    {
+        //        post.SentimentLabel = result.Label;         // positive, neutral, negative
                
-            }
+        //    }
 
-        }
+        //}
             //preluam ID-ul utilizatorului care posteaza
             post.AuthorId = _userManager.GetUserId(User);
 
@@ -476,25 +475,25 @@ namespace LookIT.Controllers
 
                     // ---  ANALIZA SENTIMENTULUI ---
                     // Verificam daca avem continut de analizat (text sau imagine noua)
-                    if (!string.IsNullOrWhiteSpace(post.TextContent))
-                    {
-                        var result = await _sentimentService.AnalyzeSentimentAsync(post.TextContent);
-                        if (result.Success)
-                        {
-                            post.SentimentLabel = result.Label;
+                    //if (!string.IsNullOrWhiteSpace(post.TextContent))
+                    //{
+                    //    var result = await _sentimentService.AnalyzeSentimentAsync(post.TextContent);
+                    //    if (result.Success)
+                    //    {
+                    //        post.SentimentLabel = result.Label;
                            
-                        }
-                    }
-                    else
-                    {
-                        // Daca nu mai avem text si nici imagine noua, dar poate a ramas imaginea veche...
-                        // E un caz mai complicat. Simplificam: daca goleste textul, resetam sentimentul pe Safe temporar.
-                        if (string.IsNullOrWhiteSpace(post.TextContent) && (Image == null))
-                        {
-                            post.SentimentLabel = "neutral";
+                    //    }
+                    //}
+                    //else
+                    //{
+                    //    // Daca nu mai avem text si nici imagine noua, dar poate a ramas imaginea veche...
+                    //    // E un caz mai complicat. Simplificam: daca goleste textul, resetam sentimentul pe Safe temporar.
+                    //    if (string.IsNullOrWhiteSpace(post.TextContent) && (Image == null))
+                    //    {
+                    //        post.SentimentLabel = "neutral";
                            
-                        }
-                    }
+                    //    }
+                    //}
 
                     // daca am ales o poza, o vom modifica
                     if (Image != null && Image.Length > 0)

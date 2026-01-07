@@ -18,18 +18,18 @@ namespace LookIT.Services
     }
 
     // Interfata serviciului pentru dependency injection
-    public interface ISentimentAnalysisService
+    public interface IMesajeAnalizaService
     {
         Task<SentimentMessageResult> AnalyzeSentimentAsync(string text);
     }
 
     // Implementarea serviciului de analiza de sentiment folosind OpenAI API
-    public class SentimentAnalysisService : ISentimentAnalysisService
+    public class MesajeAnalizaService : IMesajeAnalizaService
     {
         private readonly HttpClient _httpClient;
         private readonly string _apiKey;
-        private readonly ILogger<SentimentAnalysisService> _logger;
-        public SentimentAnalysisService(IConfiguration configuration, ILogger<SentimentAnalysisService> logger)
+        private readonly ILogger<MesajeAnalizaService> _logger;
+        public MesajeAnalizaService(IConfiguration configuration, ILogger<MesajeAnalizaService> logger)
         {
             _httpClient = new HttpClient();
             _apiKey = configuration["OpenAI:ApiKey"] ?? throw new
@@ -161,18 +161,19 @@ namespace LookIT.Services
             }
         }
     }
-    // Clase pentru deserializarea raspunsului OpenAI
-    //public class OpenAiResponse
+
+    // //Clase pentru deserializarea raspunsului OpenAI
+    //public class Open_AiResponse
     //{
     //    [JsonPropertyName("choices")]
     //    public List<Choice>? Choices { get; set; }
     //}
-    //public class Choice
+    //public class CHOICE
     //{
     //    [JsonPropertyName("message")]
     //    public Message? Message { get; set; }
     //}
-    //public class Message
+    //public class Mssg
     //{
     //    [JsonPropertyName("content")]
     //    public string? Content { get; set; }

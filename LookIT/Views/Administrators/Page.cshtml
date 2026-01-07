@@ -9,31 +9,31 @@
         <div class="row mb-5">
             <div class="col-12 text-center">
                 <div class="mb-3">
-                    <i class="bi bi-shield-lock-fill lookit-title" style="font-size: 3.5rem;"></i>
+                    @* Am folosit un gri închis/negru pentru iconița principală pentru autoritate *@
+                    <i class="bi bi-shield-lock-fill" style="font-size: 3.5rem; color: #1c1e21;"></i>
                 </div>
-                <h2 class="fw-bold lookit-title">Panou de Control Administrator</h2>
+                <h2 class="fw-bold lookit-title" style="color: #1c1e21;">Panou de Control Administrator</h2>
                 <p class="text-muted mx-auto" style="max-width: 600px;">
-                    Gestionează comunitatea LookIT: monitorizează utilizatorii, moderează conținutul și asigură respectarea regulamentului platformei.
+                    Gestionează comunitatea LookIT: monitorizează utilizatorii, moderează conținutul și asigură respectarea regulamentului.
                 </p>
             </div>
         </div>
 
         <div class="row g-4 justify-content-center">
 
-            @* GESTIONARE UTILIZATORI *@
+            @* GESTIONARE UTILIZATORI - ACCENT ALBASTRU *@
             <div class="col-md-4">
-                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden group-card-index">
+                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden admin-card card-users">
                     <div class="card-body text-center p-4">
-                        <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
-                             style="width: 80px; height: 80px; background-color: #FDF2F7;">
-                            <i class="bi bi-people-fill lookit-title" style="font-size: 2.2rem;"></i>
+                        <div class="icon-shape rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3">
+                            <i class="bi bi-people-fill" style="font-size: 2.2rem;"></i>
                         </div>
-                        <h4 class="fw-bold lookit-title">Utilizatori</h4>
+                        <h4 class="fw-bold text-black">Utilizatori</h4>
                         <p class="text-muted small">
                             Vezi lista completă a membrilor, editează profiluri sau suspendă conturile care nu respectă regulile.
                         </p>
                         <div class="mt-4">
-                            <a href="/Administrators/Index" class="btn btn-primary w-100 py-2">
+                            <a href="/Administrators/Index" class="btn btn-outline-primary w-100 py-2 rounded-pill fw-bold">
                                 Vezi toți utilizatorii
                             </a>
                         </div>
@@ -41,21 +41,19 @@
                 </div>
             </div>
 
-            @* MODERARE GRUPURI *@
+            @* MODERARE GRUPURI - ACCENT VERDE *@
             <div class="col-md-4">
-                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden group-card-index">
+                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden admin-card card-groups">
                     <div class="card-body text-center p-4">
-                        <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
-                             style="width: 80px; height: 80px; background-color: #FDF2F7;">
-                            <i class="bi bi-grid-3x3-gap-fill lookit-title" style="font-size: 2.2rem;"></i>
+                        <div class="icon-shape rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3">
+                            <i class="bi bi-grid-3x3-gap-fill" style="font-size: 2.2rem;"></i>
                         </div>
-                        <h4 class="fw-bold lookit-title">Grupuri</h4>
+                        <h4 class="fw-bold text-black">Grupuri</h4>
                         <p class="text-muted small">
                             Monitorizează comunitățile create, verifică descrierile și intervine în caz de raportări.
                         </p>
                         <div class="mt-4">
-                           
-                            <a href="/Groups/Index" class="btn btn-magenta-outline w-100 py-2">
+                            <a href="/Groups/Index" class="btn btn-outline-success w-100 py-2 rounded-pill fw-bold">
                                 Administrează grupuri
                             </a>
                         </div>
@@ -63,20 +61,19 @@
                 </div>
             </div>
 
-            @* RAPORTARI & SPAM *@
+            @* RAPORTARI - ACCENT ROȘU (CRITIC) *@
             <div class="col-md-4">
-                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden group-card-index">
+                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden admin-card card-reports">
                     <div class="card-body text-center p-4">
-                        <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
-                             style="width: 80px; height: 80px; background-color: #FDF2F7;">
-                            <i class="bi bi-exclamation-octagon-fill lookit-title" style="font-size: 2.2rem;"></i>
+                        <div class="icon-shape rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3">
+                            <i class="bi bi-exclamation-octagon-fill" style="font-size: 2.2rem;"></i>
                         </div>
-                        <h4 class="fw-bold lookit-title">Raportări</h4>
+                        <h4 class="fw-bold text-black">Raportări</h4>
                         <p class="text-muted small">
                             Analizează mesajele raportate de utilizatori și ia măsuri împotriva conținutului neadecvat.
                         </p>
                         <div class="mt-4">
-                            <a href="/Messages/Index" class="btn btn-magenta-outline w-100 py-2">
+                            <a href="/Messages/Index" class="btn btn-outline-danger w-100 py-2 rounded-pill fw-bold">
                                 Vezi mesaje raportate
                             </a>
                         </div>
@@ -89,15 +86,84 @@
 </div>
 
 <style>
-
-    .group-card-index {
+    /* Efecte generale pe carduri */
+    .admin-card {
         transition: all 0.3s ease;
-        border-bottom: 4px solid transparent !important;
+        background-color: #ffffff;
     }
 
-        .group-card-index:hover {
+        .admin-card:hover {
             transform: translateY(-10px);
-            border-bottom: 4px solid #B13079 !important;
-            border-left: none !important;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
         }
+
+    .icon-shape {
+        width: 80px;
+        height: 80px;
+        transition: all 0.3s ease;
+    }
+
+    /* Stilizare Culori - Utilizatori (Albastru) */
+    .card-users .icon-shape {
+        background-color: #E7F0FF;
+        color: #0D6EFD;
+    }
+
+    .card-users:hover {
+        border-bottom: 4px solid #0D6EFD !important;
+    }
+
+    .btn-outline-primary {
+        border: 2px solid #0D6EFD;
+        color: #0D6EFD;
+    }
+
+        .btn-outline-primary:hover {
+            background-color: #0D6EFD;
+            color: white;
+        }
+
+    /* Stilizare Culori - Grupuri (Verde) */
+    .card-groups .icon-shape {
+        background-color: #E8F5E9;
+        color: #2E7D32;
+    }
+
+    .card-groups:hover {
+        border-bottom: 4px solid #2E7D32 !important;
+    }
+
+    .btn-outline-success {
+        border: 2px solid #2E7D32;
+        color: #2E7D32;
+    }
+
+        .btn-outline-success:hover {
+            background-color: #2E7D32;
+            color: white;
+        }
+
+    /* Stilizare Culori - Raportări (Roșu) */
+    .card-reports .icon-shape {
+        background-color: #FFEBEE;
+        color: #D32F2F;
+    }
+
+    .card-reports:hover {
+        border-bottom: 4px solid #D32F2F !important;
+    }
+
+    .btn-outline-danger {
+        border: 2px solid #D32F2F;
+        color: #D32F2F;
+    }
+
+        .btn-outline-danger:hover {
+            background-color: #D32F2F;
+            color: white;
+        }
+
+    .text-black {
+        color: #1c1e21 !important;
+    }
 </style>

@@ -3,10 +3,6 @@
 @inject UserManager<ApplicationUser> UserManager
 @model LookIT.Models.Message
 
-@{
-    ViewData["Title"] = "Edit Message";
-}
-
 <div class="py-5">
     <div class="container">
         <div class="row justify-content-center">
@@ -14,17 +10,17 @@
 
                 @if (TempData["message"] != null)
                 {
-                    <div class="alert bg-light text-center mb-4 shadow-sm p-3 border-0" style="color: #B13079; border-radius: 12px;">
+                    @* Alertă subtilă - gri cu text magenta *@
+                    <div class="alert text-center mb-4 shadow-sm p-3 border-0" style="background-color: #F0F2F5; color: #B13079; border-radius: 12px;">
                         <i class="bi bi-info-circle-fill me-2"></i>
                         @TempData["message"]
                     </div>
                 }
 
-                <div class="card lookit-card-form border-0 shadow-sm rounded-4 overflow-visible">
+                <div class="card lookit-card-form border-0 shadow-sm rounded-4 bg-white">
 
-                    <div class="card-header bg-white border-bottom py-3 px-4 d-flex justify-content-between align-items-center">
-                        <h5 class="fw-bold mb-0 lookit-title">Editează Mesajul Tău</h5>
-                       
+                    <div class="card-header bg-white border-bottom py-3 px-4">
+                        <h5 class="fw-bold mb-0 text-black">Editează Mesajul Tău</h5>
                     </div>
 
                     <div class="card-body p-4">
@@ -34,62 +30,65 @@
                             <input type="hidden" asp-for="MessageId" />
                             <input type="hidden" asp-for="GroupId" />
 
+                            @* Editor Text *@
                             <div class="mb-4">
-                                <label asp-for="TextContent" class="form-label fw-bold lookit-title small text-uppercase">Conținut mesaj</label>
+                                <label asp-for="TextContent" class="form-label fw-bold text-black small text-uppercase">Conținut mesaj</label>
                                 <textarea asp-for="TextContent" class="form-control summernote"></textarea>
                             </div>
 
+                            @* Secțiunea Media - Gri neutru pentru echilibru *@
                             <div class="row mb-4">
                                 <div class="col-md-6 mb-3 mb-md-0">
-                                    <label class="form-label fw-bold lookit-title small text-uppercase">Imagine</label>
+                                    <label class="form-label fw-bold text-black small text-uppercase">Imagine</label>
                                     <div class="position-relative">
                                         <input type="file" name="Image" id="imageInput" class="position-absolute top-0 start-0 w-100 h-100 opacity-0 cursor-pointer" style="z-index: 10;" accept="image/*" />
-                                        <div class="lookit-upload-box shadow-sm py-3 text-center rounded-3 bg-light">
-                                            <i class="bi bi-image fs-3 d-block mb-1 text-magenta"></i>
-                                            <span class="small fw-bold text-magenta">Schimbă Foto</span>
+                                        <div class="upload-zone py-3 text-center rounded-3">
+                                            <i class="bi bi-image fs-4 d-block mb-1"></i>
+                                            <span class="small fw-bold">Schimbă Foto</span>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label class="form-label fw-bold lookit-title small text-uppercase">Video</label>
+                                    <label class="form-label fw-bold text-black small text-uppercase">Video</label>
                                     <div class="position-relative">
                                         <input type="file" name="Video" id="videoInput" class="position-absolute top-0 start-0 w-100 h-100 opacity-0 cursor-pointer" style="z-index: 10;" accept="video/*" />
-                                        <div class="lookit-upload-box shadow-sm py-3 text-center rounded-3 bg-light">
-                                            <i class="bi bi-camera-video-fill fs-3 d-block mb-1 text-magenta"></i>
-                                            <span class="small fw-bold text-magenta">Schimbă Video</span>
+                                        <div class="upload-zone py-3 text-center rounded-3">
+                                            <i class="bi bi-camera-video fs-4 d-block mb-1"></i>
+                                            <span class="small fw-bold">Schimbă Video</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="row mb-4">
-                                <div class="col-12">
-                                    @if (!string.IsNullOrEmpty(Model.ImageUrl))
-                                    {
-                                        <div id="currentImageContainer" class="bg-light text-center p-3 rounded-3 border-0 mb-3">
-                                            <p class="lookit-title small fw-bold text-uppercase mb-2">Imagine curentă</p>
-                                            <img src="@Model.ImageUrl" class="img-fluid rounded-3 shadow-sm mb-2" style="max-height: 200px;" />
-                                            <div class="form-check d-flex justify-content-center">
-                                                <input class="form-check-input border-danger me-2 shadow-none" type="checkbox" name="DeleteImage" value="true" id="delImg">
-                                                <label class="form-check-label text-danger fw-bold small" for="delImg">Șterge imaginea</label>
-                                            </div>
-                                        </div>
-                                    }
-                                    <div id="newImageContainer" class="d-none bg-light text-center p-3 rounded-3 mb-3">
-                                        <p class="lookit-title small fw-bold text-uppercase mb-2">Previzualizare Nouă</p>
-                                        <img id="newImagePreview" src="#" class="img-fluid rounded-3 shadow-sm" style="max-height: 200px;" />
+                            @* Previzualizare Media existentă *@
+                            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                            {
+                                <div id="currentImageContainer" class="p-3 rounded-4 mb-4 text-center" style="background-color: #F8F9FA; border: 1px solid #E4E6EB;">
+                                    <p class="text-black small fw-bold text-uppercase mb-3">Imagine curentă</p>
+                                    <img src="@Model.ImageUrl" class="img-fluid rounded-3 shadow-sm mb-3" style="max-height: 250px;" />
+
+                                    @* Pete de culoare: Roșu pentru acțiunea de ștergere *@
+                                    <div class="form-check d-flex justify-content-center">
+                                        <input class="form-check-input me-2 shadow-none border-danger" type="checkbox" name="DeleteImage" value="true" id="delImg">
+                                        <label class="form-check-label text-danger fw-bold small" for="delImg">Șterge această imagine</label>
                                     </div>
                                 </div>
+                            }
+
+                            @* Container pentru previzualizarea din JS-ul tău *@
+                            <div id="newImageContainer" class="d-none p-3 rounded-4 mb-4 text-center" style="background-color: #F8F9FA; border: 1px solid #E4E6EB;">
+                                <p class="text-black small fw-bold text-uppercase mb-2">Previzualizare Nouă</p>
+                                <img id="newImagePreview" src="#" class="img-fluid rounded-3 shadow-sm" style="max-height: 250px;" />
                             </div>
 
-                            <div class="d-grid gap-3 mt-4">
-                                <button type="submit" class="btn btn-primary-lookit btn-lg py-3">
-                                    <i class="bi bi-check-circle-fill me-2"></i> Salvează Modificările
+                            @* Butoane de acțiune - Balans între Magenta și Gri *@
+                            <div class="d-grid gap-2 mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg py-2 fw-bold rounded-pill shadow-sm">
+                                    Salvează Modificările
                                 </button>
-
-                                <a href="/Groups/Show/@Model.GroupId" class="btn-discard-lookit text-center py-2">
-                                    Anulează și abandonează
+                                <a href="/Groups/Show/@Model.GroupId" class="btn-discard text-decoration-none">
+                                    Anulează
                                 </a>
                             </div>
 
@@ -102,13 +101,45 @@
 </div>
 
 <style>
-
-    .text-magenta {
-        color: #B13079 !important;
+    /* Culori text */
+    .text-black {
+        color: #1c1e21 !important;
     }
 
-    .lookit-card-form {
-        border-radius: 20px !important;
+    /* Zonele de upload - Gri discret care devine negru/alb la hover */
+    .upload-zone {
+        background-color: #F0F2F5;
+        border: 1px solid #E4E6EB;
+        color: #8d949e;
+        transition: all 0.2s ease;
+    }
+
+        .upload-zone:hover {
+            background-color: #E4E6EB;
+            color: #1c1e21;
+            border-color: #ccd0d5;
+        }
+
+    /* Butonul Anulează - Gri neutru care devine Roz pal la hover */
+    .btn-discard {
+        text-align: center;
+        color: #8d949e;
+        font-weight: 600;
+        font-size: 0.9rem;
+        padding: 10px;
+        border-radius: 50rem;
+        transition: all 0.2s ease;
+    }
+
+        .btn-discard:hover {
+            background-color: #FDF2F7;
+            color: #B13079;
+        }
+
+    /* Ajustare Summernote pentru aspect modern */
+    .note-editor.note-frame {
+        border: 1px solid #E4E6EB !important;
+        border-radius: 12px !important;
+        overflow: hidden;
     }
 </style>
-

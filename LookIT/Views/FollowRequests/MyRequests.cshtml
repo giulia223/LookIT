@@ -5,18 +5,17 @@
 
 <div class="container mt-4 mb-5" style="max-width: 600px;">
 
-    @* --- 1. HEADER (Buton Înapoi + Titlu + Badge) --- *@
+    @* --- 1. HEADER --- *@
     <div class="d-flex align-items-center mb-4">
-        @* Buton Înapoi *@
-        <a href="javascript:history.back()" class="btn btn-light rounded-circle shadow-sm d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
-            <i class="bi bi-arrow-left"></i>
+        <a href="javascript:history.back()" class="btn btn-back shadow-sm me-3">
+            <i class="bi bi-chevron-left"></i>
         </a>
 
         <div class="d-flex align-items-center">
-            <h4 class="fw-bold mb-0 me-2">Cereri de urmărire</h4>
+            <h4 class="fw-bold mb-0 text-black">Cereri de urmărire</h4>
             @if (Model.Any())
             {
-                <span class="badge rounded-pill bg-danger" style="background-color: #B13079 !important;">
+                <span class="badge rounded-pill ms-2" style="background-color: #B13079;">
                     @Model.Count noi
                 </span>
             }
@@ -25,20 +24,15 @@
 
     @if (!Model.Any())
     {
-        @* --- 2. EMPTY STATE (Stilizat cu cerc roz) --- *@
-        <div class="text-center py-5 bg-white border-0 shadow-sm rounded-4 mt-2">
-
-            <div class="mb-4 d-inline-block">
-                @* Cercul Roz Pal *@
-                <div class="rounded-circle d-flex align-items-center justify-content-center"
-                     style="width: 100px; height: 100px; background-color: #FBF1F7;">
-                    @* Iconița Magenta *@
-                    <i class="bi bi-person-check" style="font-size: 3rem; color: #B13079;"></i>
+        @* --- 2. EMPTY STATE --- *@
+        <div class="card border-0 shadow-sm rounded-4 py-5 text-center">
+            <div class="card-body">
+                <div class="empty-state-icon mx-auto mb-4">
+                    <i class="bi bi-person-plus"></i>
                 </div>
+                <h5 class="fw-bold text-black">Totul e la zi</h5>
+                <p class="text-muted small">Nu ai nicio cerere de urmărire în așteptare.</p>
             </div>
-
-            <h5 class="fw-bold text-dark">Totul e la zi</h5>
-            <p class="text-muted small mb-0">Nu ai nicio cerere de urmărire în așteptare.</p>
         </div>
     }
     else
@@ -50,17 +44,16 @@
                 {
                     <div class="request-item d-flex align-items-center justify-content-between p-3 border-bottom">
 
-                        @* INFO UTILIZATOR (Stânga) *@
+                        @* INFO UTILIZATOR *@
                         <div class="d-flex align-items-center flex-grow-1 overflow-hidden">
-                            <a asp-controller="Profile" asp-action="Details" asp-route-userId="@req.FollowerId">
+                            <a asp-controller="Profile" asp-action="Details" asp-route-userId="@req.FollowerId" class="text-decoration-none">
                                 <img src="@(!string.IsNullOrEmpty(req.Follower.ProfilePictureUrl) ? req.Follower.ProfilePictureUrl : "/images/default-profile.png")"
-                                     class="rounded-circle border me-3"
-                                     style="width: 48px; height: 48px; object-fit: cover;"
+                                     class="rounded-circle profile-img-request me-3"
                                      alt="Profile">
                             </a>
                             <div class="d-flex flex-column text-truncate">
                                 <a asp-controller="Profile" asp-action="Details" asp-route-userId="@req.FollowerId"
-                                   class="text-decoration-none text-dark fw-bold text-truncate"
+                                   class="text-decoration-none text-black fw-bold text-truncate"
                                    style="font-size: 0.95rem;">
                                     @req.Follower.FullName
                                 </a>
@@ -70,22 +63,22 @@
                             </div>
                         </div>
 
-                        @* BUTOANE ACȚIUNE (Dreapta) *@
+                        @* BUTOANE ACȚIUNE (VERDE / ROȘU) *@
                         <div class="d-flex gap-2 ms-3">
-                            @* BUTON CONFIRMĂ (Magenta) *@
+                            @* Acceptă - Verde *@
                             <form asp-action="HandleRequest" method="post">
                                 <input type="hidden" name="requestId" value="@req.Id" />
                                 <input type="hidden" name="decision" value="accept" />
-                                <button type="submit" class="btn btn-primary btn-sm px-3 fw-bold rounded-pill shadow-sm" style="min-width: 80px;">
+                                <button type="submit" class="btn btn-accept-request shadow-sm">
                                     Confirmă
                                 </button>
                             </form>
 
-                            @* BUTON ȘTERGE *@
+                            @* Șterge - Roșu Soft *@
                             <form asp-action="HandleRequest" method="post">
                                 <input type="hidden" name="requestId" value="@req.Id" />
                                 <input type="hidden" name="decision" value="decline" />
-                                <button type="submit" class="btn btn-light border btn-sm px-3 fw-bold rounded-pill text-secondary" style="min-width: 80px;">
+                                <button type="submit" class="btn btn-decline-request">
                                     Șterge
                                 </button>
                             </form>
@@ -98,20 +91,101 @@
     }
 </div>
 
-@* --- 4. STILURI CSS --- *@
-<style>
-    /* Eliminăm bordura de la ultimul element pentru aspect curat */
-    .request-item:last-child {
-        border-bottom: none !important;
-    }
 
-    /* Efect subtil la hover pe rând */
-    .request-item {
-        transition: background-color 0.2s ease;
-        background-color: #fff;
-    }
-
-        .request-item:hover {
-            background-color: #FBF1F7; /* Roz pal la hover */
+    <style>
+        /* Fundal general din paleta ta */
+        body {
+            background-color: #F7F8FA;
         }
-</style>
+
+        .text-black {
+            color: #1c1e21 !important;
+        }
+
+        /* Butonul înapoi gri/alb */
+        .btn-back {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background-color: #ffffff;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1c1e21;
+            transition: all 0.2s;
+        }
+
+            .btn-back:hover {
+                background-color: #F0F2F5;
+                transform: translateX(-3px);
+            }
+
+        /* Empty state styling */
+        .empty-state-icon {
+            width: 90px;
+            height: 90px;
+            background-color: #FDF2F7;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #B13079;
+            font-size: 2.5rem;
+        }
+
+        /* Imagine profil */
+        .profile-img-request {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border: 2px solid #F0F2F5;
+        }
+
+        /* Rândul de cerere */
+        .request-item {
+            transition: background-color 0.2s ease;
+            border-color: #E4E6EB !important;
+        }
+
+            .request-item:hover {
+                background-color: #F8F9FA;
+            }
+
+            .request-item:last-child {
+                border-bottom: none !important;
+            }
+
+        /* Butoanele de acțiune - Culori funcționale */
+        .btn-accept-request {
+            background-color: #2E7D32; /* Verde forestier (profesional) */
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 50rem;
+            font-size: 0.85rem;
+            font-weight: 700;
+            transition: all 0.2s;
+        }
+
+            .btn-accept-request:hover {
+                background-color: #1B5E20;
+                transform: translateY(-2px);
+            }
+
+        .btn-decline-request {
+            background-color: #F0F2F5;
+            color: #D32F2F; /* Text roșu */
+            border: none;
+            padding: 8px 16px;
+            border-radius: 50rem;
+            font-size: 0.85rem;
+            font-weight: 700;
+            transition: all 0.2s;
+        }
+
+            .btn-decline-request:hover {
+                background-color: #FFEBEE; /* Fundal roșu foarte pal la hover */
+                color: #C62828;
+            }
+    </style>

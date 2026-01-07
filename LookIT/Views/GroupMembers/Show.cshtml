@@ -2,27 +2,27 @@
 @using LookIT.Models
 @inject UserManager<ApplicationUser> UserManager
 
-@* Containerul principal preia acum automat fundalul din site.css *@
 <div class="py-5">
     <div class="container">
 
         @* --- HEADER PAGINA --- *@
         <div class="d-flex justify-content-between align-items-center mb-5">
             <div>
-                <h2 class="fw-bold lookit-title mb-0">Grupurile tale</h2>
+                <h2 class="fw-bold text-black mb-0">Grupurile tale</h2>
                 <p class="text-muted small">Comunitățile din care faci parte</p>
             </div>
-            @* Folosim btn-primary care acum este Magenta Vibrant cu hover ridicat *@
+            @* Butonul principal Magenta *@
             <a class="btn btn-primary d-flex align-items-center px-4"
                asp-controller="Groups" asp-action="New">
                 <i class="bi bi-plus-lg me-2"></i> Grup nou
             </a>
         </div>
 
-        @* --- MESAJ ALERTA (Stilizat prin site.css) --- *@
+        @* --- MESAJ ALERTA (Stilizat conform paletei) --- *@
         @if (ViewBag.message != null)
         {
-            <div class="alert alert-dismissible fade show shadow-sm text-center mb-5" role="alert">
+            <div class="alert shadow-sm text-center mb-5 border-0" role="alert"
+                 style="background-color: #FDF2F7; color: #B13079; border-radius: 12px;">
                 <i class="bi bi-check-circle-fill me-2"></i>
                 <span class="fw-bold">@ViewBag.message</span>
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -31,40 +31,37 @@
 
         @* --- GRID GRUPURI --- *@
         <div class="row">
-            @if (ViewBag.GroupsUser != null)
+            @if (ViewBag.GroupsUser != null && ViewBag.GroupsCount > 0)
             {
                 @foreach (var groupEntry in ViewBag.GroupsUser)
                 {
                     <div class="col-md-6 col-lg-4 mb-4">
-                        @* Folosim group-card-index pentru hover-ul cu dungă Magenta *@
-                        <div class="card h-100 shadow-sm border-0 group-card-index overflow-hidden">
+                        @* Cardul foloseste hover-ul tau cu dunga Magenta la baza *@
+                        <div class="card h-100 shadow-sm border-0 group-card-index overflow-hidden rounded-4">
 
-                            @* Cover colorat folosind gradientul de brand *@
+                            @* Cover colorat cu gradient LookIT *@
                             <div class="card-cover" style="height: 100px; background: linear-gradient(135deg, #B13079 0%, #D83B91 100%);"></div>
 
-                            <div class="card-body pt-0 position-relative">
-                                @* Avatar (Initiala) - Stilizat cu Roz Pal si Magenta *@
-                                <div class="group-avatar-circle shadow-sm d-flex align-items-center justify-content-center">
-                                    <span class="fw-bold">
-                                        @groupEntry.Group.GroupName.Substring(0, 1).ToUpper()
-                                    </span>
+                            <div class="card-body pt-0 position-relative bg-white">
+                                @* Avatar tip patrat rotunjit (Pastila) *@
+                                <div class="group-avatar-circle shadow-sm d-flex align-items-center justify-content-center fw-bold">
+                                    @groupEntry.Group.GroupName.Substring(0, 1).ToUpper()
                                 </div>
 
                                 <div class="mt-5 pt-2">
-                                    <h5 class="fw-bold text-dark text-truncate mb-1">@groupEntry.Group.GroupName</h5>
-                                    <p class="text-muted small mb-3" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 40px;">
+                                    <h5 class="fw-bold text-black text-truncate mb-1">@groupEntry.Group.GroupName</h5>
+                                    <p class="text-muted small mb-3" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 40px;">
                                         @groupEntry.Group.Description
                                     </p>
 
                                     <div class="d-flex align-items-center mb-4">
-                                        @* Badge-ul curatat de verde, acum este Magenta/Roz Pal *@
-                                        <div class="lookit-badge-status px-3 py-1 small rounded-pill">
+                                        @* Badge-ul de status - Roz pal cu text Magenta *@
+                                        <div class="lookit-status-badge px-3 py-1 small rounded-pill fw-bold">
                                             <i class="bi bi-person-check-fill me-1"></i> Membru
                                         </div>
                                     </div>
 
                                     <div class="d-grid">
-                                        @* Folosim btn-magenta-outline definit în site.css *@
                                         <a class="btn btn-magenta-outline py-2"
                                            asp-controller="Groups" asp-action="Show" asp-route-id="@groupEntry.GroupId">
                                             Accesează Grupul
@@ -78,32 +75,60 @@
             }
         </div>
 
-        @* --- EMPTY STATE (Curățat de gri) --- *@
+        @* --- EMPTY STATE --- *@
         @if (ViewBag.GroupsUser == null || ViewBag.GroupsCount == 0)
         {
             <div class="text-center mt-5 py-5 bg-white rounded-4 shadow-sm border-0">
-                <i class="bi bi-people lookit-title opacity-25" style="font-size: 5rem;"></i>
-                <h4 class="lookit-title mt-3">Nu ești în niciun grup</h4>
-                <a asp-controller="Groups" asp-action="Index" class="lookit-title fw-bold text-decoration-none d-block mt-2">
-                    Descoperă comunități noi <i class="bi bi-arrow-right ms-1"></i>
+                <div class="mb-4 d-inline-block p-4 rounded-circle" style="background-color: #FDF2F7;">
+                    <i class="bi bi-people" style="font-size: 4rem; color: #B13079; opacity: 0.6;"></i>
+                </div>
+                <h4 class="fw-bold text-black">Nu ești în niciun grup</h4>
+                <p class="text-muted">Explorează comunitățile platformei și fă-ți prieteni noi.</p>
+                <a asp-controller="Groups" asp-action="Index" class="btn btn-magenta-outline px-4 mt-2">
+                    Descoperă grupuri <i class="bi bi-arrow-right ms-1"></i>
                 </a>
             </div>
         }
     </div>
 </div>
 
-@* Adăugăm un mic CSS specific doar pentru poziționarea cercului de avatar, restul culorilor vin din site.css *@
 <style>
+    /* Suprascriem text-black pentru siguranta */
+    .text-black {
+        color: #1c1e21 !important;
+    }
+
+    /* Poziționarea cercului de avatar peste cover */
     .group-avatar-circle {
-        width: 60px;
-        height: 60px;
+        width: 65px;
+        height: 65px;
         background-color: white;
         border: 4px solid white;
-        border-radius: 15px;
+        border-radius: 18px; /* Un look de "squircle" modern */
         position: absolute;
-        top: -30px;
+        top: -32px;
         left: 20px;
         color: #B13079;
-        font-size: 1.5rem;
+        font-size: 1.6rem;
+        z-index: 2;
     }
+
+    /* Badge status personalizat */
+    .lookit-status-badge {
+        background-color: #FDF2F7;
+        color: #B13079;
+        border: 1px solid rgba(177, 48, 121, 0.1);
+        display: inline-flex;
+        align-items: center;
+    }
+
+    /* Animatie card la hover */
+    .group-card-index {
+        transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+    }
+
+        .group-card-index:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(177, 48, 121, 0.1) !important;
+        }
 </style>

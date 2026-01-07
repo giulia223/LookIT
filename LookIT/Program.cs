@@ -27,7 +27,7 @@ builder.Services.AddAuthorization(options =>
          policy => policy.RequireRole("Administrator"));
 });
 
-builder.Services.AddScoped<ISentimentAnalysisService, SentimentAnalysisService>();
+builder.Services.AddScoped<IMesajeAnalizaService, MesajeAnalizaService>();
 
 var app = builder.Build();
 

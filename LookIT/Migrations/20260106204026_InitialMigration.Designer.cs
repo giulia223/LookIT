@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LookIT.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260103115410_InitialMigration")]
+    [Migration("20260106204026_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -154,6 +154,15 @@ namespace LookIT.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("DateModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FlagCategory")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("IsFlagged")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ModeratedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("PostId")
@@ -305,6 +314,9 @@ namespace LookIT.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<bool>("IsSafe")
+                        .HasColumnType("bit");
+
                     b.Property<string>("TextContent")
                         .HasMaxLength(5000)
                         .HasColumnType("nvarchar(max)");
@@ -316,6 +328,9 @@ namespace LookIT.Migrations
                     b.Property<string>("VideoUrl")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool>("isReported")
+                        .HasColumnType("bit");
 
                     b.HasKey("MessageId");
 
@@ -344,6 +359,15 @@ namespace LookIT.Migrations
                     b.Property<string>("ImageUrl")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime?>("SentimentAnalyzedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<double?>("SentimentConfidence")
+                        .HasColumnType("float");
+
+                    b.Property<string>("SentimentLabel")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TextContent")
                         .HasMaxLength(5000)

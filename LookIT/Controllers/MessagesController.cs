@@ -26,9 +26,9 @@ namespace LookIT.Controllers
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IWebHostEnvironment _env;
         private readonly IConfiguration _configuration;
-        private readonly ISentimentAnalysisService _sentimentService;
+        private readonly IMesajeAnalizaService _sentimentService;
 
-        public MessagesController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IWebHostEnvironment env, IConfiguration configuration, ISentimentAnalysisService sentimentService)
+        public MessagesController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IWebHostEnvironment env, IConfiguration configuration, IMesajeAnalizaService sentimentService)
         {
             _context = context;
             _userManager = userManager;
