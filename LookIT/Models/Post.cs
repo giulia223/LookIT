@@ -39,7 +39,6 @@ namespace LookIT.Models
         //relatia many-to-many dintre Post si Collection
         public virtual ICollection<PostCollection> PostCollections { get; set; } = new List<PostCollection>();
 
-        // --- CAMPURI NOI PENTRU SENTIMENT ANALYSIS ---
         public string? SentimentLabel { get; set; } // positive, neutral, negative
 
         public double? SentimentConfidence { get; set; } // 0.0 - 1.0

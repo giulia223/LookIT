@@ -16,6 +16,7 @@ namespace LookIT.Controllers
         private readonly IWebHostEnvironment _env = env;
 
         //afisarea tuturor colectiilor unui utilizator
+
         [Authorize(Roles ="User,Administrator")]
         public IActionResult Index()
         {
@@ -28,46 +29,24 @@ namespace LookIT.Controllers
 
             SetAccessRights();
 
-            if (User.IsInRole("User"))
-            {
-                //iau colectiile proprii
-                var collections = db.Collections
-                                    .Include(collection => collection.User)
-                                    .Where(collection => collection.UserId == _userManager.GetUserId(User))
-                                    //punem colectia default "All Posts" pe prima pozitie
-                                    .OrderByDescending(collection => collection.Name == "All Posts")
-                                    //iar pe restul le vom ordona descrescator dupa data crearii 
-                                    .ThenByDescending(collection => collection.CreationDate)
-                                    .ToList();
+            //iau colectiile proprii
+            var collections = db.Collections
+                                .Include(collection => collection.User)
+                                .Where(collection => collection.UserId == _userManager.GetUserId(User))
+                                //punem colectia default "All Posts" pe prima pozitie
+                                .OrderByDescending(collection => collection.Name == "All Posts")
+                                //iar pe restul le vom ordona descrescator dupa data crearii 
+                                .ThenByDescending(collection => collection.CreationDate)
+                                .ToList();
 
 
-                ViewBag.Collections = collections;
-                return View();
-            }
-            else
-            {
-                if (User.IsInRole("Administrator"))
-                {
-                    //daca sunt administrator, voi putea vedea toate colectiile din platforma
-                    var collections = db.Collections
-                                        .Include(collection => collection.User)
-                                        .OrderByDescending(collection => collection.Name == "All Posts")
-                                        .ToList();
-
-                    ViewBag.Collections = collections;
-                    return View();
-
-                }
-                else
-                {
-                    TempData["message"] = "Nu aveti drepturi asupra colectiei.";
-                    TempData["messageType"] = "alert-danger";
-                    return RedirectToAction("Index");
-                }
-            }
+            ViewBag.Collections = collections;
+            return View();
+             
         }
 
         //afisarea postarilor pe care utilizatorul le-a salvat in colectia sa
+
         [Authorize(Roles ="User,Administrator")]
         public IActionResult Show(int Id)
         {
@@ -102,6 +81,7 @@ namespace LookIT.Controllers
 
         //formularul in care se completeaza detele unei colectii
         //avem [HttpGet] implicit
+
         [Authorize(Roles="User,Administrator")]
         public IActionResult New(int? postId)
         {
@@ -125,6 +105,7 @@ namespace LookIT.Controllers
         }
 
         //adaugarea colectiei in baza de date
+
         [HttpPost]
         [Authorize(Roles ="User,Administrator")]
         public IActionResult New(Collection collection, int? PostToSave)
@@ -336,7 +317,6 @@ namespace LookIT.Controllers
 
             return Json(true);
         }
-
 
     }
 }

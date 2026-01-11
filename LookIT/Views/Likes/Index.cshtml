@@ -6,23 +6,20 @@
 
 <div class="container py-4">
 
-    @* --- 0. BUTON ÎNAPOI --- *@
+
     <div class="mb-4">
         <a href="javascript:history.back()" class="btn btn-sm btn-light rounded-pill px-3 fw-bold text-muted border-0 shadow-sm">
             <i class="bi bi-arrow-left me-1"></i> Înapoi la profil
         </a>
     </div>
 
-    @* --- 1. HEADER (DESIGN NOU) --- *@
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-end align-items-md-center mb-5 pb-3 border-bottom gap-3">
         
-        @* Stânga: Titlu și Descriere *@
         <div>
             <h2 class="fw-bold mb-1">Postări apreciate</h2>
             <p class="text-muted mb-0 small">Aici găsești tot conținutul care ți-a plăcut.</p>
         </div>
 
-        @* Dreapta: Număr aprecieri *@
         <div>
             <span class="badge bg-light text-dark border rounded-pill px-3 py-2 shadow-sm">
                 <i class="bi bi-heart-fill text-danger me-1"></i>
@@ -31,7 +28,6 @@
         </div>
     </div>
 
-    @* --- 2. GRID POSTĂRI --- *@
     @if (Model.Any())
     {
         <div class="row g-1 mb-4">
@@ -42,7 +38,6 @@
 
                         <div class="ratio ratio-1x1 border-0 rounded-0 overflow-hidden position-relative shadow-sm bg-light post-card-hover">
 
-                            @* ICONITE TIP (PERMANENTE - STANGA SUS) *@
                             <div class="position-absolute" style="top: 11px; left: 10px; z-index: 20;">
                                 @if (!string.IsNullOrEmpty(post.VideoUrl))
                                 {
@@ -58,7 +53,6 @@
                                 }
                             </div>
 
-                            @* OVERLAY HOVER (AUTOR - DREAPTA SUS) *@
                             <div class="hover-overlay p-3">
                                 <div class="d-flex align-items-center justify-content-end w-100 text-truncate">
                                     <span class="text-white me-3 fw-bold text-truncate text-shadow text-end" style="font-size: 1rem;">
@@ -71,7 +65,6 @@
                                 </div>
                             </div>
 
-                            @* CONTINUTUL POSTARII *@
                             @if (!string.IsNullOrEmpty(post.ImageUrl))
                             {
                                 <img src="@post.ImageUrl" class="w-100 h-100" style="object-fit: cover;" alt="Post Image">
@@ -105,7 +98,6 @@
     }
     else
     {
-        @* --- 3. EMPTY STATE --- *@
         <div class="text-center py-5 mt-4 rounded-4 bg-light border border-dashed">
             <div class="mb-4 d-inline-block position-relative">
                 <div class="bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center" 
@@ -122,9 +114,7 @@
     }
 </div>
 
-@* STILURI CSS *@
 <style>
-    /* Overlay-ul negru pentru hover */
     .hover-overlay {
         position: absolute;
         top: 0;

@@ -20,7 +20,6 @@
 <body>
     <header>
         <nav class="navbar navbar-expand-lg navbar-light shadow-none">
-            @* Folosim container-fluid pentru a întinde elementele spre colțuri *@
             <div class="container-fluid px-3 px-lg-5">
 
                 <a class="navbar-brand d-flex align-items-center me-lg-5" asp-area="" asp-controller="Posts" asp-action="Index">
@@ -33,7 +32,6 @@
 
                 <div class="navbar-collapse collapse">
 
-                    @* Search Bar *@
                     <form asp-controller="Search" asp-action="Index" method="get" class="d-flex mx-auto my-3 my-lg-0 w-100" style="max-width: 500px;">
                         <div class="input-group search-container w-100 align-items-center">
                             <span class="search-icon ps-2 pe-3">
@@ -47,7 +45,6 @@
                         </div>
                     </form>
 
-                    @* Navigare *@
                     <ul class="navbar-nav ms-auto align-items-center gap-2 gap-lg-4">
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="Posts" asp-action="Index" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Acasă">
@@ -103,7 +100,6 @@
         </main>
     </div>
 
-    @* Footer Clasic *@
     <footer class="border-top footer text-muted">
         <div class="container text-center">
             <small>&copy; 2025 - <strong>LookIT</strong> - Conectăm oameni.</small>

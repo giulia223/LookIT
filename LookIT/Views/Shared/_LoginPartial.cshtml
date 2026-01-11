@@ -5,7 +5,6 @@
 @inject UserManager<ApplicationUser> UserManager
 
 @{
-    // Obtinem utilizatorul curent pentru a-i accesa poza
     var user = await UserManager.GetUserAsync(User);
 }
 
@@ -14,7 +13,6 @@
    
     @if (SignInManager.IsSignedIn(User))
     {
-        @* DROPDOWN CU AVATAR *@
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle d-flex align-items-center gap-2 p-0 ms-2" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 @if (user != null && !string.IsNullOrEmpty(user.ProfilePictureUrl))
@@ -30,14 +28,12 @@
             </a>
 
             <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3 mt-2" aria-labelledby="navbarDropdown">
-                @* Link catre Profilul Public *@
                 <li>
                     <a class="dropdown-item d-flex align-items-center gap-2 py-2" asp-controller="Profile" asp-action="Details" asp-route-userId="@UserManager.GetUserId(User)">
                         <i class="bi bi-person-circle text-muted"></i> Profilul meu
                     </a>
                 </li>
 
-                @* Link catre Setari (Identity) - Optional, il avem si pe profil acum *@
                 <li>
                     <a class="dropdown-item d-flex align-items-center gap-2 py-2" asp-area="Identity" asp-page="/Account/Manage/Index">
                         <i class="bi bi-gear text-muted"></i> Setări
@@ -46,7 +42,6 @@
 
                 <li><hr class="dropdown-divider"></li>
 
-                @* Logout *@
                 <li>
                     <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Posts", new { area = "" })">
                         <button type="submit" class="dropdown-item d-flex align-items-center gap-2 py-2 text-danger">
