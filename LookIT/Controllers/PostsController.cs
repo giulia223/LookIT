@@ -14,6 +14,7 @@ namespace LookIT.Controllers
 {
     public class PostsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IWebHostEnvironment env, IModerationService moderationService) : Controller
     {
+        //injectarea depdendentelor in controller
         private readonly ApplicationDbContext db = context;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly RoleManager<IdentityRole> _roleManager = roleManager;
@@ -24,6 +25,7 @@ namespace LookIT.Controllers
 
         //au acces la aceasta metoda atat utilizatorii inregistrati, cat si neinregistrati si administratorii
         //afisarea postarilor apartinand conturilor publice sau urmaritorilor (daca sunt conturi private)
+
         [AllowAnonymous]
         public IActionResult Index()
         {
@@ -99,6 +101,7 @@ namespace LookIT.Controllers
 
         //feed-ul personalizat al utilizatorilor inregistrati sau administratori
         //contine postarile utilizatorlior pe care ii urmareste
+
         [Authorize(Roles="User,Administrator")]
         public IActionResult Feed()
         {
@@ -166,8 +169,8 @@ namespace LookIT.Controllers
 
         //se afiseaza o singura postare in functie de ID-ul sau impreuna cu userul care a postat-o
         //[HttpGet] implicit
-
         //au acces la aceasta metoda atat utilizatorii inregistrati, cat si neinregistrati si administratorii
+
         [AllowAnonymous]
         public IActionResult Show(int Id)
         {
@@ -250,7 +253,7 @@ namespace LookIT.Controllers
                 {
                     if (moderationResult.IsFlagged is true)
                     {
-                        TempData["message"] = $"Comentariul nu a fost postat deoarece incalca regulile comunitatii: {moderationResult.Reason}";
+                        TempData["message"] = $"Comentariul tau contine termeni nepotriviti, te rugam sa reformulezi. Motiv: {moderationResult.Reason}";
                         TempData["messageType"] = "alert-danger";
 
                         return RedirectToAction("Show", new { IDataTokensMetadata = comment.PostId });
@@ -302,43 +305,33 @@ namespace LookIT.Controllers
         [HttpPost]
         public async Task<IActionResult> New(Post post, IFormFile? Image, IFormFile? Video)
         {
-            // Setari initiale
+            //setarile initiale
             post.Date = DateTime.Now;
             post.AuthorId = _userManager.GetUserId(User);
 
+            //valori booleaene pentru verificarea existentei componentelor unei postari
             bool hasText = !string.IsNullOrWhiteSpace(post.TextContent);
             bool hasImage = Image != null && Image.Length > 0;
             bool hasVideo = Video != null && Video.Length > 0;
 
-            // -----------------------------------------------------------
-            // COD NOU: MODERARE AUTOMATA CU _moderationService
-            // -----------------------------------------------------------
 
-            // Verificam daca exista titlu sau continut text
+            //verificam daca exista continut text
             if (!string.IsNullOrWhiteSpace(post.TextContent))
             {
-                // Apelam metoda CheckPostAsync din ModerationService 
+                //apelam metoda CheckPostAsync din ModerationService 
                 var moderationResult = await _moderationService.CheckPostAsync( post.TextContent );
 
                 if (moderationResult.IsFlagged)
                 {
-                    // Daca AI-ul zice ca e continut interzis (IsFlagged = true):
+                    //daca AI-ul zice ca e continut interzis (IsFlagged = true):
 
-                    // 1. Afisam mesaj de eroare utilizatorului
-                    TempData["message"] = $"Postarea a fost respinsă automat. Motiv: {moderationResult.Reason}";
-                    TempData["messageType"] = "alert-danger";
+                    //afisam mesaj de eroare utilizatorului
+                    ModelState.AddModelError("TextContent", $"Postarea ta contine termeni nepotriviti, te rugam sa reformulezi. Motiv: {moderationResult.Reason}");
 
-                    // 2. Returnam View-ul cu datele introduse (ca sa nu le piarda), dar NU salvam in baza de date
+                    //returnam View-ul cu datele introduse (ca sa nu le piarda), dar NU salvam in baza de date
                     return View(post);
                 }
             }
-            // -----------------------------------------------------------
-            // SFARSIT COD MODERARE
-            // -----------------------------------------------------------
-
-
-            // ... Aici continua codul tau vechi pentru Sentiment (daca vrei sa il pastrezi) ...
-            // ... Sau validarea imaginilor/video ...
 
             if (!hasText && !hasImage && !hasVideo)
             {
@@ -346,33 +339,62 @@ namespace LookIT.Controllers
                 return View(post);
             }
 
-            // ... Logica de salvare imagini/video (copiata din codul tau) ...
             if (hasImage)
             {
-                // ... codul tau pentru imagini ...
                 var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
                 var fileExtension = Path.GetExtension(Image.FileName).ToLower();
-                if (!allowedExtensions.Contains(fileExtension)) { ModelState.AddModelError("Image", "Fisierul trebuie sa fie imagine."); return View(post); }
+
+                if (!allowedExtensions.Contains(fileExtension)) 
+                { 
+                    ModelState.AddModelError("Image", "Fisierul trebuie sa fie imagine."); 
+                    return View(post); 
+                }
+
                 var uniqueFileName = Guid.NewGuid().ToString() + fileExtension;
                 var storagePath = Path.Combine(_env.WebRootPath, "images", "posts");
-                if (!Directory.Exists(storagePath)) Directory.CreateDirectory(storagePath);
+
+                //daca nu exista folderul wwwroot/images/posts, il vom crea
+                if (!Directory.Exists(storagePath))
+                {
+                    Directory.CreateDirectory(storagePath);
+                }
+
                 var filePath = Path.Combine(storagePath, uniqueFileName);
-                using (var fileStream = new FileStream(filePath, FileMode.Create)) { await Image.CopyToAsync(fileStream); }
+                using (var fileStream = new FileStream(filePath, FileMode.Create)) 
+                { 
+                    await Image.CopyToAsync(fileStream); 
+                }
+
                 ModelState.Remove(nameof(post.ImageUrl));
                 post.ImageUrl = "/images/posts/" + uniqueFileName;
             }
 
             if (hasVideo)
             {
-                // ... codul tau pentru video ...
                 var allowedExtensions = new[] { ".mp4", ".mov", ".webm", ".avi", ".mkv" };
                 var fileExtension = Path.GetExtension(Video.FileName).ToLower();
-                if (!allowedExtensions.Contains(fileExtension)) { ModelState.AddModelError("Video", "Fisierul trebuie sa fie video."); return View(post); }
+
+                if (!allowedExtensions.Contains(fileExtension)) 
+                { 
+                    ModelState.AddModelError("Video", "Fisierul trebuie sa fie video."); 
+                    return View(post); 
+                }
+
                 var uniqueFileName = Guid.NewGuid().ToString() + fileExtension;
                 var storagePath = Path.Combine(_env.WebRootPath, "videos", "posts");
-                if (!Directory.Exists(storagePath)) Directory.CreateDirectory(storagePath);
+
+                if (!Directory.Exists(storagePath))
+                {
+                    Directory.CreateDirectory(storagePath);
+                }
+
                 var filePath = Path.Combine(storagePath, uniqueFileName);
-                using (var fileStream = new FileStream(filePath, FileMode.Create)) { await Video.CopyToAsync(fileStream); }
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create)) 
+                { 
+                    await Video.CopyToAsync(fileStream); 
+                }
+
                 ModelState.Remove(nameof(post.VideoUrl));
                 post.VideoUrl = "/videos/posts/" + uniqueFileName;
             }
@@ -390,9 +412,10 @@ namespace LookIT.Controllers
                 return View(post);
             }
         }
-        //Se editeaza o postare in baza de date
-        //Se afiseaza formularul impreuna cu datele aferente postarii
-        //Doar userii al caror postari le apartin pot edita postarile
+
+        //se editeaza o postare in baza de date
+        //se afiseaza formularul impreuna cu datele aferente postarii
+        //doar userii al caror postari le apartin pot edita postarile
         //[HttpGet] implicit
 
         [Authorize(Roles = "Administrator,User")]
@@ -448,21 +471,29 @@ namespace LookIT.Controllers
                     // Actualizam textul din input
                     post.TextContent = requestPost.TextContent;
 
-                    // ---  ANALIZA SENTIMENTULUI ---
-                    // Verificam daca avem continut de analizat (text sau imagine noua)
                     if (!string.IsNullOrWhiteSpace(post.TextContent))
                     {
+                        //apelam serviciul de moderare pentru textul editat
+                        var moderationResult = await _moderationService.CheckPostAsync(post.TextContent);
 
-                    }
-                    else
-                    {
-                        // Daca nu mai avem text si nici imagine noua, dar poate a ramas imaginea veche...
-                        // E un caz mai complicat. Simplificam: daca goleste textul, resetam sentimentul pe Safe temporar.
-                        if (string.IsNullOrWhiteSpace(post.TextContent) && (Image == null))
+                        if (moderationResult.IsFlagged)
                         {
-                            post.SentimentLabel = "neutral";
-                           
+                            //daca AI-ul zice ca e continut interzis:
+                            ModelState.AddModelError("TextContent", $"Postarea ta contine termeni nepotriviti, te rugam sa reformulezi. Motiv: {moderationResult.Reason}");
+
+                            //resetam textul la cel original pentru ca modificarea este ilegala
+                            post.TextContent = initialTextContent;
+
+                            //trebuie sa populam requestPost cu URL-urile existente ca sa nu dispara imaginile din View
+                            requestPost.ImageUrl = post.ImageUrl;
+                            requestPost.VideoUrl = post.VideoUrl;
+
+                            return View(requestPost);
                         }
+                    }
+                    if (string.IsNullOrWhiteSpace(post.TextContent) && (Image == null))
+                    {
+                        post.SentimentLabel = "neutral";
                     }
 
                     // daca am ales o poza, o vom modifica
@@ -554,7 +585,7 @@ namespace LookIT.Controllers
                         post.VideoUrl = null;
                     }
 
-                    // VERIFICARE POSTARE GOALA
+                    //verificare postare goala
                     if (string.IsNullOrWhiteSpace(post.TextContent) && post.ImageUrl == null && post.VideoUrl == null)
                     {
                         post.TextContent = initialTextContent;
@@ -566,7 +597,7 @@ namespace LookIT.Controllers
                         return View(post);
                     }
 
-                    // STERGEREA FIZICA FINALA A FISIERELOR VECHI (Daca e cazul)
+                    //steregrea fizica a fisierelor vechi (daca este cazul)
                     if (post.ImageUrl == null && !string.IsNullOrEmpty(initialImageUrl) && DeleteImage == true)
                     {
                         var oldPath = Path.Combine(_env.WebRootPath, initialImageUrl.TrimStart('/'));
@@ -585,7 +616,6 @@ namespace LookIT.Controllers
                         }
                     }
 
-                    // SALVAM MODIFICARILE
                     await db.SaveChangesAsync();
 
                     TempData["message"] = "Postarea a fost modificată cu succes!";
@@ -606,6 +636,7 @@ namespace LookIT.Controllers
                 return RedirectToAction("Index");
             }
         }
+
         //se sterge o postare din baza de date 
         //doar utilizatorii autentificati care au facut postarea respetiva o pot sterge
 
@@ -676,6 +707,7 @@ namespace LookIT.Controllers
         //metoda aceasta se va ocupa atat de adaugarea unei postari intr-o colectie, cat si de eliminarea acesteia dintr-una
         //daca postarea deja exista in colectie, prin incercarea de a o adauga iar, o vom sterge din colectie
         //daca postarea nu exista in colectie, o vom aduaga
+
         [HttpPost]
         [Authorize(Roles ="User,Administrator")]
         public IActionResult AddToCollection([FromForm] PostCollection postCollection)
@@ -764,6 +796,7 @@ namespace LookIT.Controllers
         //aceasta metoda se va ocupa atat de aprecierea unei postari, cat si de scoaterea acesteia de la apreciere
         //daca postarea este deja apreciata, prin incercarea de a o aprecia iar, vom scoate like-ul asociat
         //daca postarea nu este apeciata, atunci se va aduga o relatie intre Post si User in tabela asociativa Likes
+
         [HttpPost]
         [Authorize(Roles ="User, Administrator")]
         public IActionResult LikePost([FromForm] int Id)
