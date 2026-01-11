@@ -5,7 +5,9 @@
 
 <div class="container mt-4 mb-5" style="max-width: 600px;">
 
+    @* ---  HEADER (Buton inapoi + Titlu + Badge) --- *@
     <div class="d-flex align-items-center mb-4">
+        @* Buton inapoi *@
         <a href="javascript:history.back()" class="btn btn-light rounded-circle shadow-sm d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
             <i class="bi bi-arrow-left"></i>
         </a>
@@ -23,6 +25,7 @@
 
     @if (!Model.Any())
     {
+        @* --- EMPTY STATE  --- *@
         <div class="text-center py-5 bg-white border-0 shadow-sm rounded-4 mt-2">
 
             <div class="mb-4 d-inline-block">
@@ -38,12 +41,14 @@
     }
     else
     {
+        @* ---  LISTA DE CERERI --- *@
         <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
             <div class="card-body p-0">
                 @foreach (var req in Model)
                 {
                     <div class="request-item d-flex align-items-center justify-content-between p-3 border-bottom">
 
+                        @* INFO UTILIZATOR (Stanga) *@
                         <div class="d-flex align-items-center flex-grow-1 overflow-hidden">
                             <a asp-controller="Profile" asp-action="Details" asp-route-userId="@req.FollowerId">
                                 <img src="@(!string.IsNullOrEmpty(req.Follower.ProfilePictureUrl) ? req.Follower.ProfilePictureUrl : "/images/default-profile.png")"
@@ -63,6 +68,7 @@
                             </div>
                         </div>
 
+                        @* BUTOANE ACTIUNE (Dreapta) *@
                         <div class="d-flex gap-2 ms-3">
 
                             <form asp-action="HandleRequest" method="post">
@@ -73,6 +79,7 @@
                                 </button>
                             </form>
 
+                            @* BUTON STERGE *@
                             <form asp-action="HandleRequest" method="post">
                                 <input type="hidden" name="requestId" value="@req.Id" />
                                 <input type="hidden" name="decision" value="decline" />
@@ -91,11 +98,12 @@
 
 
 <style>
-
+   
     .request-item:last-child {
         border-bottom: none !important;
     }
 
+    
     .request-item {
         transition: background-color 0.2s ease;
         background-color: #fff;

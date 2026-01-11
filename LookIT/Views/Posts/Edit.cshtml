@@ -3,7 +3,14 @@
 @{
     ViewData["Title"] = "Editează Postarea";
 }
-
+@if (TempData["message"] != null)
+{
+    <div class="alert @TempData["messageType"] alert-dismissible fade show" role="alert">
+        @*  motivul respingerii venit din Controller *@
+        <strong>Atentie!</strong> @TempData["message"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
 <div class="container mt-5 mb-5">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
@@ -69,7 +76,7 @@
                                         </div>
                                     </div>
                                 </div>
-
+                                @* Checkbox ascuns pentru ștergere *@
                                 <input class="form-check-input d-none" type="checkbox" name="DeleteImage" value="true" id="deleteImageCheck">
                             }
 
@@ -129,7 +136,7 @@
                                         </div>
                                     </div>
                                 </div>
-
+                                @* Checkbox ascuns pentru ștergere *@
                                 <input class="form-check-input d-none" type="checkbox" name="DeleteVideo" value="true" id="deleteVideoCheck">
                             }
 
@@ -140,7 +147,7 @@
                                         Your browser does not support the video tag.
                                     </video>
 
-                                    @*buton de stergere pentru noul videoclip*@
+                                    @* Buton X pentru anulare upload nou *@
                                     <button type="button" id="removeNewVideo" class="btn btn-sm btn-light rounded-circle shadow-sm position-absolute top-0 end-0 m-2" style="width: 30px; height: 30px; padding: 0; z-index: 20;">
                                         <i class="bi bi-x fs-5"></i>
                                     </button>
@@ -152,9 +159,9 @@
                             </div>
                         </div>
 
-
-                        @*continut text*@
-
+                        @* ========================================== *@
+                        @* SECȚIUNEA CONȚINUT            *@
+                        @* ========================================== *@
                         <div class="mb-5">
                             <label asp-for="TextContent" class="form-label small text-muted fw-bold ms-1">CONȚINUT</label>
                             <textarea asp-for="TextContent" class="form-control summernote bg-light border-0 rounded-3 p-3"></textarea>
@@ -191,6 +198,7 @@
             background-color: #e9ecef !important;
         }
 
+    /* Stiluri pentru a curăța editorul Summernote */
     .note-editor.note-frame {
         border: none !important;
         box-shadow: none !important;
@@ -215,8 +223,10 @@
     <partial name="_ValidationScriptsPartial" />
 
     <script>
-   
-        //functii pentru stergerea imaginii/videoclipului curent
+        // ==========================================
+        //  LOGICA PENTRU ELEMENTE EXISTENTE (VECHI)
+        // ==========================================
+
         function markImageForDeletion() {
             //ascundem vizual containerul imaginii vechi
             const wrapper = document.getElementById('currentImageWrapper');
@@ -224,6 +234,7 @@
                 wrapper.classList.add('d-none');
             }
 
+            // Bifăm checkbox-ul ascuns ca serverul să șteargă fișierul
             const checkbox = document.getElementById('deleteImageCheck');
             if(checkbox) {
                 checkbox.checked = true;
@@ -237,12 +248,17 @@
                 wrapper.classList.add('d-none');
             }
 
+            // Bifăm checkbox-ul ascuns
             const checkbox = document.getElementById('deleteVideoCheck');
             if(checkbox) {
                 checkbox.checked = true;
             }
         }
 
+
+        // ==========================================
+        //  LOGICA PENTRU ELEMENTE NOI (UPLOAD)
+        // ==========================================
 
         const imageInput = document.getElementById('imageInput');
         const newImgContainer = document.getElementById('newImageContainer');
@@ -252,39 +268,27 @@
         const deleteImgCheck = document.getElementById('deleteImageCheck');
 
         if (imageInput) {
-            //cand selectam un fisier
+            // Când selectăm fișier
             imageInput.addEventListener('change', function () {
                 const file = this.files[0];
                 if (file) {
                     newImgPreview.src = URL.createObjectURL(file);
                     newImgContainer.classList.remove('d-none');
 
-                    //ascundem imaginea veche
-                    if(currentImgWrapper) {
-                        currentImgWrapper.classList.add('d-none');
-                    }
-
-                    if(deleteImgCheck) {
-                        deleteImgCheck.checked = false;
-                    }
+                    // Ascundem automat imaginea veche (se înlocuiește)
+                    if(currentImgWrapper) currentImgWrapper.classList.add('d-none');
+                    // Resetăm checkbox-ul de ștergere (înlocuirea are prioritate)
+                    if(deleteImgCheck) deleteImgCheck.checked = false;
                 }
             });
 
-            //cand stergem imaginea noua
+            // Când apăsăm X pe fișierul nou
             if (removeNewImgBtn) {
                 removeNewImgBtn.addEventListener('click', function () {
                     imageInput.value = '';
                     newImgPreview.src = '';
                     newImgContainer.classList.add('d-none');
-
-                    if (currentImgWrapper) {
-                        currentImgWrapper.classList.remove('d-none');
-                    }
-
-
-                    if (deleteImgCheck) {
-                        deleteImgCheck.checked = false;
-                    }
+                    // NU reafișăm imaginea veche. Totul rămâne gol.
                 });
             }
         }
@@ -297,7 +301,7 @@
         const deleteVidCheck = document.getElementById('deleteVideoCheck');
 
         if (videoInput) {
-            //cand selectam fisier
+            // Când selectăm fișier
             videoInput.addEventListener('change', function () {
                 const file = this.files[0];
                 if (file) {
@@ -315,20 +319,13 @@
                 }
             });
 
-            //cand stergem videoclipul nou
+            // Când apăsăm X pe fișierul nou
             if (removeNewVidBtn) {
                 removeNewVidBtn.addEventListener('click', function () {
                     videoInput.value = '';
                     newVidPreview.src = '';
                     newVidContainer.classList.add('d-none');
                     // NU reafișăm video vechi.
-
-                    if (currentVidWrapper) {
-                        currentVidWrapper.classList.remove('d-none');
-                    }
-                    if (deleteVidCheck) {
-                        deleteVidCheck.checked = false;
-                    }
                 });
             }
         }

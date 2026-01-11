@@ -437,7 +437,7 @@ namespace LookIT.Controllers
                 return View(post);
             }
 
-            //nu am acces la editarea postarii
+            
             else
             {
                 TempData["message"] = "Nu aveti dreptul sa faceti modificari asupra unei postari care nu va apartine";

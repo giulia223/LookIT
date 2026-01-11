@@ -158,7 +158,6 @@ namespace LookIT.Controllers
             if (string.IsNullOrEmpty(userId)) return NotFound();
 
             var targetUser = await _context.Users
-                //.Include(u => u.Articles) 
                 .FirstOrDefaultAsync(u => u.Id == userId);
 
             if (targetUser == null) return NotFound();
@@ -208,7 +207,7 @@ namespace LookIT.Controllers
         public async Task<IActionResult> FollowToggle(string userId)
         {
             var currentUser = await _userManager.GetUserAsync(User);
-            if (currentUser == null) return Challenge(); // Te trimite la login  ???
+            if (currentUser == null) return Challenge(); 
 
             // Verificam daca exista deja o relatie
             var existingFollow = await _context.FollowRequests
@@ -239,7 +238,7 @@ namespace LookIT.Controllers
             return RedirectToAction("Details", new { userId = userId });
         }
 
-        // LISTA DE URMĂRITORI (Cine mă urmărește pe mine)
+        // LISTA DE URMARITORI 
         [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> Followers(string userId)
@@ -253,17 +252,17 @@ namespace LookIT.Controllers
 
             ViewData["Title"] = $"Urmăritori - {user.FullName}";
 
-            // Căutăm relațiile unde 'userId' este DESTINATARUL (FollowingId) și statusul e Accepted
+            //cautam relațiile unde 'userId' este DESTINATARUL (FollowingId) și statusul e Accepted
             var followers = await _context.FollowRequests
-                                          .Include(f => f.Follower) // Avem nevoie de datele celui care dă follow
+                                          .Include(f => f.Follower) // Avem nevoie de datele celui care da follow
                                           .Where(f => f.FollowingId == userId && f.Status == FollowStatus.Accepted)
-                                          .Select(f => f.Follower) // Selectăm doar userii, nu obiectul cererii
+                                          .Select(f => f.Follower) // Selectam doar userii, nu obiectul cererii
                                           .ToListAsync();
 
-            return View("UserList", followers); // Refolosim un View comun "UserList"
+            return View("UserList", followers); 
         }
 
-        // LISTA DE URMĂRIRI (Pe cine urmăresc eu)
+        // LISTA DE URMARIRI 
         [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> Following(string userId)
@@ -277,9 +276,9 @@ namespace LookIT.Controllers
 
             ViewData["Title"] = $"Urmăriri - {user.FullName}";
 
-            // Căutăm relațiile unde 'userId' este EXPEDITORUL (FollowerId) și statusul e Accepted
+            //cautam relațiile unde 'userId' este EXPEDITORUL (FollowerId) si statusul e Accepted
             var following = await _context.FollowRequests
-                                          .Include(f => f.Following) // Avem nevoie de datele celui urmărit
+                                          .Include(f => f.Following) //avem nevoie de datele celui urmarit
                                           .Where(f => f.FollowerId == userId && f.Status == FollowStatus.Accepted)
                                           .Select(f => f.Following)
                                           .ToListAsync();

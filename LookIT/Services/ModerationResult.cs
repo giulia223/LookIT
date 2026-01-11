@@ -10,11 +10,25 @@ namespace LookIT.Services
 {
     // clasa pentru rezultatul moderarii
     public class ModerationResult
+
     {
+
+        //ne va intoarce true daca comentariul este intezis , false altfel
+
         public bool IsFlagged { get; set; }
+
+        //motivul blocarii publicarii comentariului
+
         public string? Reason { get; set; }
+
+        //ne spune daca apelul catre AI a reusit sau nu
+
         public bool Success { get; set; }
+
+        //mesajul de eroare tehnica (daca exista)
+
         public string? ErrorMessage { get; set; }
+
     }
 
     //interfata serviciului penteu dependency injection
@@ -27,28 +41,33 @@ namespace LookIT.Services
         Task<ModerationResult> CheckPostAsync(string content);
     }
 
-    //implementarea serviciului folosind OpenAi API
+    //implementarea serviciului de analiza a comentariului folsing OpenAi API
     public class ModerationService : IModerationService
     {
         private readonly HttpClient _httpClient;
         private readonly string _apiKey;
         private readonly ILogger<ModerationService> _logger;
+        //constructorul serviciului
 
         public ModerationService(IConfiguration configuration, ILogger<ModerationService> logger)
         {
             _httpClient = new HttpClient();
+            //luam cheia din appsettings.json
             _apiKey = configuration["OpenAI:ApiKey"] ?? throw new ArgumentNullException("OpenAI:ApiKey not configured");
             _logger = logger;
-
+            //configurare HttpClient pentru OpenAI API
             _httpClient.BaseAddress = new Uri("https://api.openai.com/v1/");
+            //setam cheia de autorizare (Bearer sk-..)
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
+            //setam faptul ca trimitem/primim JSON
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
         // metoda noua care verifica continutul unei potsari
         public async Task<ModerationResult> CheckPostAsync( string content)
         {
-
+            // Combinam titlul si continutul pentru a face un singur apel la AI (economie de bani)
+            // Punem etichete ca AI-ul sa stie care e titlul si care e continutul
             string combinedText = $"[CONTENT START] {content} [CONTENT END]";
 
             //refolosim logica de baza de la CheckContentAsync
@@ -126,7 +145,8 @@ namespace LookIT.Services
 
                 _logger.LogInformation("OpenAI response: {Response}", assistantMessage);
 
-                var moderationData = JsonSerializer.Deserialize<ModerationResponse>(assistantMessage);
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var moderationData = JsonSerializer.Deserialize<ModerationResponse>(assistantMessage, options);
 
                 if (moderationData is null)
                 {
@@ -136,7 +156,9 @@ namespace LookIT.Services
                         ErrorMessage = "Failed to parse API response" 
                     };
                 }
+                //validam si normalizam raspunsul bazat pe analiza comentariului
 
+                //returnam rezultatul
                 return new ModerationResult
                 {
                     Success = true,

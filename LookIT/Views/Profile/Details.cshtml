@@ -7,12 +7,14 @@
 
 <div class="container mt-4 mb-5">
 
+    @* ---  BUTON INAPOI  --- *@
     <div class="mb-4">
         <a href="javascript:history.back()" class="btn btn-sm btn-light rounded-pill px-3 fw-bold text-muted border-0 shadow-sm">
             <i class="bi bi-arrow-left me-1"></i> Înapoi
         </a>
     </div>
 
+    @* ---  CARD PROFIL HEADER --- *@
     <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
         <div class="card-body p-4 text-center">
 
@@ -37,6 +39,7 @@
                 }
             </p>
 
+            @* Statistici (Postari, Urmaritori, Urmariri) *@
             <div class="d-flex justify-content-center gap-4 gap-md-5 my-4 border-top border-bottom py-3 bg-light bg-opacity-25">
                 
                 <div class="text-center">
@@ -44,6 +47,7 @@
                     <small class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">Postări</small>
                 </div>
 
+                @* Urmaritori *@
                 <div class="text-center">
                     @if (showFullProfile)
                     {
@@ -59,6 +63,7 @@
                     }
                 </div>
 
+                @* Urmariri *@
                 <div class="text-center">
                     @if (showFullProfile)
                     {
@@ -84,6 +89,7 @@
                 </div>
             }
 
+            @* --- ZONA DE ACTIUNI (BUTOANE) --- *@
             <div class="d-flex flex-wrap justify-content-center gap-2">
                 @if (ViewBag.IsOwner)
                 {
@@ -136,6 +142,7 @@
         </div>
     </div>
 
+    @* ---  GRID POSTARI --- *@
     @if (showFullProfile)
     {
         var posts = ViewBag.UserPosts as List<LookIT.Models.Post>;
@@ -148,6 +155,7 @@
                         <a asp-controller="Posts" asp-action="Show" asp-route-id="@post.PostId" class="text-decoration-none user-select-none d-block">
                             <div class="ratio ratio-1x1 border-0 rounded-0 overflow-hidden position-relative shadow-sm bg-light post-card-hover">
                                 
+                                @* Iconita tip continut *@
                                 <div class="position-absolute top-0 end-0 m-2" style="z-index: 10;">
                                     @if (!string.IsNullOrEmpty(post.VideoUrl))
                                     {
@@ -198,6 +206,7 @@
         }
         else
         {
+            @* FARA POSTARI *@
             <div class="text-center py-5 mt-4 rounded-4 bg-light border border-dashed">
                 <div class="mb-3 text-muted opacity-25">
                     <i class="bi bi-grid-3x3" style="font-size: 3rem;"></i>
@@ -219,6 +228,7 @@
         </div>
     }
 </div>
+
 
 <style>
     .hover-magenta:hover { color: #B13079 !important; }

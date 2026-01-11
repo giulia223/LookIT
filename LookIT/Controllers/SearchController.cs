@@ -31,9 +31,6 @@ namespace LookIT.Controllers
                     .Where(u => u.FullName.Contains(query) || u.UserName.Contains(query))
                     .ToListAsync();
 
-
-
-
             }
             return View(model);
 
