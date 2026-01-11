@@ -7,7 +7,6 @@
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
 
-            @* Card container *@
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
                 <div class="card-body p-4">
 
@@ -30,7 +29,6 @@
                                      class="rounded-circle border border-3 border-white shadow-sm"
                                      style="width: 120px; height: 120px; object-fit: cover;" />
 
-                                @* Butonul flotant de upload (Camera) *@
                                 <label for="fileInput" class="position-absolute bottom-0 end-0 bg-white border-0 shadow-sm rounded-circle p-2"
                                        style="cursor: pointer; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; transition: transform 0.2s;">
                                     <i class="bi bi-camera-fill" style="color: #B13079;"></i>
@@ -41,7 +39,6 @@
                             
                         </div>
 
-                        @* --- INPUT NUME COMPLET --- *@
                         <div class="mb-3">
                             <label class="form-label small text-muted fw-bold ms-1">NUME COMPLET</label>
                             <div class="input-group">
@@ -53,7 +50,6 @@
                             <span asp-validation-for="FullName" class="text-danger small ms-1"></span>
                         </div>
 
-                        @* --- INPUT DESCRIERE --- *@
                         <div class="mb-4">
                             <label class="form-label small text-muted fw-bold ms-1">DESCRIERE</label>
                             <textarea asp-for="Description" class="form-control custom-input-bg border-0 rounded-3 p-3" rows="4" placeholder="Spune-ne ceva despre tine..."></textarea>
@@ -73,7 +69,6 @@
                             </div>
                         </div>
 
-                        @* --- BUTON SAVE --- *@
                         <div class="d-grid">
                             <button type="submit" class="btn btn-primary rounded-pill py-2 fw-bold shadow-sm">
                                 Salvează Modificările

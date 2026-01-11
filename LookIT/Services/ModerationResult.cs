@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace LookIT.Services
 {
-    //clasa pentru rezultatul analizei comentariului
+    // clasa pentru rezultatul moderarii
     public class ModerationResult
 
     {
@@ -31,13 +31,13 @@ namespace LookIT.Services
 
     }
 
-   //interfata sistemului pentru dependency injection
+    //interfata serviciului penteu dependency injection
     public interface IModerationService
     {
-        // Metoda  pentru comentarii 
+        //metoda pentru comentarii
         Task<ModerationResult> CheckContentAsync(string text);
 
-        // Metoda pentru postari
+        //metoda pentru postari
         Task<ModerationResult> CheckPostAsync(string content);
     }
 
@@ -63,43 +63,42 @@ namespace LookIT.Services
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
-        // Metoda noua care verifica o Postare completa (Continut)
+        // metoda noua care verifica continutul unei potsari
         public async Task<ModerationResult> CheckPostAsync( string content)
         {
-           
             
             string combinedText = $"[CONTENT START] {content} [CONTENT END]";
 
-            // Refolosim logica de baza de la CheckContentAsync
+            //refolosim logica de baza de la CheckContentAsync
             return await CheckContentAsync(combinedText);
         }
 
-        // Metoda de baza care vorbeste cu OpenAI
         public async Task<ModerationResult> CheckContentAsync(string text)
         {
             try
             {
-                //construim prompt-ul pentru analiza de continut al comentariului
-                var systemPrompt = @"You are a content moderation assistant. Analyze the given text for: profanity,
+                // construim prompt-ul pentru analiza continutului
+                var systemPrompt = @"You are a strict, zero-tolerance content moderation assistant. 
+                                     Your goal is to maintain a completely safe, family-friendly environment.
+        
+                                     Analyze the input text (in any language, especially Romanian and English) and flag it if it contains ANY of the following:
+                                     1. Profanity: Strong or mild swearing, masked words (e.g., 'f*ck', 'b@d'), slang, or vulgarity.
+                                     2. Hate Speech & Discrimination: Racism, sexism, homophobia, religious intolerance, or mockery of disabilities.
+                                     3. Toxicity & Insults: Bullying, harassment, aggressive behavior, personal attacks, or calling someone names (e.g., 'stupid', 'idiot').
+                                     4. Sexual Content: Explicit descriptions, sexual innuendos, solicitation, or creeping.
+                                     5. Violence: Threats, encouragement of self-harm, or graphic descriptions of violence.
 
-                                       hate speech, racism, homophobia, sexual content or violence.Respond ONLY with a JSON
+                                     INSTRUCTIONS:
+                                     - Be extremely strict. If you are unsure, FLAG IT.
+                                     - Detect toxic intent even without specific keywords.
+                                    - Respond ONLY with a JSON object.
 
-                                       object in this exact format:
+                                    Format:
+                                    {""isFlagged"" : true/false, ""category"": ""Reason (e.g. Profanity, Harassment)""}";
 
-                                       {""isFlagged"" : true/false, ""category"": ""reason_or_null""}
-
-                                        
-
-                                       Rules:
-
-                                       -isFlagged: true is the text violates any rules, false otherwise.
-
-                                       -category: if flagged, put the reason (e.g. 'Hate Speech', 'Violence'). If safe, do
-
-                                       -not include any other text.";
-                //definim User Prompt (comentariul de verificat)
                 var userPrompt = $"Analyze the content of this text: \"{text}\"";
-                //construim request-ul pentru OpenAi API
+
+                //construim request ul pentru OpenAi API
                 var requestBody = new
                 {
                     model = "gpt-4o-mini",
@@ -115,7 +114,8 @@ namespace LookIT.Services
                 var jsonContent = JsonSerializer.Serialize(requestBody);
                 var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
                 _logger.LogInformation("Sending moderation request to OpenAI API");
-                //trimitem request-ul catre OpenAI API
+
+                //trimitem request ul catre OpenAi API
                 var response = await _httpClient.PostAsync("chat/completions", content);
                 var responseContent = await response.Content.ReadAsStringAsync();
 
@@ -129,25 +129,31 @@ namespace LookIT.Services
                     };
                 }
 
-                //parsam raspunsul dat de OpenA
+                // parsam raspunsul (folosim clasele interne definite jos)
                 var openAiResponse = JsonSerializer.Deserialize<ModerationOpenAiResponse>(responseContent);
                 var assistantMessage = openAiResponse?.Choices?.FirstOrDefault()?.Message?.Content;
 
                 if (string.IsNullOrEmpty(assistantMessage))
                 {
-                    return new ModerationResult { Success = false, ErrorMessage = "Empty response from API" };
+                    return new ModerationResult 
+                    { 
+                        Success = false, 
+                        ErrorMessage = "Empty response from API" 
+                    };
                 }
 
-                // Curatam JSON-ul
-                assistantMessage = assistantMessage.Replace("```json", "").Replace("```", "").Trim();
                 _logger.LogInformation("OpenAI response: {Response}", assistantMessage);
-                //parsam JSON ul din raspunsul asistentului
+
                 var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
                 var moderationData = JsonSerializer.Deserialize<ModerationResponse>(assistantMessage, options);
 
                 if (moderationData is null)
                 {
-                    return new ModerationResult { Success = false, ErrorMessage = "Failed to parse API response" };
+                    return new ModerationResult 
+                    { 
+                        Success = false, 
+                        ErrorMessage = "Failed to parse API response" 
+                    };
                 }
                 //validam si normalizam raspunsul bazat pe analiza comentariului
 
@@ -167,7 +173,6 @@ namespace LookIT.Services
         }
     }
 
-    // --- CLASE INTERNE PENTRU MODERARE (NUMITE UNIC) ---
     public class ModerationResponse
     {
         [JsonPropertyName("isFlagged")]

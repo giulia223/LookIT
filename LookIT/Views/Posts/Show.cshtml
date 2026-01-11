@@ -49,7 +49,7 @@
 
 <br />
 
-@* --- 0. BUTON ÎNAPOI --- *@
+@*buton de intoarcere inapoi*@
 <div class="container mb-3 mx-auto" style="max-width: 600px;">
     <a href="javascript:history.back()" class="btn btn-sm btn-light rounded-pill px-3 fw-bold text-muted border-0 shadow-sm">
         <i class="bi bi-arrow-left me-1"></i> Înapoi
@@ -59,7 +59,6 @@
 <div class="card mb-3 mx-auto border-0 shadow-sm" style="max-width: 600px;">
     <div class="card-body p-3">
 
-        @* HEADER POSTARE *@
         <div class="d-flex justify-content-between align-items-start mb-3">
             <div class="d-flex align-items-center">
                 <a asp-controller="Profile" asp-action="Details" asp-route-userId="@Model.AuthorId" class="text-decoration-none">
@@ -92,14 +91,14 @@
                             <a class="dropdown-item custom-dropdown-item d-flex align-items-center gap-2 rounded-2"
                                asp-controller="Posts" asp-action="Edit" asp-route-id="@Model.PostId">
                                 <i class="bi bi-pencil"></i>
-                                <span class="text-dark">Editează postarea</span>
+                                <span>Editează postarea</span>
                             </a>
                         </li>
                         <li>
                             <form method="post" asp-controller="Posts" asp-action="Delete" asp-route-id="@Model.PostId">
                                 <button class="dropdown-item custom-dropdown-item delete-item d-flex align-items-center gap-2 rounded-2" type="submit">
                                     <i class="bi bi-trash"></i>
-                                    <span class="text-dark">Șterge postarea</span>
+                                    <span>Șterge postarea</span>
                                 </button>
                             </form>
                         </li>
@@ -108,37 +107,7 @@
             }
         </div>
     
-       @* --- SENTIMENT ANALYSIS --- *@
-@if (User.IsInRole("Administrator") && !string.IsNullOrEmpty(Model.SentimentLabel))
-{
-        string badgeClass = "bg-secondary"; 
-        string displayText = "Neutru";
-        
-        if (Model.SentimentLabel == "positive")
-        {
-            badgeClass = "bg-success"; // Verde
-            displayText = "Pozitiv";
-        }
-        else if (Model.SentimentLabel == "negative")
-        {
-            badgeClass = "bg-danger"; // Roșu
-            displayText = "Negativ";
-        }
-    
-
-    <div class="card mb-3 border-0 shadow-sm">
-        <div class="card-body py-2 d-flex align-items-center justify-content-between bg-light rounded">
-            <div>
-                <strong class="text-uppercase text-muted small">Analiză AI:</strong>
-                <span class="badge @badgeClass ms-2">@displayText</span>
-            </div>
-            
-          
-        </div>
-    </div>
-}
-
-                @* CONTINUT *@
+       
         @if (!string.IsNullOrEmpty(@Model.TextContent))
         {
             <div class="mb-2">@Html.Raw(Model.TextContent)</div>
@@ -158,7 +127,6 @@
             </div>
         }
 
-        @* BARA DE ACTIUNI *@
         @if (ViewBag.EsteUser == true || ViewBag.EsteAdministrator == true)
         {
             <div class="d-flex justify-content-between align-items-center mt-3 px-1">
@@ -186,33 +154,30 @@
                                     <input type="hidden" name="PostId" value="@Model.PostId" />
                                     <input type="hidden" name="CollectionId" value="@collection.CollectionId" />
 
-                                    @* --- MODIFICARE: Clase condiționale pentru fundal și text --- *@
                                     <button type="submit" class="dropdown-item custom-dropdown-item rounded-2 d-flex justify-content-between align-items-center @(isInCollection ? "active-collection" : "")">
                                         <span>
                                             @if (isInCollection)
                                             {
                                                 @* Iconiță plină + Text Magenta *@
-                                                <i class="bi bi-folder-fill me-2 text-magenta"></i>
-                                                <span class="fw-bold text-magenta">@collection.Name</span>
+                                                <i class="bi bi-folder-fill me-2 text-black"></i>
+                                                <span class="fw-bold">@collection.Name</span>
                                             }
                                             else
                                             {
-                                                @* Iconiță goală + Text normal *@
                                                 <i class="bi bi-folder me-2 text-muted"></i>
-                                                <span class="text-dark">@collection.Name</span>
+                                                <span >@collection.Name</span>
                                             }
                                         </span>
                                         @if (isInCollection)
                                         {
                                             @* Bifă Magenta *@
-                                            <i class="bi bi-check-lg text-magenta fw-bold"></i>
+                                            <i class="bi bi-check-lg fw-bold"></i>
                                         }
                                     </button>
                                 </form>
                             }
                         }
                         <div class="border-top pt-2 mt-2 text-center">
-                            @* Link "Colecție nouă" - Magenta *@
                             <a asp-action="New" asp-controller="Collections" asp-area="" asp-route-postId="@Model.PostId" class="text-decoration-none small text-magenta fw-bold">
                                 <i class="bi bi-plus-lg"></i> Colecție nouă
                             </a>
@@ -224,7 +189,7 @@
     </div>
 </div>
 
-@* ZONA COMENTARII *@
+
 <div class="card mb-4 mx-auto border-0 shadow-sm" style="max-width: 600px;">
     <div class="card-body p-3">
         <h6 class="text-muted mb-3 ps-1">Comentarii</h6>
@@ -240,33 +205,26 @@
                              style="width: 32px; height: 32px; object-fit: cover;"
                              alt="Me" />
                         <div class="flex-grow-1">
-                            <div class="d-flex align-items-center bg-light rounded-pill px-3 py-2 border shadow-sm" style="background-color: #f0f2f5 !important;">
+                            @* Use class custom-comment-box (no inline style) so CSS controls colors *@
+                            <div class="d-flex align-items-center rounded-pill px-3 py-2 shadow-sm custom-comment-box">
 
-                                @* --- MODIFICARE AICI: Am adăugat clasa 'comment-input-gray' --- *@
-                                @* <textarea class="form-control bg-transparent border-0 shadow-none p-0 me-2 comment-input-gray"
-                                      name="Content" rows="1" placeholder="Scrie un comentariu..."
+                                @* Textarea uses lookit-textarea and form-control; placeholders come from site.css *@
+                                <textarea class="form-control bg-transparent border-0 shadow-none p-0 me-2 lookit-textarea"
+                                      name="Content"
+                                      rows="1"
+                                      placeholder="Scrie un comentariu..."
                                       style="resize: none; overflow-y: hidden; font-size: 0.9rem;"></textarea>
 
-                                <button class="btn btn-link text-primary p-0 text-decoration-none" type="submit">
-                                    <i class="bi bi-send-fill"></i>
-                                </button> *@
-                               
-                                    @* Inputul pentru comentariu *@
-                                    <textarea class="form-control bg-transparent border-0 shadow-none p-0 me-2 comment-input-gray flex-grow-1"
-                                          name="Content"
-                                          rows="1"
-                                          placeholder="Scrie un comentariu..."
-                                          style="resize: none; overflow-y: hidden; font-size: 0.9rem; color: #4b4f56;"></textarea>
-
-                                    @* Butonul de trimitere schimbat pe Magenta *@
-                                    <button class="btn btn-link p-0 text-decoration-none d-flex align-items-center"
-                                            type="submit"
-                                            style="color: #B13079; transition: transform 0.2s ease;">
-                                        <i class="bi bi-send-fill fs-5"></i>
-                                    </button>
-                                
+                                @* Send button no inline color; site.css will style it gray *@
+                                <button class="btn btn-link p-0 text-decoration-none d-flex align-items-center send-btn"
+                                        type="submit"
+                                        style="transition: all 0.2s ease;">
+                                    <i class="bi bi-send-fill fs-5"></i>
+                                </button>
                             </div>
-                            <div class="text-danger small mt-1 ms-3">
+
+                            @* Mesajul de eroare *@
+                            <div class="text-danger small mt-1 ms-3" style="font-size: 0.75rem; font-weight: 500;">
                                 @Html.ValidationMessage("Content")
                             </div>
                         </div>
@@ -292,17 +250,16 @@
 </div>
 
 <style>
-    /* --- CULORI LOOKIT --- */
     .text-magenta {
         color: #B13079 !important;
     }
 
-    /* Fundal roz pal pentru elementele active din listă */
+
     .active-collection {
         background-color: #FBF1F7 !important;
     }
 
-    /* --- STILURI DROPDOWN --- */
+
     .custom-dropdown-item {
         background: none;
         border: none;
@@ -316,34 +273,34 @@
         transition: background-color 0.2s, color 0.2s;
     }
 
-        /* Hover standard (gri deschis) */
-        .custom-dropdown-item:hover {
-            background-color: #f8f9fa;
-        }
+    .custom-dropdown-item:hover {
+            background-color: #f8f9fa; /* Fundal gri foarte deschis */
+            color: #B13079 !important;
+            
+    }
 
-        /* Hover pe element deja activ (păstrăm rozul dar puțin mai închis sau la fel) */
-        .custom-dropdown-item.active-collection:hover {
-            background-color: #F3E5F5; /* O idee mai închis la hover */
-        }
+            .custom-dropdown-item:hover i,
+            .custom-dropdown-item:hover span {
+                color: #B13079 !important;
+            }
+
+    .custom-dropdown-item.active-collection:hover {
+        background-color: #F3E5F5;
+    }
 
     .bookmark-dropdown form {
         margin-bottom: 5px;
     }
 
-        .bookmark-dropdown form:last-of-type {
-            margin-bottom: 0;
-        }
+    .bookmark-dropdown form:last-of-type {
+        margin-bottom: 0;
+    }
 
     .bookmark-container {
         position: relative;
         display: inline-block;
-
         padding-top: 10px;
         margin-top: -10px;
-
-/*         padding-bottom: 10px;
-        margin-bottom: -10px; */
-
     }
 
     .bookmark-dropdown {
@@ -373,30 +330,41 @@
         display: block;
     }
 
-    /* --- PLACEHOLDER --- */
-    .comment-input-gray::placeholder {
-        color: #6c757d !important;
-        opacity: 1;
+    /* Zona de input comentariu - fundal gri */
+    .custom-comment-box {
+        background-color: #f0f2f5 !important; /* Același gri ca la editare */
+        border: none !important;
+        transition: background-color 0.2s ease;
     }
 
-    /* Efect de mărire la hover pentru butonul de trimitere */
-    button[type="submit"]:hover {
-        transform: scale(1.1);
-        color: #922763 !important;
+        .custom-comment-box:focus-within {
+            background-color: #e4e6eb !important; /* Se închide puțin când scrii */
+        }
+
+    /* Stil pentru textarea din interiorul bulei de comentariu */
+    .lookit-textarea {
+        color: #212529;
     }
 
-    /* Stil pentru placeholder-ul gri */
-    .comment-input-gray::placeholder {
-        color: #8e8e8e !important;
-        font-style: italic;
-        opacity: 0.8;
+        .lookit-textarea::placeholder {
+            color: #6c757d;
+            opacity: 0.8;
+        }
+
+    /* Stil pentru butonul de trimite (avionul) la hover */
+    .send-btn {
+        color: #6c757d; /* Gri implicit */
     }
 
-    /* Eliminăm orice outline albastru la focus */
-    .comment-input-gray:focus {
-        background-color: transparent !important;
-        box-shadow: none !important;
-    }
+        .send-btn:hover {
+            color: #B13079 !important; /* Devine magenta la hover */
+            transform: scale(1.1);
+        }
+
+            .send-btn:hover i {
+                color: #B13079 !important; /* Movul tău la hover */
+                transition: all 0.2s ease;
+            }
 </style>
 
 <script>
@@ -425,4 +393,4 @@
         })
         .catch(error => console.error('Eroare:', error));
     }
-</script>t>
+</script>

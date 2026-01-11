@@ -36,6 +36,7 @@ namespace LookIT.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
@@ -47,6 +48,7 @@ namespace LookIT.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("FullName")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
@@ -74,6 +76,7 @@ namespace LookIT.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("ProfilePictureUrl")
+                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 

@@ -97,7 +97,7 @@
                 <nav aria-label="Page navigation">
                     <ul class="pagination align-items-center gap-2">
 
-                        @* --- BUTONUL PREVIOUS (Cerc cu iconita) --- *@
+                        @*buton previous*@
                         <li class="page-item @(currentPage == 1 ? "disabled" : "")">
                             <a class="page-link rounded-circle d-flex align-items-center justify-content-center shadow-sm"
                                href="@ViewBag.PaginationBaseUrl@prevPage"
@@ -107,11 +107,11 @@
                             </a>
                         </li>
 
-                        @* --- BUTOANELE NUMEROTATE --- *@
+                        @*butoanele numeerotate*@
                         @for (int i = 1; i <= lastPage; i++)
                         {
-                            @* Logica pentru a nu afisa TOATE paginile daca sunt multe (optional, dar util) *@
-                            @* Afisam prima, ultima, curenta si vecinii ei *@
+                            @* logica pentru a nu afisa TOATE paginile daca sunt multe (optional, dar util) *@
+                            @* afisam prima, ultima, curenta si vecinii ei *@
                             if (i == 1 || i == lastPage || (i >= currentPage - 1 && i <= currentPage + 1))
                             {
                                 <li class="page-item @(i == currentPage ? "active" : "")">
@@ -124,14 +124,13 @@
                             }
                             else if (i == currentPage - 2 || i == currentPage + 2)
                             {
-                                @* Puncte de suspensie (...) *@
                                 <li class="page-item disabled">
                                     <span class="page-link border-0 bg-transparent text-muted">...</span>
                                 </li>
                             }
                         }
 
-                        @* --- BUTONUL NEXT (Cerc cu iconita) --- *@
+                        @*butonul de next*@
                         <li class="page-item @(currentPage == lastPage ? "disabled" : "")">
                             <a class="page-link rounded-circle d-flex align-items-center justify-content-center shadow-sm"
                                href="@ViewBag.PaginationBaseUrl@nextPage"
@@ -175,30 +174,30 @@
         --lookit-magenta: #B13079;
         --lookit-pink-light: #FBF1F7;
     }
-    /* Resetăm stilurile default ale pagination */
+ 
     .pagination .page-item .page-link {
         border: none;
-        color: #555; /* Gri închis pentru text */
+        color: #555; 
         background-color: #fff;
         transition: all 0.2s ease-in-out;
     }
 
-    /* Hover pe butoanele normale */
+
     .pagination .page-item:not(.active):not(.disabled) .page-link:hover {
-        background-color: #FBF1F7; /* Roz pal la hover */
-        color: #B13079; /* Magenta LookIT */
-        transform: translateY(-2px); /* Mic efect de ridicare */
+        background-color: #FBF1F7; 
+        color: #B13079;
+        transform: translateY(-2px);
     }
 
-    /* Starea ACTIVE (Pagina curentă) */
+    /* starea active pt pagina curenta*/
     .pagination .page-item.active .page-link {
-        background-color: #D87CB0; /* Magenta LookIT */
+        background-color: #D87CB0; 
         color: #fff;
-        box-shadow: 0 4px 6px rgba(177, 48, 121, 0.3) !important; /* Umbră magenta */
+        box-shadow: 0 4px 6px rgba(177, 48, 121, 0.3) !important;
         pointer-events: none;
     }
 
-    /* Starea DISABLED (Săgețile când nu mai poți da next/prev) */
+    /* starea dsiabled pt unde nu mai pot ajunge*/
     .pagination .page-item.disabled .page-link {
         background-color: #f0f2f5;
         color: #bcc0c4;

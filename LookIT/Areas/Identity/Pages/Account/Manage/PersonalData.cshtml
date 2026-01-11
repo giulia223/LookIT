@@ -8,27 +8,30 @@
 <div class="row justify-content-start">
     <div class="col-md-10 col-lg-8">
 
-        @* Card container *@
         <div class="card border-0 shadow-sm rounded-4">
             <div class="card-body p-4">
 
+                @* titlu pagina *@
                 <h4 class="fw-bold mb-3">@ViewData["Title"]</h4>
 
+                @* text explicativ *@
                 <div class="mb-4">
                     <p class="text-muted">
                         Contul tău conține date personale pe care ni le-ai furnizat. Această pagină îți permite să descarci aceste date sau să le ștergi definitiv.
                     </p>
                 </div>
 
-                @* --- SECȚIUNEA DOWNLOAD --- *@
+                @* sectiune descarcare date *@
                 <form id="download-data" asp-page="DownloadPersonalData" method="post" class="mb-4">
                     <button class="btn btn-primary rounded-pill w-100 py-2 fw-bold shadow-sm" type="submit">
                         <i class="bi bi-cloud-download-fill me-2"></i> Descarcă datele mele
                     </button>
                 </form>
 
-                @* --- SECȚIUNEA DELETE (Zona de pericol) --- *@
+                @* sectiune stergere cont (zona pericol) *@
                 <div class="border-top pt-4">
+
+                    @* mesaj avertisment *@
                     <div class="alert alert-light border border-danger-subtle rounded-3 p-3 mb-3">
                         <div class="d-flex align-items-start">
                             <i class="bi bi-exclamation-triangle-fill text-danger fs-5 me-2"></i>
@@ -41,6 +44,7 @@
                         </div>
                     </div>
 
+                    @* buton catre pagina de stergere *@
                     <a id="delete" asp-page="DeletePersonalData" class="btn btn-danger rounded-pill w-100 py-2 fw-bold shadow-sm">
                         <i class="bi bi-trash3-fill me-2"></i> Șterge contul
                     </a>

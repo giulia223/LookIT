@@ -1,6 +1,5 @@
 ﻿@model IEnumerable<LookIT.Models.Comment>
 
-@* Aici doar iterăm și refolosim partial-ul de mai sus *@
 @foreach (var comment in Model)
 {
     <partial name="_CommentInfo" model="comment" />

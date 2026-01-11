@@ -9,7 +9,6 @@
 <div class="row justify-content-start">
     <div class="col-md-10 col-lg-8">
 
-        @* Card container *@
         <div class="card border-0 shadow-sm rounded-4">
             <div class="card-body p-4">
 
@@ -20,7 +19,7 @@
                     var consentFeature = HttpContext.Features.Get<ITrackingConsentFeature>();
                     @if (consentFeature?.CanTrack ?? true)
                     {
-                        @* --- STATUS GENERAL 2FA --- *@
+                        @* status general 2fa *@
                         <div class="d-flex align-items-center mb-4">
                             <span class="me-2 fw-bold text-muted small">STATUS:</span>
                             @if (Model.Is2faEnabled)
@@ -39,9 +38,10 @@
 
                         @if (Model.Is2faEnabled)
                         {
-                            @* --- ZONA DE AVERTISMENTE CODURI --- *@
+                            @* zona avertismente coduri recuperare *@
                             if (Model.RecoveryCodesLeft == 0)
                             {
+                                @* niciun cod ramas *@
                                 <div class="alert alert-danger border-0 shadow-sm rounded-3 mb-4">
                                     <div class="d-flex">
                                         <i class="bi bi-exclamation-octagon-fill fs-4 me-3"></i>
@@ -54,6 +54,7 @@
                             }
                             else if (Model.RecoveryCodesLeft == 1)
                             {
+                                @* un singur cod ramas *@
                                 <div class="alert alert-danger border-0 shadow-sm rounded-3 mb-4">
                                     <div class="d-flex">
                                         <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
@@ -66,6 +67,7 @@
                             }
                             else if (Model.RecoveryCodesLeft <= 3)
                             {
+                                @* putine coduri ramase *@
                                 <div class="alert alert-warning border-0 shadow-sm rounded-3 mb-4">
                                     <div class="d-flex">
                                         <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
@@ -77,7 +79,7 @@
                                 </div>
                             }
 
-                            @* --- ACȚIUNI PRINCIPALE (Butoane) --- *@
+                            @* actiuni principale butoane *@
                             <div class="d-grid gap-2 mb-4">
                                 @if (Model.IsMachineRemembered)
                                 {
@@ -100,7 +102,7 @@
 
                         <hr class="my-4 text-muted opacity-25">
 
-                        @* --- APLICAȚIE DE AUTENTIFICARE --- *@
+                        @* sectiune aplicatie autentificare *@
                         <h5 class="fw-bold mb-3 text-muted small text-uppercase">
                             <i class="bi bi-phone me-1"></i> Aplicație de autentificare
                         </h5>
@@ -108,12 +110,14 @@
                         <div class="d-grid">
                             @if (!Model.HasAuthenticator)
                             {
+                                @* buton adaugare aplicatie *@
                                 <a id="enable-authenticator" asp-page="./EnableAuthenticator" class="btn btn-primary rounded-pill py-2 fw-bold shadow-sm">
                                     <i class="bi bi-qr-code-scan me-2"></i> Adaugă aplicație de autentificare
                                 </a>
                             }
                             else
                             {
+                                @* butoane configurare/resetare *@
                                 <div class="d-flex gap-2 flex-column flex-sm-row">
                                     <a id="enable-authenticator" asp-page="./EnableAuthenticator" class="btn btn-primary rounded-pill w-100 fw-bold shadow-sm">
                                         <i class="bi bi-gear-fill me-2"></i> Configurează aplicația
@@ -127,7 +131,7 @@
                     }
                     else
                     {
-                        @* --- MESAJ COOKIES --- *@
+                        @* mesaj cookies neacceptate *@
                         <div class="alert alert-danger border-0 shadow-sm rounded-3">
                             <div class="d-flex">
                                 <i class="bi bi-cookie fs-4 me-3"></i>

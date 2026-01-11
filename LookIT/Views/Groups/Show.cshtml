@@ -4,165 +4,159 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @model LookIT.Models.Group
 
-@{
-    ViewData["Title"] = "Group Details";
-}
-
 <div class="py-4">
     <div class="container">
         <div class="row justify-content-center">
 
-            @* COLOANA CENTRALA (Feed si Info) *@
+            @* --- 1. COLOANA CENTRALA --- *@
             <div class="col-md-8">
 
                 @if (ViewBag.message != null)
                 {
-                    <div class="alert shadow-sm text-center mb-4">
+                    <div class="alert text-center mb-4 border-0 shadow-sm" style="background-color: #F0F2F5; color: #B13079; border-radius: 12px;">
                         <i class="bi bi-info-circle-fill me-2"></i>
                         @ViewBag.message
                     </div>
                 }
 
                 @* HEADER GRUP *@
-                <div class="card mb-4 shadow-sm border-0 overflow-hidden rounded-4">
+                <div class="card mb-4 shadow-sm border-0 overflow-hidden rounded-4 bg-white">
                     <partial name="_GroupInfo" model="@ViewBag.GroupDetails"></partial>
-
                     <div class="card-footer bg-white border-0 px-4 pb-4">
+                        @* 1. LOGICĂ PENTRU MEMBRU SIMPLU (PENDING SAU ACCEPTED) *@
                         @if (ViewBag.UserGroupStatus == "Pending")
                         {
-                            <button type="button" class="btn btn-discard w-100 fw-bold opacity-75" disabled>
+                            <button type="button" class="btn w-100 fw-bold rounded-pill opacity-75 mb-3" disabled style="background-color: #F0F2F5; color: #8d949e; border: none;">
                                 <i class="bi bi-clock-history me-1"></i> Cerere în așteptare
                             </button>
                         }
                         else if (ViewBag.UserGroupStatus == "Accepted")
                         {
-                            <div class="d-flex flex-column gap-3">
-                                <div class="lookit-badge-status text-center py-2 rounded-3">
-                                    <i class="bi bi-person-check-fill me-2"></i> Ești membru al acestui grup
+                            <div class="d-flex flex-column gap-3 mb-3">
+                                <div class="text-center py-2 rounded-pill fw-bold" style="background-color: #E8F5E9; color: #2E7D32;">
+                                    <i class="bi bi-person-check-fill me-2"></i> Ești membru activ
                                 </div>
-
                                 <form asp-controller="GroupMembers" asp-action="LeaveGroup" method="post" onsubmit="return confirm('Sigur vrei să părăsești acest grup?');">
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="groupId" value="@ViewBag.GroupDetails.GroupId" />
-                                    <button type="submit" class="btn btn-discard btn-sm w-100 border-0 fw-bold" style="color: #dc3545 !important;">
+                                    <button type="submit" class="btn btn-link w-100 text-decoration-none fw-bold btn-text-red">
                                         <i class="bi bi-box-arrow-right me-1"></i> Părăsește grupul
                                     </button>
                                 </form>
                             </div>
                         }
-                        else if (ViewBag.UserGroupStatus == "moderator" || ViewBag.EsteAdministrator)
+
+                        @* 2. LOGICĂ PENTRU ADMINISTRARE (MODERATOR SAU ADMIN GLOBAL) *@
+                        @if (ViewBag.UserGroupStatus == "moderator" || ViewBag.EsteAdministrator)
                         {
                             <div class="d-flex flex-column gap-2">
-                                @if (!ViewBag.EsteAdministrator)
-                                {
-                                    <div class="lookit-badge-status text-center py-2 mb-2 rounded-3">
-                                        <i class="bi bi-shield-check me-2"></i> Ești moderatorul grupului
-                                    </div>
-                                }
+                                <div class="text-center py-2 mb-2 rounded-pill fw-bold" style="background-color: #FDF2F7; color: #B13079;">
+                                    <i class="bi bi-shield-check me-2"></i> Panou Administrativ
+                                </div>
 
-                                <div class="d-flex gap-2">
+                                <div class="d-flex gap-2 mb-2">
                                     <a asp-controller="Groups" asp-action="Edit" asp-route-id="@ViewBag.GroupDetails.GroupId"
-                                       class="btn btn-discard flex-fill fw-bold py-2">
+                                       class="btn btn-edit flex-fill py-2 fw-bold rounded-pill">
                                         <i class="bi bi-pencil-square me-1"></i> Editează
                                     </a>
 
                                     <form asp-controller="Groups" asp-action="Delete" asp-route-id="@ViewBag.GroupDetails.GroupId"
                                           method="post" class="flex-fill" onsubmit="return confirm('Ștergerea este definitivă. Continui?');">
                                         @Html.AntiForgeryToken()
-                                        <button type="submit" class="btn btn-discard w-100 py-2 fw-bold" style="color: #dc3545 !important;">
+                                        <button type="submit" class="btn btn-delete w-100 py-2 fw-bold rounded-pill">
                                             <i class="bi bi-trash3 me-1"></i> Șterge
                                         </button>
                                     </form>
                                 </div>
                             </div>
                         }
-                        else
+
+                        @* 3. BUTONUL DE JOIN - Afișat dacă NU este membru/moderator, CHIAR DACĂ este Admin *@
+                        @if (ViewBag.UserGroupStatus == "None" || (ViewBag.EsteAdministrator && ViewBag.UserGroupStatus == "None"))
                         {
-                            <form asp-controller="Groups" asp-action="JoinGroup" method="post" class="w-100">
+                            <form asp-controller="Groups" asp-action="JoinGroup" method="post" class="w-100 mt-2">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="MemberId" value="@UserManager.GetUserId(User)" />
                                 <input type="hidden" name="GroupId" value="@ViewBag.GroupDetails.GroupId" />
-                                <button type="submit" class="btn btn-primary btn-lg w-100 py-3">
-                                    <i class="bi bi-person-plus-fill me-1"></i> Alătură-te Grupului
+                                <button type="submit" class="btn btn-join-community btn-lg py-2 w-100 shadow-sm">
+                                    <i class="bi bi-person-plus-fill me-1"></i> Alătură-te Comunității
                                 </button>
                             </form>
                         }
                     </div>
                 </div>
 
-                @* MESAJE *@
-                @if (SignInManager.IsSignedIn(User) && (ViewBag.UserGroupStatus == "Accepted" || ViewBag.UserGroupStatus == "moderator" || ViewBag.EsteAdministrator))
-                {
-                    <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
-                        <h5 class="fw-bold lookit-title mb-0">
-                            <i class="bi bi-chat-left-text me-2"></i>Discuții
-                        </h5>
-
-                        <a class="btn btn-lookit-action-vibrant"
-                           asp-controller="Messages"
-                           asp-action="New"
-                           asp-route-id="@ViewBag.GroupDetails.GroupId">
-                            <i class="bi bi-plus-lg"></i> Mesaj Nou
-                        </a>
-                    </div>
-
-                    @foreach (var m in ViewBag.Messages)
+                @* --- ZONA DISCUTII --- *@
+                <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
+                    <h5 class="fw-bold text-black mb-0">Discuții</h5>
+                    @if (SignInManager.IsSignedIn(User) && (ViewBag.UserGroupStatus == "Accepted" || ViewBag.UserGroupStatus == "moderator" || ViewBag.EsteAdministrator))
                     {
-                        <div class="card mb-3 shadow-sm border-0 rounded-4 overflow-hidden">
-                            <partial name="_MsgInfo" model="m"></partial>
-                        </div>
+                        <a class="btn btn-lookit-gray btn-sm px-4 rounded-pill fw-bold shadow-sm"
+                           asp-controller="Messages" asp-action="New" asp-route-id="@ViewBag.GroupDetails.GroupId">
+                            <i class="bi bi-plus-lg me-1"></i> Mesaj Nou
+                        </a>
                     }
 
-                    @if (ViewBag.Messages.Count == 0)
+                </div>
+
+                @* Mesaje sau Lock Screen *@
+                @if (SignInManager.IsSignedIn(User) && (ViewBag.UserGroupStatus == "Accepted" || ViewBag.UserGroupStatus == "moderator" || ViewBag.EsteAdministrator))
+                {
+
+                    @if (ViewBag.Messages != null && ViewBag.Messages.Count > 0)
                     {
-                        <div class="lookit-card-empty text-center shadow-sm">
-                            <i class="bi bi-chat-dots lookit-title opacity-25" style="font-size: 3rem;"></i>
-                            <p class="text-muted mt-2">Nu există mesaje. Începe o conversație!</p>
+                        @foreach (var m in ViewBag.Messages)
+                        {
+                            <div class="card mb-3 shadow-sm border-0 rounded-4 overflow-hidden bg-white">
+                                <partial name="_MsgInfo" model="m"></partial>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+  
+                        <div class="card border-0 shadow-sm rounded-4 py-5 text-center bg-white mb-4">
+                            <div class="mb-3">
+
+                                <i class="bi bi-chat-dots" style="font-size: 3.5rem; color: #E4E6EB;"></i>
+                            </div>
+                            <h5 class="fw-bold text-black">Încă nu sunt discuții</h5>
+                            <p class="text-muted small">Fii primul care pornește o conversație în această comunitate!</p>
+                            <div class="mt-3">
+                                <a class="btn btn-magenta-outline btn-sm px-4"
+                                   asp-controller="Messages" asp-action="New" asp-route-id="@ViewBag.GroupDetails.GroupId">
+                                    Scrie un mesaj
+                                </a>
+                            </div>
                         </div>
                     }
                 }
                 else
                 {
-                    <div class="lookit-card-empty text-center shadow-sm">
-                        <i class="bi bi-lock-fill lookit-title opacity-25" style="font-size: 3rem;"></i>
-                        <h5 class="mt-3 fw-bold lookit-title">Acest grup este privat</h5>
-                        <p class="text-muted">Trebuie să fii membru pentru a vedea activitatea.</p>
+                    <div class="card border-0 shadow-sm rounded-4 py-5 text-center bg-white">
+                        <i class="bi bi-lock-fill mb-3" style="font-size: 3rem; color: #8d949e; opacity: 0.3;"></i>
+                        <h5 class="fw-bold text-black">Conținut Privat</h5>
+                        <p class="text-muted small">Trebuie să fii membru pentru a vedea discuțiile.</p>
                     </div>
                 }
             </div>
 
-            @* COLOANA LATERALA *@
+            @* --- 2. COLOANA LATERALA --- *@
             <div class="col-md-4">
                 @* LISTA MEMBRI *@
-                <div class="card shadow-sm border-0 mb-4 rounded-4">
+                <div class="card shadow-sm border-0 mb-4 rounded-4 bg-white">
                     <div class="card-body">
-                        <h6 class="lookit-sidebar-title">Membri • @ViewBag.ActiveMembersCount</h6>
-
-                        <div class="member-list scrollbar-lookit" style="max-height: 350px; overflow-y: auto; overflow-x: hidden; padding-right: 5px;">
+                        <h6 class="fw-bold text-black mb-4">Membri (@ViewBag.ActiveMembersCount)</h6>
+                        <div class="member-list" style="max-height: 300px; overflow-y: auto;">
                             @foreach (var member in ViewBag.GroupDetails.Members)
                             {
                                 @if (member.Status != "Pending")
                                 {
                                     <div class="d-flex align-items-center justify-content-between mb-3">
                                         <div class="d-flex align-items-center">
-                                            <img src="@member.Member.ProfilePictureUrl" class="rounded-circle border-0 shadow-sm me-2" style="width:34px;height:34px;object-fit:cover;" />
-                                            <span class="small fw-bold">
-                                                <a asp-controller="Profile" asp-action="Details" asp-route-userId="@member.Member.Id" class="text-dark text-decoration-none hover-magenta">
-                                                    @member.Member.FullName
-                                                </a>
-                                            </span>
+                                            <img src="@member.Member.ProfilePictureUrl" class="rounded-circle shadow-sm me-2" style="width:32px;height:32px;object-fit:cover;" />
+                                            <span class="small fw-bold text-black">@member.Member.FullName</span>
                                         </div>
-
-                                        @if (ViewBag.GroupDetails.ModeratorId == UserManager.GetUserId(User) && member.Member.Id != ViewBag.GroupDetails.ModeratorId)
-                                        {
-                                            <form method="post" asp-controller="GroupMembers" asp-action="RemoveMember" asp-route-groupId="@member.GroupId" asp-route-memberId="@member.MemberId">
-                                                @Html.AntiForgeryToken()
-                                                <input type="hidden" name="id" value="@member.Member.Id" />
-                                                <button type="submit" class="btn btn-sm text-danger border-0 p-0 opacity-50 hover-opacity-100" onclick="return confirm('Elimini acest utilizator?');">
-                                                    <i class="bi bi-person-x fs-5"></i>
-                                                </button>
-                                            </form>
-                                        }
                                     </div>
                                 }
                             }
@@ -170,34 +164,30 @@
                     </div>
                 </div>
 
-                @* CERERI IN ASTEPTARE *@
+                @* CERERI *@
                 @if (ViewBag.GroupDetails.ModeratorId == UserManager.GetUserId(User))
                 {
                     var pendingRequests = ViewBag.PendingRequests;
                     @if (pendingRequests != null && pendingRequests.Count > 0)
                     {
-                        <div class="card shadow-sm border-0 rounded-4 overflow-hidden mb-4" style="border-left: 4px solid #B13079 !important;">
+                        <div class="card shadow-sm border-0 rounded-4 overflow-hidden mb-4" style="border-top: 4px solid #2E7D32;">
                             <div class="card-body">
-                                <h6 class="fw-bold mb-3 lookit-title">Cereri noi (@pendingRequests.Count)</h6>
-
-                                <div class="pending-list scrollbar-lookit" style="max-height: 300px; overflow-y: auto; overflow-x: hidden; padding-right: 5px;">
-                                    @foreach (var member in pendingRequests)
-                                    {
-                                        <div class="p-3 mb-2 bg-light rounded-3 shadow-none border-0">
-                                            <div class="d-flex align-items-center mb-2">
-                                                <img src="@member.Member.ProfilePictureUrl" class="rounded-circle me-2 shadow-sm" style="width:28px;height:28px;object-fit:cover;" />
-                                                <span class="small fw-bold">@member.Member.FullName</span>
-                                            </div>
-                                            <form method="post" asp-controller="GroupMembers" asp-action="AcceptMember">
-                                                @Html.AntiForgeryToken()
-                                                <input type="hidden" name="MemberId" value="@member.Member.Id" />
-                                                <input type="hidden" name="GroupId" value="@ViewBag.GroupDetails.GroupId" />
-
-                                                <button type="submit" class="btn btn-primary btn-sm w-100 rounded-pill">Aprobă</button>
-                                            </form>
+                                <h6 class="fw-bold mb-3 text-black">Cereri în așteptare</h6>
+                                @foreach (var member in pendingRequests)
+                                {
+                                    <div class="p-3 mb-2 rounded-4" style="background-color: #F8F9FA; border: 1px solid #E4E6EB;">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <img src="@member.Member.ProfilePictureUrl" class="rounded-circle me-2" style="width:28px;height:28px;object-fit:cover;" />
+                                            <span class="small fw-bold text-black">@member.Member.FullName</span>
                                         </div>
-                                    }
-                                </div>
+                                        <form method="post" asp-controller="GroupMembers" asp-action="AcceptMember">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="MemberId" value="@member.Member.Id" />
+                                            <input type="hidden" name="GroupId" value="@ViewBag.GroupDetails.GroupId" />
+                                            <button type="submit" class="btn btn-success w-100 btn-sm rounded-pill fw-bold">Aprobă</button>
+                                        </form>
+                                    </div>
+                                }
                             </div>
                         </div>
                     }
@@ -208,12 +198,99 @@
 </div>
 
 <style>
-    .hover-magenta:hover {
-        color: #B13079 !important;
+
+
+    .text-black {
+        color: #1c1e21 !important;
     }
 
-    .hover-opacity-100:hover {
-        opacity: 1 !important;
+    /* Starea inițială a butonului (gri deschis, discret) */
+    .btn-lookit-gray {
+        background-color: #f0f2f5; /* Griul tău "nu dens" */
+        color: #6c757d; /* Text gri pentru a nu fi strident initial */
+        border: none;
+        transition: all 0.3s ease;
     }
 
+        .btn-lookit-gray i {
+            color: #6c757d; /* Iconița gri la început */
+        }
+
+        /* Starea de HOVER (Roz pal cu scris magenta) */
+        .btn-lookit-gray:hover {
+            background-color: #FBF1F7 !important; /* Rozul tău pal (fundalul "nu dens") */
+            color: #B13079 !important; /* Scrisul magenta închis */
+            transform: translateY(-2px); /* Mișcarea pe care o avem la restul butoanelor */
+            box-shadow: 0 4px 8px rgba(177, 48, 121, 0.1) !important;
+            border: 1px solid #B13079 !important;
+        }
+
+            /* Forțăm și iconița să devină magenta la hover */
+            .btn-lookit-gray:hover i {
+                color: #B13079 !important;
+            }
+
+        /* Reset la apăsare */
+        .btn-lookit-gray:active {
+            transform: translateY(0);
+        }
+
+    .btn-delete {
+        background-color: #FFEBEE;
+        color: #D32F2F;
+        border: none;
+    }
+
+        .btn-delete:hover {
+            background-color: #D32F2F;
+            color: white;
+        }
+
+    .btn-edit {
+        background-color: #F0F2F5;
+        color: #4b4f56;
+        border: none;
+    }
+
+        .btn-edit:hover {
+            background-color: #E4E6EB;
+            color: #1c1e21;
+        }
+
+    .btn-text-red:hover {
+        color: #C62828 !important;
+        background-color: #FFEBEE;
+        border-radius: 50rem;
+    }
+
+    .member-list::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .member-list::-webkit-scrollbar-thumb {
+        background: #E4E6EB;
+        border-radius: 10px;
+    }
+
+    .btn-join-community {
+        background-color: #B13079;
+        color: white;
+        border: none;
+        border-radius: 50rem;
+        font-weight: 700;
+        font-size: 1.1rem;
+        transition: all 0.3s cubic-bezier(.175,.885,.32,1.275);
+        min-width: 280px; 
+    }
+
+        .btn-join-community:hover {
+            background-color: #922763;
+            color: white;
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(177, 48, 121, 0.3) !important;
+        }
+
+        .btn-join-community:active {
+            transform: translateY(-1px);
+        }
 </style>

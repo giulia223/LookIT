@@ -26,9 +26,9 @@ namespace LookIT.Controllers
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IWebHostEnvironment _env;
         private readonly IConfiguration _configuration;
-        private readonly ISentimentAnalysisService _sentimentService;
+        private readonly IMesajeAnalizaService _sentimentService;
 
-        public MessagesController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IWebHostEnvironment env, IConfiguration configuration, ISentimentAnalysisService sentimentService)
+        public MessagesController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IWebHostEnvironment env, IConfiguration configuration, IMesajeAnalizaService sentimentService)
         {
             _context = context;
             _userManager = userManager;
@@ -36,6 +36,13 @@ namespace LookIT.Controllers
             _env = env;
             _configuration = configuration;
             _sentimentService = sentimentService;
+        }
+
+        private bool IsMember(int groupId)
+        {
+            
+            var userId = _userManager.GetUserId(User);
+            return _context.GroupMembers.Any(gm => gm.GroupId == groupId && gm.MemberId == userId && (gm.Status == "Accepted" || gm.Status == "moderator"));
         }
 
         //afisare toate mesajele
@@ -53,6 +60,12 @@ namespace LookIT.Controllers
         [Authorize(Roles = "User,Administrator")]
         public IActionResult ShowMessages(int groupId)
         {
+            if (!IsMember(groupId))
+            {
+                TempData["message"] = "Nu ai permisiunea de a accesa acest grup.";
+                TempData["messageType"] = "alert-danger";
+                return RedirectToAction("Index", "Groups");
+            }
             var messages = _context.Messages
                 .Where(m => m.GroupId == groupId)
                 .Include(m => m.User)
@@ -84,6 +97,12 @@ namespace LookIT.Controllers
         [Authorize(Roles = "User,Administrator")]
         public IActionResult New(int id)
         {
+            if (!IsMember(id))
+            {
+                TempData["message"] = "Nu ai permisiunea de a accesa acest grup.";
+                TempData["messageType"] = "alert-danger";
+                return RedirectToAction("Index", "Groups");
+            }
             Message msg = new Message();
             msg.GroupId = id;
             return View(msg);
@@ -93,6 +112,12 @@ namespace LookIT.Controllers
         [Authorize(Roles = "User,Administrator")]
         public async Task<IActionResult> New(Message msg, IFormFile? Image, IFormFile? Video)
         {
+            if (!IsMember(msg.GroupId))
+            {
+                TempData["message"] = "Nu ai permisiunea de a accesa acest grup. (Nu ai voie sa trimiti mesaje)";
+                TempData["messageType"] = "alert-danger";
+                return RedirectToAction("Index", "Groups");
+            }
             //variabile boolenane pentru a verifica daca avem continut de tip text, imagine sau videoclip
             bool hasText = !string.IsNullOrWhiteSpace(msg.TextContent);
             bool hasImage = Image != null && Image.Length > 0;
@@ -182,20 +207,7 @@ namespace LookIT.Controllers
                 msg.VideoUrl = databaseFileName;
             }
 
-            //if (hasText)
-            //{
-            //    var aiCheck = await CheckContentGemini(msg.TextContent);
-
-            //    if (!aiCheck.IsSafe)
-            //    {
-            //        // Mesajul de eroare cerut
-            //        ModelState.AddModelError("TextContent",
-            //            $"Conținutul tău conține termeni nepotriviți (Detectat: {aiCheck.Reasons}). Te rugăm să reformulezi.");
-
-            //        return View(msg);
-            //    }
-
-            //}
+         
 
             if (ModelState.IsValid)
             {
@@ -604,11 +616,15 @@ namespace LookIT.Controllers
         public IActionResult Report(int Id)
         {
             SetAccessRights();
+
             var msg = _context.Messages.Find(Id);
             var groupId = msg.GroupId;
             if (msg is null)
                 return NotFound();
-
+            if (!IsMember(msg.GroupId))
+            {
+                return Forbid();
+            }
             var group = _context.Groups.Find(groupId);
            // if (group.Members.Contains(GetUserId(User))) ;
             msg.isReported = true;

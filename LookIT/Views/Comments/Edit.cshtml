@@ -8,7 +8,6 @@
 
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
 
-                @* HEADER CARD - STILIZAT MODERN (Alb + Iconiță Roz) *@
                 <div class="card-header bg-white border-0 pt-4 pb-0 text-center">
                     <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3"
                          style="width: 64px; height: 64px; background-color: #FBF1F7;">
@@ -25,7 +24,6 @@
 
                 <div class="card-body p-4">
 
-                    @* Mesaj informativ discret *@
                     <div class="alert alert-light border-0 d-flex align-items-center mb-4 rounded-3" style="background-color: #f8f9fa;">
                         <i class="bi bi-info-circle-fill text-muted me-2 fs-5"></i>
                         <span class="text-muted small">Modifici conținutul mesajului tău original.</span>
@@ -36,26 +34,24 @@
                         <input type="hidden" asp-for="PostId" />
                         <input type="hidden" asp-for="Date" />
 
-                        @* TEXTAREA MODERNĂ (Stil LookIT) *@
                         <div class="mb-4">
                             <label asp-for="Content" class="form-label small text-muted fw-bold ms-1">CONȚINUT NOU</label>
 
                             <textarea asp-for="Content"
-                                      class="form-control custom-input-bg border-0 rounded-3 p-3"
+                                      class="form-control custom-textarea-gray border-0 rounded-3 p-3"
                                       placeholder="Scrie aici..."
                                       style="height: 150px; resize: none; white-space: pre-line; box-shadow: none;"></textarea>
 
                             <span asp-validation-for="Content" class="text-danger small mt-1 d-block ms-1"></span>
                         </div>
 
-                        @* BUTOANE ACȚIUNE *@
                         <div class="d-grid gap-2">
                             <button class="btn btn-primary rounded-pill py-2 fw-bold shadow-sm" type="submit">
                                 <i class="bi bi-check-lg me-1"></i> Salvează modificările
                             </button>
 
                             <a asp-controller="Posts" asp-action="Show" asp-route-id="@Model.PostId"
-                               class="btn btn-outline-secondary rounded-pill py-2 fw-bold border-0">
+                               class="btn btn-outline-secondary rounded-pill py-2 fw-bold border-0 custom-cancel-hover">
                                 Anulează
                             </a>
                         </div>
@@ -66,10 +62,48 @@
     </div>
 </div>
 
-@* STILURI CSS SPECIALE PENTRU ACEASTĂ PAGINĂ *@
 <style>
     /* Suprascriere placeholder doar aici dacă e nevoie,
            deși clasa custom-input-bg ar trebui să fie ok */
+   
+    .custom-textarea-gray {
+        background-color: #f0f2f5 !important; /* Un gri deschis curat (stil Facebook/Social) */
+        transition: background-color 0.2s ease;
+    }
+
+        .custom-textarea-gray:focus {
+            background-color: #e4e6eb !important; /* Un gri puțin mai pronunțat la focus */
+            outline: none;
+        }
+
+    /* 2. Butonul principal Salvează (Roz) */
+    .btn-save-magenta {
+        background-color: #D14095; /* Varianta mai deschisă înainte de hover */
+        color: white;
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+        .btn-save-magenta:hover {
+            background-color: #B13079; /* Culoarea ta de bază la hover */
+            color: white;
+            transform: translateY(-1px);
+        }
+
+    /* 3. Butonul Anulează (Hover Roz) */
+    .custom-cancel-hover {
+        transition: all 0.3s ease;
+        color: #6c757d;
+        
+    }
+
+        .custom-cancel-hover:hover {
+            background-color: #FBF1F7; /* Fundal roz pal la hover */
+            color: #B13079 !important; /* Textul devine rozul tău la hover */
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+
     .custom-input-bg::placeholder {
         color: #6c757d;
         opacity: 0.8;

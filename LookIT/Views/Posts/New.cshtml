@@ -113,7 +113,7 @@
 
                         @*buton de submit: adaugam postarea*@
                         <div class="d-grid mt-4">
-                            <button class="btn btn-primary fw-bold py-2 rounded-3" type="submit" style="background-color: #1877f2; border: none;">
+                            <button class="btn btn-primary btn-magenta fw-bold py-2 rounded-3" type="submit">
                                 Postează
                             </button>
                         </div>
@@ -141,10 +141,10 @@
     }
 
         .upload-box:hover {
-            background-color: #e4e6eb !important; /* Gri mai inchis la hover */
+            background-color: #e4e6eb !important; 
             transform: translateY(-2px);
         }
-    /* Ascundem toolbar-ul complex summernote pentru un look mai clean, sau il simplificam */
+
     .note-editor.note-frame {
         border: none !important;
         box-shadow: none !important;
@@ -158,6 +158,17 @@
     .note-statusbar {
         display: none !important;
     }
+
+    .btn-magenta {
+        background-color: #E04EAB; /* Magenta */
+        border: none;
+        transition: background-color 0.3s ease;
+    }
+
+        .btn-magenta:hover {
+            background-color: #B13079; /* Un magenta puțin mai închis la hover */
+            color: white;
+        }
 </style>
 
 @*sectiune cu JavaScript unde ne ocupam de logica previzulaizarii imaginilor, videoclipurilor cat si cea de stergere a acestora*@

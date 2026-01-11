@@ -1,4 +1,4 @@
-﻿    @model LookIT.Models.Collection
+﻿        @model LookIT.Models.Collection
 
     @{
         ViewData["Title"] = Model.Name;
@@ -6,22 +6,14 @@
 
     <div class="container mt-4 mb-5">
 
-        @* ================================================================================= *@
-        @* 0. BUTON ÎNAPOI                                                                  *@
-        @* ================================================================================= *@
-        @* AM MODIFICAT AICI: mb-3 în loc de mb-5 pentru distanță mai mică *@
         <div class="mb-3">
             <a asp-action="Index" asp-controller="Collections" class="btn btn-sm btn-light rounded-pill px-3 fw-bold text-muted border-0 shadow-sm">
                 <i class="bi bi-arrow-left me-1"></i> Înapoi la Colecții
             </a>
         </div>
 
-        @* ================================================================================= *@
-        @* 1. HEADER                                                                        *@
-        @* ================================================================================= *@
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-end mb-4 border-bottom pb-4 gap-3">
 
-            @* Titlu și Iconiță *@
             <div>
                 <div class="d-flex align-items-center gap-3">
                     <div class="d-flex align-items-center justify-content-center rounded-circle"
@@ -30,10 +22,8 @@
                     </div>
 
                     <div>
-                        @* AM MODIFICAT AICI: font-size 1.5rem (mai mic) *@
                         <h1 class="fw-bold mb-0" style="font-size: 1.5rem;">@Model.Name</h1>
 
-                        @* AM MODIFICAT AICI: font-size 0.8rem (mai mic) *@
                         <p class="text-muted mb-0 text-uppercase fw-bold tracking-wide" style="font-size: 0.8rem;">
                             @Model.PostCollections.Count @(Model.PostCollections.Count == 1 ? "postare" : "postări")
                         </p>
@@ -41,17 +31,15 @@
                 </div>
             </div>
 
-            @* Butoane Acțiuni *@
             @if ((Model.UserId == ViewBag.UserCurent || ViewBag.EsteAdministrator) && Model.Name != "All Posts")
             {
                 <div class="d-flex gap-2">
-                    @* Buton Editare *@
+
                     <a asp-action="Edit" asp-controller="Collections" asp-route-Id="@Model.CollectionId"
                        class="btn btn-action rounded-pill px-4 fw-bold shadow-sm">
                         <i class="bi bi-pencil-square me-2"></i> Editează
                     </a>
 
-                    @* Buton Ștergere *@
                     <form method="post" asp-controller="Collections" asp-action="Delete" asp-route-Id="@Model.CollectionId">
                         <button type="submit" class="btn btn-action-danger rounded-pill px-4 fw-bold shadow-sm"
                                 onclick="return confirm('Ești sigur că vrei să ștergi colecția? Postările vor rămâne salvate, dar colecția va dispărea.')">
@@ -62,9 +50,6 @@
             }
         </div>
 
-        @* ================================================================================= *@
-        @* 2. GRID POSTĂRI                                                                  *@
-        @* ================================================================================= *@
         @if (Model.PostCollections.Count > 0)
         {
             <div class="row g-1">
@@ -163,17 +148,14 @@
         }
     else
     {
-        @* ================================================================================= *@
-        @* 3. EMPTY STATE                                                                    *@
-        @* ================================================================================= *@
+
         <div class="text-center py-5 mt-4 rounded-4 bg-light border border-dashed">
             <div class="mb-4 d-inline-block position-relative">
 
-                @* MODIFICARE: background-color: #FBF1F7 (Roz pal) în loc de bg-white *@
+
                 <div class="rounded-circle shadow-sm d-flex align-items-center justify-content-center"
                      style="width: 100px; height: 100px; background-color: #FBF1F7;">
 
-                    @* MODIFICARE: Am scos 'opacity-50' pentru ca Magenta să fie clară *@
                     <i class="bi bi-journal-bookmark" style="font-size: 3rem; color: #B13079;"></i>
                 </div>
 
@@ -189,11 +171,9 @@
     }
     </div>
 
-    @* ================================================================================= *@
-    @* 4. STILURI CSS                                                                   *@
-    @* ================================================================================= *@
+
     <style>
-        /* STIL BUTON EDITARE */
+
         .btn-action {
             background-color: #fff;
             border: 1px solid #dee2e6;
@@ -207,7 +187,7 @@
                 border-color: #B13079;
             }
 
-        /* STIL BUTON ȘTERGERE */
+
         .btn-action-danger {
             background-color: #fff;
             border: 1px solid #dee2e6;
@@ -221,7 +201,6 @@
                 border-color: #dc3545;
             }
 
-        /* Alte stiluri */
         .hover-overlay {
             position: absolute;
             top: 0;
