@@ -461,8 +461,8 @@ namespace LookIT.Controllers
                         {
                             post.SentimentLabel = "neutral";
                            
-                    //    }
-                    //}
+                       }
+                    }
 
                     // daca am ales o poza, o vom modifica
                     if (Image != null && Image.Length > 0)

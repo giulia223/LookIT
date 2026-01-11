@@ -29,10 +29,10 @@
 
                             @* Stil Input consistent cu restul aplicației *@
                             <div class="input-group">
-                                <span class="input-group-text border-0 rounded-start-3 ps-3">
+                                <span class="input-group-text border-0 rounded-start-3 ps-3 custom-input-gray">
                                     <i class="bi bi-fonts"></i>
                                 </span>
-                                <input asp-for="Name" class="form-control custom-input-bg border-0 rounded-end-3 py-2" placeholder="Nume nou..." autocomplete="off" />
+                                <input asp-for="Name" class="form-control custom-input-gray border-0 rounded-end-3 py-2" placeholder="Nume nou..." autocomplete="off" />
                             </div>
 
                             <span asp-validation-for="Name" class="text-danger small mt-1 d-block ms-1"></span>
@@ -45,7 +45,7 @@
                             </button>
 
                             @* Buton Anulare *@
-                            <a asp-action="Index" class="btn btn-outline-secondary rounded-pill py-2 fw-bold shadow-sm">
+                            <a asp-action="Index" class="btn btn-outline-secondary rounded-pill py-2 fw-bold shadow-sm custom-cancel-hover">
                                 Anulează
                             </a>
                         </div>
@@ -63,6 +63,24 @@
         </div>
     </div>
 </div>
+
+<style>
+    .custom-cancel-hover {
+        transition: all 0.3s ease;
+        color: #6c757d;
+    }
+
+        .custom-cancel-hover:hover {
+           
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+
+    .custom-input-gray {
+        background-color: #f0f2f5 !important;
+        transition: background-color 0.2s ease;
+    }
+</style>
 
 @section Scripts {
     @{

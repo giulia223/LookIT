@@ -8,10 +8,9 @@
     <div class="container">
         <div class="row justify-content-center">
 
-            @* --- 1. COLOANA CENTRALĂ --- *@
+            @* --- 1. COLOANA CENTRALA --- *@
             <div class="col-md-8">
 
-                @* Alertă subtilă - fundal gri deschis, text magenta *@
                 @if (ViewBag.message != null)
                 {
                     <div class="alert text-center mb-4 border-0 shadow-sm" style="background-color: #F0F2F5; color: #B13079; border-radius: 12px;">
@@ -23,21 +22,20 @@
                 @* HEADER GRUP *@
                 <div class="card mb-4 shadow-sm border-0 overflow-hidden rounded-4 bg-white">
                     <partial name="_GroupInfo" model="@ViewBag.GroupDetails"></partial>
-
                     <div class="card-footer bg-white border-0 px-4 pb-4">
+                        @* 1. LOGICĂ PENTRU MEMBRU SIMPLU (PENDING SAU ACCEPTED) *@
                         @if (ViewBag.UserGroupStatus == "Pending")
                         {
-                            <button type="button" class="btn w-100 fw-bold rounded-pill opacity-75" disabled style="background-color: #F0F2F5; color: #8d949e; border: none;">
+                            <button type="button" class="btn w-100 fw-bold rounded-pill opacity-75 mb-3" disabled style="background-color: #F0F2F5; color: #8d949e; border: none;">
                                 <i class="bi bi-clock-history me-1"></i> Cerere în așteptare
                             </button>
                         }
                         else if (ViewBag.UserGroupStatus == "Accepted")
                         {
-                            <div class="d-flex flex-column gap-3">
+                            <div class="d-flex flex-column gap-3 mb-3">
                                 <div class="text-center py-2 rounded-pill fw-bold" style="background-color: #E8F5E9; color: #2E7D32;">
                                     <i class="bi bi-person-check-fill me-2"></i> Ești membru activ
                                 </div>
-
                                 <form asp-controller="GroupMembers" asp-action="LeaveGroup" method="post" onsubmit="return confirm('Sigur vrei să părăsești acest grup?');">
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="groupId" value="@ViewBag.GroupDetails.GroupId" />
@@ -47,21 +45,21 @@
                                 </form>
                             </div>
                         }
-                        else if (ViewBag.UserGroupStatus == "moderator" || ViewBag.EsteAdministrator)
+
+                        @* 2. LOGICĂ PENTRU ADMINISTRARE (MODERATOR SAU ADMIN GLOBAL) *@
+                        @if (ViewBag.UserGroupStatus == "moderator" || ViewBag.EsteAdministrator)
                         {
                             <div class="d-flex flex-column gap-2">
                                 <div class="text-center py-2 mb-2 rounded-pill fw-bold" style="background-color: #FDF2F7; color: #B13079;">
                                     <i class="bi bi-shield-check me-2"></i> Panou Administrativ
                                 </div>
 
-                                <div class="d-flex gap-2">
-                                    @* Buton Editare - Albastru/Gri *@
+                                <div class="d-flex gap-2 mb-2">
                                     <a asp-controller="Groups" asp-action="Edit" asp-route-id="@ViewBag.GroupDetails.GroupId"
                                        class="btn btn-edit flex-fill py-2 fw-bold rounded-pill">
                                         <i class="bi bi-pencil-square me-1"></i> Editează
                                     </a>
 
-                                    @* Buton Ștergere - Roșu intens *@
                                     <form asp-controller="Groups" asp-action="Delete" asp-route-id="@ViewBag.GroupDetails.GroupId"
                                           method="post" class="flex-fill" onsubmit="return confirm('Ștergerea este definitivă. Continui?');">
                                         @Html.AntiForgeryToken()
@@ -72,13 +70,15 @@
                                 </div>
                             </div>
                         }
-                        else
+
+                        @* 3. BUTONUL DE JOIN - Afișat dacă NU este membru/moderator, CHIAR DACĂ este Admin *@
+                        @if (ViewBag.UserGroupStatus == "None" || (ViewBag.EsteAdministrator && ViewBag.UserGroupStatus == "None"))
                         {
-                            <form asp-controller="Groups" asp-action="JoinGroup" method="post" class="w-100">
+                            <form asp-controller="Groups" asp-action="JoinGroup" method="post" class="w-100 mt-2">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="MemberId" value="@UserManager.GetUserId(User)" />
                                 <input type="hidden" name="GroupId" value="@ViewBag.GroupDetails.GroupId" />
-                                <button type="submit" class="btn btn-join-community btn-lg py-2 shadow-sm">
+                                <button type="submit" class="btn btn-join-community btn-lg py-2 w-100 shadow-sm">
                                     <i class="bi bi-person-plus-fill me-1"></i> Alătură-te Comunității
                                 </button>
                             </form>
@@ -86,12 +86,12 @@
                     </div>
                 </div>
 
-                @* --- ZONA DISCUȚII --- *@
+                @* --- ZONA DISCUTII --- *@
                 <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
                     <h5 class="fw-bold text-black mb-0">Discuții</h5>
                     @if (SignInManager.IsSignedIn(User) && (ViewBag.UserGroupStatus == "Accepted" || ViewBag.UserGroupStatus == "moderator" || ViewBag.EsteAdministrator))
                     {
-                        <a class="btn btn-success-lookit btn-sm px-4 rounded-pill fw-bold shadow-sm"
+                        <a class="btn btn-lookit-gray btn-sm px-4 rounded-pill fw-bold shadow-sm"
                            asp-controller="Messages" asp-action="New" asp-route-id="@ViewBag.GroupDetails.GroupId">
                             <i class="bi bi-plus-lg me-1"></i> Mesaj Nou
                         </a>
@@ -102,7 +102,7 @@
                 @* Mesaje sau Lock Screen *@
                 @if (SignInManager.IsSignedIn(User) && (ViewBag.UserGroupStatus == "Accepted" || ViewBag.UserGroupStatus == "moderator" || ViewBag.EsteAdministrator))
                 {
-                    @* Verificăm dacă există mesaje în listă *@
+
                     @if (ViewBag.Messages != null && ViewBag.Messages.Count > 0)
                     {
                         @foreach (var m in ViewBag.Messages)
@@ -114,10 +114,10 @@
                     }
                     else
                     {
-                        @* --- ACEASTA ESTE SECȚIUNEA REINTRODUSĂ --- *@
+  
                         <div class="card border-0 shadow-sm rounded-4 py-5 text-center bg-white mb-4">
                             <div class="mb-3">
-                                @* Iconiță gri neutră pentru a nu încărca vizual pagina *@
+
                                 <i class="bi bi-chat-dots" style="font-size: 3.5rem; color: #E4E6EB;"></i>
                             </div>
                             <h5 class="fw-bold text-black">Încă nu sunt discuții</h5>
@@ -141,7 +141,7 @@
                 }
             </div>
 
-            @* --- 2. COLOANA LATERALĂ --- *@
+            @* --- 2. COLOANA LATERALA --- *@
             <div class="col-md-4">
                 @* LISTA MEMBRI *@
                 <div class="card shadow-sm border-0 mb-4 rounded-4 bg-white">
@@ -164,7 +164,7 @@
                     </div>
                 </div>
 
-                @* CERERI (VERDE PENTRU APROBARE) *@
+                @* CERERI *@
                 @if (ViewBag.GroupDetails.ModeratorId == UserManager.GetUserId(User))
                 {
                     var pendingRequests = ViewBag.PendingRequests;
@@ -198,29 +198,43 @@
 </div>
 
 <style>
-    /* Fundal neutru pentru pagină */
-    body {
-        background-color: #F7F8FA;
-    }
+
 
     .text-black {
         color: #1c1e21 !important;
     }
 
-    /* Buton Verde (Succes/Mesaj Nou) */
-    .btn-success-lookit {
-        background-color: #2E7D32;
-        color: white;
+    /* Starea inițială a butonului (gri deschis, discret) */
+    .btn-lookit-gray {
+        background-color: #f0f2f5; /* Griul tău "nu dens" */
+        color: #6c757d; /* Text gri pentru a nu fi strident initial */
         border: none;
-        transition: all 0.2s ease;
+        transition: all 0.3s ease;
     }
 
-        .btn-success-lookit:hover {
-            background-color: #1B5E20;
-            transform: translateY(-2px);
+        .btn-lookit-gray i {
+            color: #6c757d; /* Iconița gri la început */
         }
 
-    /* Buton Roșu (Ștergere) */
+        /* Starea de HOVER (Roz pal cu scris magenta) */
+        .btn-lookit-gray:hover {
+            background-color: #FBF1F7 !important; /* Rozul tău pal (fundalul "nu dens") */
+            color: #B13079 !important; /* Scrisul magenta închis */
+            transform: translateY(-2px); /* Mișcarea pe care o avem la restul butoanelor */
+            box-shadow: 0 4px 8px rgba(177, 48, 121, 0.1) !important;
+            border: 1px solid #B13079 !important;
+        }
+
+            /* Forțăm și iconița să devină magenta la hover */
+            .btn-lookit-gray:hover i {
+                color: #B13079 !important;
+            }
+
+        /* Reset la apăsare */
+        .btn-lookit-gray:active {
+            transform: translateY(0);
+        }
+
     .btn-delete {
         background-color: #FFEBEE;
         color: #D32F2F;
@@ -232,7 +246,6 @@
             color: white;
         }
 
-    /* Buton Editare (Gri) */
     .btn-edit {
         background-color: #F0F2F5;
         color: #4b4f56;
@@ -244,14 +257,12 @@
             color: #1c1e21;
         }
 
-    /* Text Roșu pentru "Părăsește" */
     .btn-text-red:hover {
         color: #C62828 !important;
         background-color: #FFEBEE;
         border-radius: 50rem;
     }
 
-    /* Scrollbar */
     .member-list::-webkit-scrollbar {
         width: 4px;
     }
@@ -261,7 +272,6 @@
         border-radius: 10px;
     }
 
-    /* Stil pentru butonul de Join - rafinat și centrat */
     .btn-join-community {
         background-color: #B13079;
         color: white;
@@ -270,7 +280,7 @@
         font-weight: 700;
         font-size: 1.1rem;
         transition: all 0.3s cubic-bezier(.175,.885,.32,1.275);
-        min-width: 280px; /* Îi dăm o lățime fixă minimă să nu fie nici prea mic */
+        min-width: 280px; 
     }
 
         .btn-join-community:hover {

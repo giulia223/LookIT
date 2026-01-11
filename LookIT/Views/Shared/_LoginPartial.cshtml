@@ -8,13 +8,13 @@
     var user = await UserManager.GetUserAsync(User);
 }
 
-@* Am adaugat clasele d-flex si align-items-center pentru aliniere verticala perfecta *@
+
 <ul class="navbar-nav d-flex align-items-center">
 
     @if (SignInManager.IsSignedIn(User))
     {
         <li class="nav-item dropdown">
-            @* Am scos ms-2 si am pus o clasa de centrare *@
+    
             <a class="nav-link dropdown-toggle d-flex align-items-center gap-2 p-0" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 @if (user != null && !string.IsNullOrEmpty(user.ProfilePictureUrl))
                 {
@@ -52,18 +52,39 @@
     }
     else
     {
-        @* Folosim d-flex si aici pentru a asigura alinierea *@
+    
         <li class="nav-item d-flex align-items-center">
-            <a class="nav-link text-light fw-medium" asp-area="Identity" asp-page="/Account/Login">Autentificare</a>
+            <a class="btn-hover-effect  fw-medium" asp-area="Identity" asp-page="/Account/Login">Autentificare</a>
         </li>
         <li class="nav-item d-flex align-items-center">
-            @* Am scos ms-2 care putea impinge butonul si am pus o margine mai controlata *@
+          
             <a class="btn btn-primary btn-sm rounded-pill px-3 ms-2 fw-bold d-inline-flex align-items-center"
                asp-area="Identity" asp-page="/Account/Register"
                style="height: 32px;">
-                @* Am setat inaltimea egala cu cea a avatarului pentru consistenta *@
+               
                 Înregistrare
             </a>
         </li>
     }
 </ul>
+
+<style>
+   
+    .btn-hover-effect {
+        display: inline-block;
+        color: white !important; 
+        text-decoration: none !important;
+        transition: all 0.3s ease; 
+        padding: 8px 16px;
+        border-radius: 6px;
+        background-color: transparent; 
+    }
+
+        .btn-hover-effect:hover {
+            transform: translateY(-4px);
+            background-color: rgba(255, 255, 255, 0.7) !important; 
+            color: #B13079 !important; 
+            text-decoration: none !important; 
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); 
+        }
+</style>

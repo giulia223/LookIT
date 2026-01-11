@@ -10,7 +10,7 @@
 
                 @if (TempData["message"] != null)
                 {
-                    @* Alertă subtilă - gri cu text magenta *@
+
                     <div class="alert text-center mb-4 shadow-sm p-3 border-0" style="background-color: #F0F2F5; color: #B13079; border-radius: 12px;">
                         <i class="bi bi-info-circle-fill me-2"></i>
                         @TempData["message"]
@@ -30,13 +30,11 @@
                             <input type="hidden" asp-for="MessageId" />
                             <input type="hidden" asp-for="GroupId" />
 
-                            @* Editor Text *@
                             <div class="mb-4">
                                 <label asp-for="TextContent" class="form-label fw-bold text-black small text-uppercase">Conținut mesaj</label>
                                 <textarea asp-for="TextContent" class="form-control summernote"></textarea>
                             </div>
 
-                            @* Secțiunea Media - Gri neutru pentru echilibru *@
                             <div class="row mb-4">
                                 <div class="col-md-6 mb-3 mb-md-0">
                                     <label class="form-label fw-bold text-black small text-uppercase">Imagine</label>
@@ -61,14 +59,12 @@
                                 </div>
                             </div>
 
-                            @* Previzualizare Media existentă *@
                             @if (!string.IsNullOrEmpty(Model.ImageUrl))
                             {
                                 <div id="currentImageContainer" class="p-3 rounded-4 mb-4 text-center" style="background-color: #F8F9FA; border: 1px solid #E4E6EB;">
                                     <p class="text-black small fw-bold text-uppercase mb-3">Imagine curentă</p>
                                     <img src="@Model.ImageUrl" class="img-fluid rounded-3 shadow-sm mb-3" style="max-height: 250px;" />
 
-                                    @* Pete de culoare: Roșu pentru acțiunea de ștergere *@
                                     <div class="form-check d-flex justify-content-center">
                                         <input class="form-check-input me-2 shadow-none border-danger" type="checkbox" name="DeleteImage" value="true" id="delImg">
                                         <label class="form-check-label text-danger fw-bold small" for="delImg">Șterge această imagine</label>
@@ -76,13 +72,11 @@
                                 </div>
                             }
 
-                            @* Container pentru previzualizarea din JS-ul tău *@
                             <div id="newImageContainer" class="d-none p-3 rounded-4 mb-4 text-center" style="background-color: #F8F9FA; border: 1px solid #E4E6EB;">
                                 <p class="text-black small fw-bold text-uppercase mb-2">Previzualizare Nouă</p>
                                 <img id="newImagePreview" src="#" class="img-fluid rounded-3 shadow-sm" style="max-height: 250px;" />
                             </div>
 
-                            @* Butoane de acțiune - Balans între Magenta și Gri *@
                             <div class="d-grid gap-2 mt-4">
                                 <button type="submit" class="btn btn-primary btn-lg py-2 fw-bold rounded-pill shadow-sm">
                                     Salvează Modificările
@@ -101,12 +95,11 @@
 </div>
 
 <style>
-    /* Culori text */
+
     .text-black {
         color: #1c1e21 !important;
     }
 
-    /* Zonele de upload - Gri discret care devine negru/alb la hover */
     .upload-zone {
         background-color: #F0F2F5;
         border: 1px solid #E4E6EB;
@@ -120,7 +113,6 @@
             border-color: #ccd0d5;
         }
 
-    /* Butonul Anulează - Gri neutru care devine Roz pal la hover */
     .btn-discard {
         text-align: center;
         color: #8d949e;
@@ -136,7 +128,6 @@
             color: #B13079;
         }
 
-    /* Ajustare Summernote pentru aspect modern */
     .note-editor.note-frame {
         border: 1px solid #E4E6EB !important;
         border-radius: 12px !important;

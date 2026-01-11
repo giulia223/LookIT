@@ -10,14 +10,13 @@
 
                 @if (ViewBag.message != null)
                 {
-                    @* Alertă neutră cu accent magenta *@
+
                     <div class="alert text-center mb-4 shadow-sm p-3 border-0" style="background-color: #FDF2F7; color: #B13079; border-radius: 12px;">
                         <i class="bi bi-info-circle-fill me-2"></i>
                         @ViewBag.message
                     </div>
                 }
 
-                @* Card Alb Pur cu design minimalist *@
                 <div class="card lookit-card-form border-0 shadow-sm" style="background-color: #ffffff; border-radius: 15px;">
 
                     <div class="card-header border-0 bg-white pt-4 pb-0 px-4 text-center">
@@ -29,7 +28,6 @@
                     <div class="card-body p-4">
                         <form asp-controller="Groups" asp-action="New" method="post">
 
-                            @* Input Nume Grup *@
                             <div class="form-group mb-3">
                                 <label asp-for="GroupName" class="form-label fw-bold ms-1" style="color: #1c1e21; font-size: 0.9rem;">Numele Grupului</label>
                                 <div class="input-group">
@@ -43,7 +41,6 @@
                                 <span asp-validation-for="GroupName" class="text-danger small ms-1"></span>
                             </div>
 
-                            @* Input Descriere *@
                             <div class="form-group mb-4">
                                 <label asp-for="Description" class="form-label fw-bold ms-1" style="color: #1c1e21; font-size: 0.9rem;">Descriere</label>
                                 <textarea asp-for="Description" class="form-control lookit-textarea custom-input"
@@ -53,7 +50,6 @@
                                 <span asp-validation-for="Description" class="text-danger small ms-1"></span>
                             </div>
 
-                            @* Butoane Acțiune *@
                             <div class="d-grid gap-2">
                                 <button type="submit" class="btn btn-primary btn-lg py-2 shadow-sm"
                                         style="background-color: #B13079; border: none; font-weight: 700; border-radius: 50rem;">
@@ -80,7 +76,7 @@
 </div>
 
 <style>
-    /* Stil pentru input-uri (Gri la repaus, Alb la focus) */
+
     .custom-input {
         background-color: #F0F2F5 !important;
         border: 1px solid #E4E6EB !important;
@@ -95,7 +91,6 @@
             outline: none !important;
         }
 
-    /* Stil pentru iconița laterală */
     .custom-addon {
         background-color: #F0F2F5 !important;
         border: 1px solid #E4E6EB !important;
@@ -111,7 +106,6 @@
         color: #B13079 !important;
     }
 
-    /* Buton Renunță - Gri care devine roz pal la hover */
     .btn-discard {
         text-align: center;
         margin-top: 0.5rem;

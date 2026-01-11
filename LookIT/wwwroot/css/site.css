@@ -119,21 +119,25 @@ header {
     font-size: 0.9rem;
     transition: all .2s ease;
     border: none;
-    background-color: #ffffff; /* changed to white */
+    background-color: #f0f2f5; /* changed to white */
     color: #1c1e21;
 }
-.form-control:focus,
-.input-group-text:focus,
-.btn:focus,
-.form-check-input:focus {
-    outline: none;
-    /* keep magenta focus ring instead of blue */
-    box-shadow: 0 0 0 .18rem rgba(177,48,121,0.18);
-    background-color: #ffffff;
-}
+    .form-control:focus,
+    .input-group-text:focus,
+    .btn:focus,
+    .form-check-input:focus {
+        outline: none;
+        /* keep magenta focus ring instead of blue */
+        box-shadow: 0 0 0 .18rem rgba(177,48,121,0.18);
+        background-color: #f0f2f5;
+    }
 
 /* input group icon: use white background for consistency */
-.input-group-text { background-color: #ffffff; border: none; color: #B13079; }
+.input-group-text {
+    background-color: #f0f2f5;
+    border: none;
+    color: #B13079;
+}
 .input-group-text i { color: #B13079; }
 
 /* --- 5. BUTTONS --- */
@@ -306,4 +310,61 @@ header {
     color: #ffffff !important;
     background-color: rgba(255,255,255,0.15) !important;
     outline: none !important;
+}
+
+/* Corecție pentru textul care pare acoperit */
+.lookit-textarea, .form-control {
+    padding-left: 12px !important; /* Acest spațiu împinge prima literă la dreapta */
+    padding-top: 10px !important; /* Opțional, pentru a nu fi lipit de marginea de sus */
+    text-indent: 0; /* Ne asigurăm că nu există un indent negativ ciudat */
+}
+
+/* Dacă folosești Summernote, editorul are propriul container */
+.note-editable {
+    padding: 12px !important;
+}
+
+/* Anulează efectele pentru elementul din dreapta (Profilul) */
+.navbar-nav .nav-item.border-start-lg .nav-link:hover {
+    background-color: transparent !important;
+    transform: none !important;
+}
+
+    /* 2. Schimbă culoarea săgeții la hover pe profil */
+    /* Targetăm iconița sau clasa de dropdown-toggle */
+    .navbar-nav .nav-item.border-start-lg .nav-link:hover::after,
+    .navbar-nav .nav-item.border-start-lg .nav-link:hover .bi-chevron-down,
+    .navbar-nav .nav-item.border-start-lg .nav-link:hover i {
+        color: #9c2869 !important; /* Magenta închis */
+    }
+
+/* Resetăm stilurile default ale pagination */
+.pagination .page-item .page-link {
+    border: none;
+    color: #555; /* Gri închis pentru text */
+    background-color: #fff;
+    transition: all 0.2s ease-in-out;
+}
+
+/* Hover pe butoanele normale */
+.pagination .page-item:not(.active):not(.disabled) .page-link:hover {
+    background-color: #FBF1F7; /* Roz pal la hover */
+    color: #B13079; /* Magenta LookIT */
+    transform: translateY(-2px); /* Mic efect de ridicare */
+}
+
+/* Starea ACTIVE (Pagina curentă) */
+.pagination .page-item.active .page-link {
+    background-color: #D87CB0; /* Magenta LookIT */
+    color: #fff;
+    box-shadow: 0 4px 6px rgba(177, 48, 121, 0.3) !important; /* Umbră magenta */
+    pointer-events: none;
+}
+
+/* Starea DISABLED (Săgețile când nu mai poți da next/prev) */
+.pagination .page-item.disabled .page-link {
+    background-color: #f0f2f5;
+    color: #bcc0c4;
+    opacity: 0.7;
+    box-shadow: none !important;
 }

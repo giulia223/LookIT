@@ -18,7 +18,7 @@
                 </div>
 
                 <form method="get" action="/Groups/Index">
-                    @* Am aplicat clasa .search-container din CSS-ul tau *@
+
                     <div class="search-container d-flex align-items-center p-2 shadow-sm">
                         <i class="bi bi-search ms-2"></i>
                         <input type="text"
@@ -50,7 +50,6 @@
                     <div class="d-flex flex-column gap-3">
                         @foreach (var group in ViewBag.Groups)
                         {
-                            @* Folosim clasa de card din sistemul tau *@
                             <div class="card lookit-sidebar-card border-0 overflow-hidden">
                                 <div class="card-body p-0">
                                     <div class="d-flex align-items-center justify-content-between pe-4">
@@ -134,7 +133,6 @@
 
                     @if (loggedUser is not null)
                     {
-                        @* Card Activitate *@
                         <div class="card lookit-sidebar-card border-0 mb-4">
                             <div class="card-body p-4 text-center">
                                 <h6 class="fw-bold mb-3" style="color: #B13079;">Activitatea mea</h6>
@@ -147,7 +145,6 @@
                             </div>
                         </div>
 
-                        @* Card Link-uri Utile *@
                         <div class="card lookit-sidebar-card border-0">
                             <div class="card-body p-4">
                                 <h6 class="fw-bold mb-4" style="color: #B13079;">Navigare rapidă</h6>
@@ -180,7 +177,7 @@
 
 
     <style>
-        /* Stil pentru cercurile de iconite din sidebar */
+
         .icon-circle {
             width: 42px;
             height: 42px;
@@ -193,7 +190,7 @@
         }
 
             .icon-circle i {
-                font-size: 1.4rem; /* Iconite MARI conform cerintei tale */
+                font-size: 1.4rem; 
                 color: #B13079;
             }
 
@@ -206,7 +203,6 @@
             color: #B13079;
         }
 
-        /* Suprascriere paginare pentru a asigura rotunjirea perfecta */
         .page-link {
             display: flex !important;
             align-items: center !important;

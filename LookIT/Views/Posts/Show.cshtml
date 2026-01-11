@@ -71,14 +71,14 @@
                             <a class="dropdown-item custom-dropdown-item d-flex align-items-center gap-2 rounded-2"
                                asp-controller="Posts" asp-action="Edit" asp-route-id="@Model.PostId">
                                 <i class="bi bi-pencil"></i>
-                                <span class="text-dark">Editează postarea</span>
+                                <span>Editează postarea</span>
                             </a>
                         </li>
                         <li>
                             <form method="post" asp-controller="Posts" asp-action="Delete" asp-route-id="@Model.PostId">
                                 <button class="dropdown-item custom-dropdown-item delete-item d-flex align-items-center gap-2 rounded-2" type="submit">
                                     <i class="bi bi-trash"></i>
-                                    <span class="text-dark">Șterge postarea</span>
+                                    <span>Șterge postarea</span>
                                 </button>
                             </form>
                         </li>
@@ -172,19 +172,19 @@
                                             {
                                                 @* Iconiță plină + Text Magenta *@
                                                 <i class="bi bi-folder-fill me-2 text-black"></i>
-                                                <span class="fw-bold text-black">@collection.Name</span>
+                                                <span class="fw-bold">@collection.Name</span>
                                             }
                                             else
                                             {
                                                 @* Iconiță goală + Text normal *@
                                                 <i class="bi bi-folder me-2 text-muted"></i>
-                                                <span class="text-dark">@collection.Name</span>
+                                                <span >@collection.Name</span>
                                             }
                                         </span>
                                         @if (isInCollection)
                                         {
                                             @* Bifă Magenta *@
-                                            <i class="bi bi-check-lg text-black fw-bold"></i>
+                                            <i class="bi bi-check-lg fw-bold"></i>
                                         }
                                     </button>
                                 </form>
@@ -289,8 +289,15 @@
     }
 
     .custom-dropdown-item:hover {
-        background-color: #f8f9fa;
+            background-color: #f8f9fa; /* Fundal gri foarte deschis */
+            color: #B13079 !important;
+            
     }
+
+            .custom-dropdown-item:hover i,
+            .custom-dropdown-item:hover span {
+                color: #B13079 !important;
+            }
 
     .custom-dropdown-item.active-collection:hover {
         background-color: #F3E5F5;
@@ -337,6 +344,42 @@
     .bookmark-container:hover .bookmark-dropdown {
         display: block;
     }
+
+    /* Zona de input comentariu - fundal gri */
+    .custom-comment-box {
+        background-color: #f0f2f5 !important; /* Același gri ca la editare */
+        border: none !important;
+        transition: background-color 0.2s ease;
+    }
+
+        .custom-comment-box:focus-within {
+            background-color: #e4e6eb !important; /* Se închide puțin când scrii */
+        }
+
+    /* Stil pentru textarea din interiorul bulei de comentariu */
+    .lookit-textarea {
+        color: #212529;
+    }
+
+        .lookit-textarea::placeholder {
+            color: #6c757d;
+            opacity: 0.8;
+        }
+
+    /* Stil pentru butonul de trimite (avionul) la hover */
+    .send-btn {
+        color: #6c757d; /* Gri implicit */
+    }
+
+        .send-btn:hover {
+            color: #B13079 !important; /* Devine magenta la hover */
+            transform: scale(1.1);
+        }
+
+            .send-btn:hover i {
+                color: #B13079 !important; /* Movul tău la hover */
+                transition: all 0.2s ease;
+            }
 </style>
 
 <script>
@@ -365,4 +408,4 @@
         })
         .catch(error => console.error('Eroare:', error));
     }
-</script>t>
+</script>

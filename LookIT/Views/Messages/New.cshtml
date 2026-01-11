@@ -14,7 +14,7 @@
 
                 @if (ViewBag.message != null)
                 {
-                    @* Alertă neutră cu fundal gri-albastru pal *@
+
                     <div class="alert text-center mb-4 shadow-sm border-0" style="background-color: #E7F0FF; color: #0D6EFD; border-radius: 12px;">
                         <i class="bi bi-check-circle-fill me-2"></i> @ViewBag.message
                     </div>
@@ -32,7 +32,6 @@
                             <div asp-validation-summary="ModelOnly" class="text-danger mb-3 small"></div>
                             <input type="hidden" asp-for="GroupId" />
 
-                            @* Editorul de Text *@
                             <div class="mb-4">
                                 <label asp-for="TextContent" class="form-label fw-bold text-black small text-uppercase">Conținut mesaj</label>
                                 <textarea asp-for="TextContent" class="form-control summernote border-0 shadow-none"
@@ -40,7 +39,6 @@
                                 <span asp-validation-for="TextContent" class="text-danger small"></span>
                             </div>
 
-                            @* Secțiunea de Atașamente - Gri Neutru *@
                             <div class="mb-3">
                                 <label class="form-label fw-bold text-black small text-uppercase">Adaugă media</label>
                                 <div class="row g-2">
@@ -68,7 +66,7 @@
                                 </div>
                             </div>
 
-                            @* Previzualizare Imagini (cu Pete de Roșu pentru ștergere) *@
+                            @* Previzualizare Imagini  *@
                             <div id="imagePreviewContainer" class="mb-3 d-none">
                                 <div class="p-3 rounded-4 position-relative" style="background-color: #F8F9FA; border: 1px solid #E4E6EB;">
                                     <img id="imagePreview" src="#" class="img-fluid rounded-3 shadow-sm mx-auto d-block" style="max-height: 350px;" />
@@ -88,7 +86,6 @@
                                 </div>
                             </div>
 
-                            @* Butoane de Acțiune *@
                             <div class="d-grid gap-2 mt-4">
                                 <button type="submit" class="btn btn-primary btn-lg py-2 fw-bold rounded-pill shadow-sm">
                                     <i class="bi bi-send-fill me-2"></i> Trimite Mesaj
@@ -108,7 +105,7 @@
 </div>
 
 <style>
-    /* Fundal pagină neutru */
+    
     body {
         background-color: #F7F8FA;
     }
@@ -117,7 +114,7 @@
         color: #1c1e21 !important;
     }
 
-    /* Zonele de selecție media - Gri discret */
+
     .upload-zone-compact {
         background-color: #F0F2F5;
         border: 1px solid #E4E6EB;
@@ -131,7 +128,7 @@
             transform: translateY(-2px);
         }
 
-    /* Buton Renunță - Subtil */
+ 
     .btn-discard {
         text-align: center;
         color: #8d949e;
@@ -151,7 +148,6 @@
         cursor: pointer;
     }
 
-    /* Forțăm editorul să fie curat */
     .note-editor.note-frame {
         border: 1px solid #E4E6EB !important;
         border-radius: 12px !important;
