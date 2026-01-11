@@ -118,6 +118,7 @@ namespace LookIT.Controllers
             if (user == null)
                 return NotFound();
 
+
             if (!ModelState.IsValid)
                 return View(model);
 

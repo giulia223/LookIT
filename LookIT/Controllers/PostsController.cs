@@ -27,6 +27,8 @@ namespace LookIT.Controllers
         [AllowAnonymous]
         public IActionResult Index()
         {
+            bool isAdministrator = User.IsInRole("Administrator");
+
             //afisam cate 4 postarii in pagina
             int _perPage = 4;
             
@@ -49,9 +51,12 @@ namespace LookIT.Controllers
             //luam postarile utilizatorilor publici sau pe care ii urmarim (chiar daca ar avea cont privat)
             //in cazul in care utilizatorul nu este logat, cum followingUsersIds este o lista vida, va avea doar de verificat daca autorul postarii respective
             //are contul public
+            //daca e admin va putea vedea tot
             var posts = db.Posts
                           .Include(post => post.Author)
-                          .Where(post => followingUserIds.Contains(post.AuthorId) || post.Author.Public)
+                          .Where(post => isAdministrator ||
+                                         followingUserIds.Contains(post.AuthorId) || 
+                                         post.Author.Public)
                           .OrderByDescending(post => post.Date)
                           .ToList();
 
