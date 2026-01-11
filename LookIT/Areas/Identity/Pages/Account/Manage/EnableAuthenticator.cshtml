@@ -8,7 +8,6 @@
 <div class="row justify-content-start">
     <div class="col-md-10 col-lg-8">
 
-        @* Card container *@
         <div class="card border-0 shadow-sm rounded-4">
             <div class="card-body p-4">
 
@@ -17,7 +16,7 @@
 
                 <p class="text-muted mb-4">Parcurge următorii pași pentru a activa securitatea sporită:</p>
 
-                @* --- PASUL 1: DESCARCARE APLICATIE --- *@
+                @* pasul 1 - descarcare aplicatie *@
                 <div class="mb-4 pb-3 border-bottom">
                     <h5 class="fw-bold" style="color: #B13079;">
                         <span class="badge rounded-pill me-2" style="background-color: #B13079;">1</span>
@@ -46,7 +45,7 @@
                     </div>
                 </div>
 
-                @* --- PASUL 2: SCANARE QR SAU CHEIE --- *@
+                @* pasul 2 - scanare qr sau cheie manuala *@
                 <div class="mb-4 pb-3 border-bottom">
                     <h5 class="fw-bold" style="color: #B13079;">
                         <span class="badge rounded-pill me-2" style="background-color: #B13079;">2</span>
@@ -56,6 +55,7 @@
 
                     <div class="row align-items-center mt-3">
                         <div class="col-md-5 text-center mb-3 mb-md-0">
+                            @* div pentru generare qr code *@
                             <div id="qrCode" class="border p-2 rounded-3 d-inline-block bg-white shadow-sm"></div>
                             <div id="qrCodeData" data-url="@Model.AuthenticatorUri"></div>
                         </div>
@@ -69,7 +69,7 @@
                     </div>
                 </div>
 
-                @* --- PASUL 3: VERIFICARE --- *@
+                @* pasul 3 - verificare cod *@
                 <div class="mb-2">
                     <h5 class="fw-bold" style="color: #B13079;">
                         <span class="badge rounded-pill me-2" style="background-color: #B13079;">3</span>
@@ -93,14 +93,12 @@
                                     <span asp-validation-for="Input.Code" class="text-danger small ms-1"></span>
                                 </div>
 
-                                @* --- AICI AM MODIFICAT: Container Flex pentru butoane --- *@
+                                @* butoane actiune *@
                                 <div class="d-flex gap-2">
-                                    @* Butonul de Verify (Dreapta - Principal) *@
                                     <button type="submit" class="btn btn-primary rounded-pill flex-grow-1 py-2 fw-bold shadow-sm">
                                         Activează
                                     </button>
 
-                                    @* Butonul de Cancel (Stânga) *@
                                     <a asp-page="./TwoFactorAuthentication" class="btn btn-outline-secondary rounded-pill flex-grow-1 py-2 fw-bold shadow-sm">
                                         Renunță
                                     </a>
@@ -119,7 +117,6 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-    @* Căile corecte stabilite anterior *@
     <script type="text/javascript" src="~/lib/qrcodejs/qrcode.min.js"></script>
     <script type="text/javascript" src="~/js/qr.js"></script>
 }

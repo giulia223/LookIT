@@ -11,24 +11,26 @@
             <div class="card border-0 shadow-sm rounded-4">
                 <div class="card-body p-4">
 
+                    @* titlu si subtitlu pagina *@
                     <div class="text-center mb-4">
                         <h3 class="fw-bold">Creează un cont</h3>
                         <p class="text-muted small">Alătură-te comunității LookIT</p>
                     </div>
 
+                    @* inceput formular *@
                     <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post" enctype="multipart/form-data">
                         <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
 
-                        @* --- ZONA DE POZĂ (Cu Preview) --- *@
+                        @* zona poza profil *@
                         <div class="text-center mb-4">
                             <div class="position-relative d-inline-block">
-                                @* Placeholder Imagine *@
+                                @* imaginea de preview *@
                                 <img id="imagePreview"
                                      src="/images/unknown_person.jpg"
                                      class="rounded-circle border border-3 border-light shadow-sm"
                                      style="width: 100px; height: 100px; object-fit: cover;" />
 
-                                @* Butonul de upload: Cerc alb cu iconiță Magenta *@
+                                @* butonul vizual de upload *@
                                 <label for="Input_ProfilePicture"
                                        class="position-absolute bottom-0 end-0 bg-white border shadow-sm rounded-circle p-2"
                                        style="cursor: pointer; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;">
@@ -36,7 +38,7 @@
                                 </label>
                             </div>
 
-                            @* Input ascuns *@
+                            @* input ul efectiv (ascuns dar activ pt validare) *@
                             <input asp-for="Input.ProfilePicture"
                                    accept="image/*"
                                    onchange="previewProfileImage(this)"
@@ -44,7 +46,7 @@
                             <span asp-validation-for="Input.ProfilePicture" class="text-danger small d-block mt-1"></span>
                         </div>
 
-                        @* --- INPUT: NUME COMPLET --- *@
+                        @* camp nume complet *@
                         <div class="mb-3">
                             <label class="form-label small text-muted fw-bold ms-1">NUME COMPLET</label>
                             <div class="input-group">
@@ -56,7 +58,7 @@
                             <span asp-validation-for="Input.FullName" class="text-danger small ms-1"></span>
                         </div>
 
-                        @* --- INPUT: EMAIL --- *@
+                        @* camp email *@
                         <div class="mb-3">
                             <label class="form-label small text-muted fw-bold ms-1">EMAIL</label>
                             <div class="input-group">
@@ -68,18 +70,17 @@
                             <span asp-validation-for="Input.Email" class="text-danger small ms-1"></span>
                         </div>
 
-                        @* --- INPUT: DESCRIERE --- *@
+                        @* camp descriere *@
                         <div class="mb-3">
                             <label class="form-label small text-muted fw-bold ms-1">DESCRIERE</label>
                             <textarea asp-for="Input.Description" class="form-control custom-input-bg border-0 rounded-3 p-3" placeholder="Zi-ne ceva despre tine (opțional)..." style="height: 80px"></textarea>
                             <span asp-validation-for="Input.Description" class="text-danger small ms-1"></span>
                         </div>
 
-                        @* --- INPUT: PAROLA --- *@
+                        @* camp parola *@
                         <div class="mb-3">
                             <label class="form-label small text-muted fw-bold ms-1">PAROLA</label>
                             <div class="input-group">
-                                @* Span-ul cu iconița trebuie să aibă și el custom-input-bg *@
                                 <span class="input-group-text bg-light border-0 rounded-start-3 ps-3">
                                     <i class="bi bi-lock text-muted"></i>
                                 </span>
@@ -88,7 +89,7 @@
                             <span asp-validation-for="Input.Password" class="text-danger small ms-1"></span>
                         </div>
 
-                        @* --- INPUT: CONFIRMARE PAROLA --- *@
+                        @* camp confirmare parola *@
                         <div class="mb-4">
                             <label class="form-label small text-muted fw-bold ms-1">CONFIRMA PAROLA</label>
                             <div class="input-group">
@@ -100,7 +101,7 @@
                             <span asp-validation-for="Input.ConfirmPassword" class="text-danger small ms-1"></span>
                         </div>
 
-                        @* --- BUTON REGISTER --- *@
+                        @* buton submit *@
                         <div class="d-grid mb-3">
                             <button id="registerSubmit" type="submit"
                                     class="btn rounded-pill py-2 fw-bold shadow-sm"
@@ -109,13 +110,14 @@
                             </button>
                         </div>
 
+                        @* link catre login *@
                         <div class="text-center">
                             <small class="text-muted">Ai deja un cont? <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl" class="text-decoration-none fw-bold" style="color: #B13079;">Autentifică-te</a></small>
                         </div>
 
                     </form>
 
-                    @* --- LOGIN EXTERN (Dacă există) --- *@
+                    @* logare externa (google etc) *@
                     @if ((Model.ExternalLogins?.Count ?? 0) > 0)
                     {
                         <div class="d-flex align-items-center my-4">
@@ -142,8 +144,8 @@
 </div>
 
 
-
 @section Scripts {
+    @* scripturi validare si preview *@
     <partial name="_ValidationScriptsPartial" />
 
     <script>

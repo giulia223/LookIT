@@ -1,32 +1,33 @@
 ﻿@inject SignInManager<ApplicationUser> SignInManager
 @{
+    @* verificare existenta login extern *@
     var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
 }
 
 <ul class="nav nav-pills flex-column gap-2">
 
-    @* --- PROFIL --- *@
+    @* sectiune profil *@
     <li class="nav-item">
         <a class="nav-link @ManageNavPages.IndexNavClass(ViewContext)" id="profile" asp-page="./Index">
             <i class="bi bi-person-badge me-2"></i> Profil
         </a>
     </li>
 
-    @* --- EMAIL --- *@
+    @* sectiune email *@
     <li class="nav-item">
         <a class="nav-link @ManageNavPages.EmailNavClass(ViewContext)" id="email" asp-page="./Email">
             <i class="bi bi-envelope me-2"></i> Email
         </a>
     </li>
 
-    @* --- PAROLĂ --- *@
+    @* sectiune parola *@
     <li class="nav-item">
         <a class="nav-link @ManageNavPages.ChangePasswordNavClass(ViewContext)" id="change-password" asp-page="./ChangePassword">
             <i class="bi bi-key me-2"></i> Parolă
         </a>
     </li>
 
-    @* --- LOGIN EXTERN (Dacă există) --- *@
+    @* sectiune login extern *@
     @if (hasExternalLogins)
     {
         <li id="external-logins" class="nav-item">
@@ -36,14 +37,14 @@
         </li>
     }
 
-    @* --- 2FA (Autentificare în doi pași) --- *@
+    @* sectiune 2fa *@
     <li class="nav-item">
         <a class="nav-link @ManageNavPages.TwoFactorAuthenticationNavClass(ViewContext)" id="two-factor" asp-page="./TwoFactorAuthentication">
             <i class="bi bi-shield-lock me-2"></i> Autentificare 2FA
         </a>
     </li>
 
-    @* --- DATE PERSONALE --- *@
+    @* sectiune date personale *@
     <li class="nav-item">
         <a class="nav-link @ManageNavPages.PersonalDataNavClass(ViewContext)" id="personal-data" asp-page="./PersonalData">
             <i class="bi bi-archive me-2"></i> Date Personale
