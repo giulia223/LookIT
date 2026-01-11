@@ -16,6 +16,7 @@ namespace LookIT.Controllers
         private readonly IWebHostEnvironment _env = env;
 
         //afisarea tuturor colectiilor unui utilizator
+
         [Authorize(Roles ="User,Administrator")]
         public IActionResult Index()
         {
@@ -68,6 +69,7 @@ namespace LookIT.Controllers
         }
 
         //afisarea postarilor pe care utilizatorul le-a salvat in colectia sa
+
         [Authorize(Roles ="User,Administrator")]
         public IActionResult Show(int Id)
         {
@@ -102,6 +104,7 @@ namespace LookIT.Controllers
 
         //formularul in care se completeaza detele unei colectii
         //avem [HttpGet] implicit
+
         [Authorize(Roles="User,Administrator")]
         public IActionResult New(int? postId)
         {
@@ -125,6 +128,7 @@ namespace LookIT.Controllers
         }
 
         //adaugarea colectiei in baza de date
+
         [HttpPost]
         [Authorize(Roles ="User,Administrator")]
         public IActionResult New(Collection collection, int? PostToSave)
@@ -336,7 +340,6 @@ namespace LookIT.Controllers
 
             return Json(true);
         }
-
 
     }
 }

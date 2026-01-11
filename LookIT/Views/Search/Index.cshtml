@@ -6,7 +6,6 @@
 
 <div class="container py-4" style="max-width: 900px;">
 
-    @* HEADER ZONA DE CĂUTARE *@
     <div class="mb-4">
         <h4 class="fw-bold d-flex align-items-center gap-2">
             <i class="bi bi-search text-primary"></i>
@@ -24,7 +23,6 @@
                     <div class="card border-0 shadow-sm rounded-4 h-100 user-card">
                         <div class="card-body p-3 d-flex align-items-center justify-content-between">
 
-                            @* INFO UTILIZATOR (Stânga) *@
                             <div class="d-flex align-items-center overflow-hidden">
                                 <a asp-controller="Profile" asp-action="Details" asp-route-userId="@user.Id" class="flex-shrink-0">
                                     <img src="@user.ProfilePictureUrl"
@@ -41,7 +39,6 @@
                                 </div>
                             </div>
 
-                            @* BUTON ACȚIUNE (Dreapta) *@
                             <div class="ms-2">
                                 <a asp-controller="Profile" asp-action="Details" asp-route-userId="@user.Id"
                                    class="btn btn-light border rounded-pill btn-sm fw-bold px-3 action-btn text-nowrap">
@@ -57,7 +54,6 @@
     }
     else if (!string.IsNullOrEmpty(Model.SearchTerm))
     {
-        @* EMPTY STATE *@
         <div class="text-center py-5 bg-white border-0 shadow-sm rounded-4 mt-2">
             <div class="mb-3">
                 <i class="bi bi-search text-muted opacity-25" style="font-size: 3.5rem;"></i>
@@ -74,18 +70,15 @@
 </div>
 
 <style>
-    /* Cardul utilizatorului - FĂRĂ TRANZIȚIE */
     .user-card {
         background-color: #fff;
-        /* Am scos transition și transform */
+
     }
 
-        /* Doar umbra se intensifică puțin la hover, dar instantaneu */
         .user-card:hover {
             box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08) !important;
         }
 
-    /* Stil butoane - FĂRĂ TRANZIȚIE */
     .action-btn {
         background-color: #f8f9fa;
         color: #333;

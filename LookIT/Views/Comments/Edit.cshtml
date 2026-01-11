@@ -8,7 +8,6 @@
 
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
 
-                @* HEADER CARD - STILIZAT MODERN (Alb + Iconiță Roz) *@
                 <div class="card-header bg-white border-0 pt-4 pb-0 text-center">
                     <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3"
                          style="width: 64px; height: 64px; background-color: #FBF1F7;">
@@ -25,7 +24,6 @@
 
                 <div class="card-body p-4">
 
-                    @* Mesaj informativ discret *@
                     <div class="alert alert-light border-0 d-flex align-items-center mb-4 rounded-3" style="background-color: #f8f9fa;">
                         <i class="bi bi-info-circle-fill text-muted me-2 fs-5"></i>
                         <span class="text-muted small">Modifici conținutul mesajului tău original.</span>
@@ -36,7 +34,6 @@
                         <input type="hidden" asp-for="PostId" />
                         <input type="hidden" asp-for="Date" />
 
-                        @* TEXTAREA MODERNĂ (Stil LookIT) *@
                         <div class="mb-4">
                             <label asp-for="Content" class="form-label small text-muted fw-bold ms-1">CONȚINUT NOU</label>
 
@@ -48,7 +45,6 @@
                             <span asp-validation-for="Content" class="text-danger small mt-1 d-block ms-1"></span>
                         </div>
 
-                        @* BUTOANE ACȚIUNE *@
                         <div class="d-grid gap-2">
                             <button class="btn btn-primary rounded-pill py-2 fw-bold shadow-sm" type="submit">
                                 <i class="bi bi-check-lg me-1"></i> Salvează modificările
@@ -66,10 +62,8 @@
     </div>
 </div>
 
-@* STILURI CSS SPECIALE PENTRU ACEASTĂ PAGINĂ *@
 <style>
-    /* Suprascriere placeholder doar aici dacă e nevoie,
-           deși clasa custom-input-bg ar trebui să fie ok */
+    
     .custom-input-bg::placeholder {
         color: #6c757d;
         opacity: 0.8;

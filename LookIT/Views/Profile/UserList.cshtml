@@ -2,7 +2,6 @@
 
 <div class="container py-4" style="max-width: 900px;">
 
-    @* --- 1. HEADER (Buton Înapoi + Titlu + Contor) --- *@
     <div class="mb-4 d-flex align-items-center">
         <a href="javascript:history.back()" class="btn btn-light rounded-circle shadow-sm d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
             <i class="bi bi-arrow-left"></i>
@@ -19,14 +18,12 @@
 
     @if (Model.Any())
     {
-        @* --- 2. LISTA DE UTILIZATORI (Stil Card Mare cu Rânduri) --- *@
         <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
             <div class="card-body p-0">
                 @foreach (var user in Model)
                 {
                     <div class="user-list-item d-flex align-items-center justify-content-between p-3 border-bottom">
 
-                        @* INFO UTILIZATOR (Stânga) *@
                         <div class="d-flex align-items-center flex-grow-1 overflow-hidden">
                             <a asp-controller="Profile" asp-action="Details" asp-route-userId="@user.Id" class="flex-shrink-0">
                                 <img src="@(!string.IsNullOrEmpty(user.ProfilePictureUrl) ? user.ProfilePictureUrl : "/images/default-profile.png")"
@@ -55,7 +52,6 @@
                             </div>
                         </div>
 
-                        @* BUTON ACȚIUNE (Dreapta) *@
                         <div class="ms-3">
                             <a asp-controller="Profile" asp-action="Details" asp-route-userId="@user.Id"
                                class="btn btn-light border rounded-pill btn-sm fw-bold px-4 action-btn text-nowrap">
@@ -70,7 +66,6 @@
     }
     else
     {
-        @* --- 3. EMPTY STATE (Cerc Roz) --- *@
         <div class="text-center py-5 bg-white border-0 shadow-sm rounded-4 mt-2">
 
             <div class="mb-4 d-inline-block">
@@ -86,24 +81,22 @@
     }
 </div>
 
-@* --- 4. STILURI CSS --- *@
+
 <style>
-    /* Eliminăm bordura de la ultimul element pentru aspect curat */
+
     .user-list-item:last-child {
         border-bottom: none !important;
     }
 
-    /* Efect subtil la hover pe rând - CULOARE ROZ PAL */
     .user-list-item {
         transition: background-color 0.2s ease;
         background-color: #fff;
     }
 
         .user-list-item:hover {
-            background-color: #FBF1F7 !important; /* Roz pal subtil la hover */
+            background-color: #FBF1F7 !important;
         }
 
-    /* Stil butoane */
     .action-btn {
         background-color: #f8f9fa;
         color: #333;
@@ -113,6 +106,6 @@
         .action-btn:hover {
             background-color: #e9ecef;
             border-color: #dee2e6;
-            color: #B13079; /* Magenta la hover */
+            color: #B13079; 
         }
 </style>
