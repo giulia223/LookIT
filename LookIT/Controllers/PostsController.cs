@@ -491,10 +491,6 @@ namespace LookIT.Controllers
                             return View(requestPost);
                         }
                     }
-                    if (string.IsNullOrWhiteSpace(post.TextContent) && (Image == null))
-                    {
-                        post.SentimentLabel = "neutral";
-                    }
 
                     // daca am ales o poza, o vom modifica
                     if (Image != null && Image.Length > 0)
