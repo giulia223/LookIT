@@ -6,7 +6,7 @@
 @if (TempData["message"] != null)
 {
     <div class="alert @TempData["messageType"] alert-dismissible fade show" role="alert">
-        @* Aici afisam motivul respingerii venit din Controller *@
+        @*  motivul respingerii venit din Controller *@
         <strong>Atentie!</strong> @TempData["message"]
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>

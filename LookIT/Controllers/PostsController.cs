@@ -310,11 +310,8 @@ namespace LookIT.Controllers
             bool hasImage = Image != null && Image.Length > 0;
             bool hasVideo = Video != null && Video.Length > 0;
 
-            // -----------------------------------------------------------
-            // COD NOU: MODERARE AUTOMATA CU _moderationService
-            // -----------------------------------------------------------
-
-            // Verificam daca exista titlu sau continut text
+          
+            // Verificam daca exista continut text
             if (!string.IsNullOrWhiteSpace(post.TextContent))
             {
                 // Apelam metoda CheckPostAsync din ModerationService 
@@ -332,13 +329,8 @@ namespace LookIT.Controllers
                     return View(post);
                 }
             }
-            // -----------------------------------------------------------
-            // SFARSIT COD MODERARE
-            // -----------------------------------------------------------
 
-
-            // ... Aici continua codul tau vechi pentru Sentiment (daca vrei sa il pastrezi) ...
-            // ... Sau validarea imaginilor/video ...
+           
 
             if (!hasText && !hasImage && !hasVideo)
             {
@@ -346,10 +338,9 @@ namespace LookIT.Controllers
                 return View(post);
             }
 
-            // ... Logica de salvare imagini/video (copiata din codul tau) ...
             if (hasImage)
             {
-                // ... codul tau pentru imagini ...
+          
                 var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
                 var fileExtension = Path.GetExtension(Image.FileName).ToLower();
                 if (!allowedExtensions.Contains(fileExtension)) { ModelState.AddModelError("Image", "Fisierul trebuie sa fie imagine."); return View(post); }
@@ -364,7 +355,6 @@ namespace LookIT.Controllers
 
             if (hasVideo)
             {
-                // ... codul tau pentru video ...
                 var allowedExtensions = new[] { ".mp4", ".mov", ".webm", ".avi", ".mkv" };
                 var fileExtension = Path.GetExtension(Video.FileName).ToLower();
                 if (!allowedExtensions.Contains(fileExtension)) { ModelState.AddModelError("Video", "Fisierul trebuie sa fie video."); return View(post); }
@@ -414,7 +404,7 @@ namespace LookIT.Controllers
                 return View(post);
             }
 
-            //nu am acces la editarea postarii
+            
             else
             {
                 TempData["message"] = "Nu aveti dreptul sa faceti modificari asupra unei postari care nu va apartine";
@@ -452,16 +442,18 @@ namespace LookIT.Controllers
                     // Verificam daca avem continut de analizat (text sau imagine noua)
                     if (!string.IsNullOrWhiteSpace(post.TextContent))
                     {
+                        var moderationResult = await _moderationService.CheckPostAsync( post.TextContent ?? "");
 
-                    }
-                    else
-                    {
-                        // Daca nu mai avem text si nici imagine noua, dar poate a ramas imaginea veche...
-                        // E un caz mai complicat. Simplificam: daca goleste textul, resetam sentimentul pe Safe temporar.
-                        if (string.IsNullOrWhiteSpace(post.TextContent) && (Image == null))
+                        if (moderationResult.IsFlagged)
                         {
-                            post.SentimentLabel = "neutral";
-                           
+                            // Respingem modificarea
+                            TempData["message"] = $"Modificarea a fost respinsă. Motiv: {moderationResult.Reason}";
+                            TempData["messageType"] = "alert-danger";
+
+                            // Resetam textul la cel vechi ca sa nu para ca s-a salvat in View
+                            post.TextContent = initialTextContent;
+
+                            return View(post);
                         }
                     }
 

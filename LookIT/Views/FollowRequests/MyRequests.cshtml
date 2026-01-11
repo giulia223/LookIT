@@ -5,9 +5,9 @@
 
 <div class="container mt-4 mb-5" style="max-width: 600px;">
 
-    @* --- 1. HEADER (Buton Înapoi + Titlu + Badge) --- *@
+    @* ---  HEADER (Buton inapoi + Titlu + Badge) --- *@
     <div class="d-flex align-items-center mb-4">
-        @* Buton Înapoi *@
+        @* Buton inapoi *@
         <a href="javascript:history.back()" class="btn btn-light rounded-circle shadow-sm d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
             <i class="bi bi-arrow-left"></i>
         </a>
@@ -25,14 +25,12 @@
 
     @if (!Model.Any())
     {
-        @* --- 2. EMPTY STATE (Stilizat cu cerc roz) --- *@
+        @* --- EMPTY STATE  --- *@
         <div class="text-center py-5 bg-white border-0 shadow-sm rounded-4 mt-2">
 
             <div class="mb-4 d-inline-block">
-                @* Cercul Roz Pal *@
                 <div class="rounded-circle d-flex align-items-center justify-content-center"
                      style="width: 100px; height: 100px; background-color: #FBF1F7;">
-                    @* Iconița Magenta *@
                     <i class="bi bi-person-check" style="font-size: 3rem; color: #B13079;"></i>
                 </div>
             </div>
@@ -43,14 +41,14 @@
     }
     else
     {
-        @* --- 3. LISTA DE CERERI --- *@
+        @* ---  LISTA DE CERERI --- *@
         <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
             <div class="card-body p-0">
                 @foreach (var req in Model)
                 {
                     <div class="request-item d-flex align-items-center justify-content-between p-3 border-bottom">
 
-                        @* INFO UTILIZATOR (Stânga) *@
+                        @* INFO UTILIZATOR (Stanga) *@
                         <div class="d-flex align-items-center flex-grow-1 overflow-hidden">
                             <a asp-controller="Profile" asp-action="Details" asp-route-userId="@req.FollowerId">
                                 <img src="@(!string.IsNullOrEmpty(req.Follower.ProfilePictureUrl) ? req.Follower.ProfilePictureUrl : "/images/default-profile.png")"
@@ -70,7 +68,7 @@
                             </div>
                         </div>
 
-                        @* BUTOANE ACȚIUNE (Dreapta) *@
+                        @* BUTOANE ACTIUNE (Dreapta) *@
                         <div class="d-flex gap-2 ms-3">
                             @* BUTON CONFIRMĂ (Magenta) *@
                             <form asp-action="HandleRequest" method="post">
@@ -81,7 +79,7 @@
                                 </button>
                             </form>
 
-                            @* BUTON ȘTERGE *@
+                            @* BUTON STERGE *@
                             <form asp-action="HandleRequest" method="post">
                                 <input type="hidden" name="requestId" value="@req.Id" />
                                 <input type="hidden" name="decision" value="decline" />
@@ -98,20 +96,20 @@
     }
 </div>
 
-@* --- 4. STILURI CSS --- *@
+
 <style>
-    /* Eliminăm bordura de la ultimul element pentru aspect curat */
+   
     .request-item:last-child {
         border-bottom: none !important;
     }
 
-    /* Efect subtil la hover pe rând */
+    
     .request-item {
         transition: background-color 0.2s ease;
         background-color: #fff;
     }
 
         .request-item:hover {
-            background-color: #FBF1F7; /* Roz pal la hover */
+            background-color: #FBF1F7; 
         }
 </style>

@@ -41,9 +41,9 @@
 
                         <div asp-validation-summary="All" class="text-danger mb-3 small"></div>
 
-                        @* ========================================== *@
+                     
                         @* SECȚIUNEA IMAGINE             *@
-                        @* ========================================== *@
+                 
                         <div class="mb-4">
                             <label class="form-label small text-muted fw-bold ms-1">IMAGINE</label>
 
@@ -59,7 +59,7 @@
                                 <small class="text-muted fst-italic ms-1" style="font-size: 0.7rem;">Formate: jpg, jpeg, png, gif.</small>
                             </div>
 
-                            @* 2. Imagine CURENTĂ (Dacă există) *@
+                            @* 2. Imagine CURENTA (daca exista) *@
                             @if (!string.IsNullOrEmpty(Model.ImageUrl))
                             {
                                 <div id="currentImageWrapper">
@@ -71,7 +71,7 @@
                                                 <span class="small fw-bold text-white">Imagine Curentă</span>
                                             </div>
 
-                                            @* Buton X ștergere definitivă *@
+                                            @* Buton X stergere definitiva *@
                                             <button type="button" onclick="markImageForDeletion()"
                                                     class="btn btn-sm btn-light rounded-circle shadow-sm position-absolute top-0 end-0 m-2"
                                                     style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;"
@@ -81,11 +81,11 @@
                                         </div>
                                     </div>
                                 </div>
-                                @* Checkbox ascuns pentru ștergere *@
+                                @* Checkbox ascuns pentru stergere *@
                                 <input class="form-check-input d-none" type="checkbox" name="DeleteImage" value="true" id="deleteImageCheck">
                             }
 
-                            @* 3. Imagine NOUĂ (Preview) *@
+                            @* 3. Imagine NOUA (Preview) *@
                             <div id="newImageContainer" class="d-none text-center position-relative mb-3">
                                 <div class="d-inline-block position-relative rounded-3 overflow-hidden border shadow-sm">
                                     <img id="newImagePreview" src="#" class="img-fluid" style="max-height: 250px;" />
@@ -102,9 +102,9 @@
                             </div>
                         </div>
 
-                        @* ========================================== *@
+                 
                         @* SECȚIUNEA VIDEO              *@
-                        @* ========================================== *@
+                     
                         <div class="mb-4">
                             <label class="form-label small text-muted fw-bold ms-1">VIDEO</label>
 
@@ -120,7 +120,7 @@
                                 <small class="text-muted fst-italic ms-1" style="font-size: 0.7rem;">Formate: MP4, WebM.</small>
                             </div>
 
-                            @* 2. Video CURENT (Dacă există) *@
+                            @* 2. Video CURENT *@
                             @if (!string.IsNullOrEmpty(Model.VideoUrl))
                             {
                                 <div id="currentVideoWrapper">
@@ -134,7 +134,7 @@
                                                 <span class="small fw-bold text-muted">Video Curent</span>
                                             </div>
 
-                                            @* Buton X ștergere definitivă *@
+                                            @* Buton X stergere definitiva *@
                                             <button type="button" onclick="markVideoForDeletion()"
                                                     class="btn btn-sm btn-light rounded-circle shadow-sm position-absolute top-0 end-0 m-2"
                                                     style="width: 32px; height: 32px; padding: 0; z-index: 10; display: flex; align-items: center; justify-content: center;"
@@ -144,7 +144,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                @* Checkbox ascuns pentru ștergere *@
+                                @* Checkbox ascuns pentru stergere *@
                                 <input class="form-check-input d-none" type="checkbox" name="DeleteVideo" value="true" id="deleteVideoCheck">
                             }
 
@@ -155,7 +155,7 @@
                                         Your browser does not support the video tag.
                                     </video>
 
-                                    @* Buton X pentru anulare upload nou *@
+                                    @* Buton X pt anulare upload nou *@
                                     <button type="button" id="removeNewVideo" class="btn btn-sm btn-light rounded-circle shadow-sm position-absolute top-0 end-0 m-2" style="width: 30px; height: 30px; padding: 0; z-index: 20;">
                                         <i class="bi bi-x fs-5"></i>
                                     </button>
@@ -167,9 +167,9 @@
                             </div>
                         </div>
 
-                        @* ========================================== *@
+                
                         @* SECȚIUNEA CONȚINUT            *@
-                        @* ========================================== *@
+               
                         <div class="mb-5">
                             <label asp-for="TextContent" class="form-label small text-muted fw-bold ms-1">CONȚINUT</label>
                             <textarea asp-for="TextContent" class="form-control summernote bg-light border-0 rounded-3 p-3"></textarea>
@@ -192,7 +192,7 @@
     </div>
 </div>
 
-@* STILURI CSS SUPLIMENTARE *@
+
 <style>
     .cursor-pointer {
         cursor: pointer;
@@ -207,7 +207,7 @@
             background-color: #e9ecef !important;
         }
 
-    /* Stiluri pentru a curăța editorul Summernote */
+  
     .note-editor.note-frame {
         border: none !important;
         box-shadow: none !important;
@@ -232,16 +232,14 @@
     <partial name="_ValidationScriptsPartial" />
 
     <script>
-        // ==========================================
-        //  LOGICA PENTRU ELEMENTE EXISTENTE (VECHI)
-        // ==========================================
+       
 
         function markImageForDeletion() {
             // Ascundem vizual containerul imaginii vechi
             const wrapper = document.getElementById('currentImageWrapper');
             if(wrapper) wrapper.classList.add('d-none');
 
-            // Bifăm checkbox-ul ascuns ca serverul să șteargă fișierul
+            // Bifam checkbox-ul ascuns ca serverul sa ștearga fisierul
             const checkbox = document.getElementById('deleteImageCheck');
             if(checkbox) checkbox.checked = true;
         }
@@ -251,15 +249,14 @@
             const wrapper = document.getElementById('currentVideoWrapper');
             if(wrapper) wrapper.classList.add('d-none');
 
-            // Bifăm checkbox-ul ascuns
+            // Bifam checkbox-ul ascuns
             const checkbox = document.getElementById('deleteVideoCheck');
             if(checkbox) checkbox.checked = true;
         }
 
 
-        // ==========================================
         //  LOGICA PENTRU ELEMENTE NOI (UPLOAD)
-        // ==========================================
+   
 
         // --- IMAGINE ---
         const imageInput = document.getElementById('imageInput');
@@ -270,27 +267,26 @@
         const deleteImgCheck = document.getElementById('deleteImageCheck');
 
         if (imageInput) {
-            // Când selectăm fișier
+            // Cand selectam fisier
             imageInput.addEventListener('change', function () {
                 const file = this.files[0];
                 if (file) {
                     newImgPreview.src = URL.createObjectURL(file);
                     newImgContainer.classList.remove('d-none');
 
-                    // Ascundem automat imaginea veche (se înlocuiește)
+                    // Ascundem automat imaginea veche (se inlocuieste)
                     if(currentImgWrapper) currentImgWrapper.classList.add('d-none');
-                    // Resetăm checkbox-ul de ștergere (înlocuirea are prioritate)
+                    // Resetam checkbox-ul de stergere 
                     if(deleteImgCheck) deleteImgCheck.checked = false;
                 }
             });
 
-            // Când apăsăm X pe fișierul nou
             if (removeNewImgBtn) {
                 removeNewImgBtn.addEventListener('click', function () {
                     imageInput.value = '';
                     newImgPreview.src = '';
                     newImgContainer.classList.add('d-none');
-                    // NU reafișăm imaginea veche. Totul rămâne gol.
+                    // NU reafisam imaginea veche. Totul ramane gol
                 });
             }
         }
@@ -304,7 +300,6 @@
         const deleteVidCheck = document.getElementById('deleteVideoCheck');
 
         if (videoInput) {
-            // Când selectăm fișier
             videoInput.addEventListener('change', function () {
                 const file = this.files[0];
                 if (file) {
@@ -317,13 +312,13 @@
                 }
             });
 
-            // Când apăsăm X pe fișierul nou
+            // Când apasam X pe fisierul nou
             if (removeNewVidBtn) {
                 removeNewVidBtn.addEventListener('click', function () {
                     videoInput.value = '';
                     newVidPreview.src = '';
                     newVidContainer.classList.add('d-none');
-                    // NU reafișăm video vechi.
+                    // NU reafisam video vechi
                 });
             }
         }
