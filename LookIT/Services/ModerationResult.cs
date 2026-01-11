@@ -66,8 +66,7 @@ namespace LookIT.Services
         // metoda noua care verifica continutul unei potsari
         public async Task<ModerationResult> CheckPostAsync( string content)
         {
-            // Combinam titlul si continutul pentru a face un singur apel la AI (economie de bani)
-            // Punem etichete ca AI-ul sa stie care e titlul si care e continutul
+            
             string combinedText = $"[CONTENT START] {content} [CONTENT END]";
 
             //refolosim logica de baza de la CheckContentAsync
@@ -130,7 +129,7 @@ namespace LookIT.Services
                     };
                 }
 
-                // parsam raspunsul fFolosim clasele interne definite jos)
+                // parsam raspunsul (folosim clasele interne definite jos)
                 var openAiResponse = JsonSerializer.Deserialize<ModerationOpenAiResponse>(responseContent);
                 var assistantMessage = openAiResponse?.Choices?.FirstOrDefault()?.Message?.Content;
 
