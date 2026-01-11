@@ -23,7 +23,7 @@
                 <div class="card mb-4 shadow-sm border-0 overflow-hidden rounded-4 bg-white">
                     <partial name="_GroupInfo" model="@ViewBag.GroupDetails"></partial>
                     <div class="card-footer bg-white border-0 px-4 pb-4">
-                        @* 1. LOGICĂ PENTRU MEMBRU SIMPLU (PENDING SAU ACCEPTED) *@
+                        @* 1. LOGICA PENTRU MEMBRU SIMPLU (PENDING SAU ACCEPTED) *@
                         @if (ViewBag.UserGroupStatus == "Pending")
                         {
                             <button type="button" class="btn w-100 fw-bold rounded-pill opacity-75 mb-3" disabled style="background-color: #F0F2F5; color: #8d949e; border: none;">
@@ -46,7 +46,7 @@
                             </div>
                         }
 
-                        @* 2. LOGICĂ PENTRU ADMINISTRARE (MODERATOR SAU ADMIN GLOBAL) *@
+                        @* 2. LOGICA PENTRU ADMINISTRARE (MODERATOR SAU ADMIN GLOBAL) *@
                         @if (ViewBag.UserGroupStatus == "moderator" || ViewBag.EsteAdministrator)
                         {
                             <div class="d-flex flex-column gap-2">
@@ -71,7 +71,7 @@
                             </div>
                         }
 
-                        @* 3. BUTONUL DE JOIN - Afișat dacă NU este membru/moderator, CHIAR DACĂ este Admin *@
+                        @* 3. BUTONUL DE JOIN - Afisat daca NU este membru/moderator, CHIAR DACA este Admin *@
                         @if (ViewBag.UserGroupStatus == "None" || (ViewBag.EsteAdministrator && ViewBag.UserGroupStatus == "None"))
                         {
                             <form asp-controller="Groups" asp-action="JoinGroup" method="post" class="w-100 mt-2">
@@ -154,9 +154,26 @@
                                 {
                                     <div class="d-flex align-items-center justify-content-between mb-3">
                                         <div class="d-flex align-items-center">
-                                            <img src="@member.Member.ProfilePictureUrl" class="rounded-circle shadow-sm me-2" style="width:32px;height:32px;object-fit:cover;" />
-                                            <span class="small fw-bold text-black">@member.Member.FullName</span>
+                                            <img src="@member.Member.ProfilePictureUrl" class="rounded-circle border-0 shadow-sm me-2" style="width:34px;height:34px;object-fit:cover;" />
+                                            <span class="small fw-bold">
+                                                <a asp-controller="Profile" asp-action="Details" asp-route-userId="@member.Member.Id" class="text-dark text-decoration-none hover-magenta">
+                                                    @member.Member.FullName
+                                                </a>
+                                            </span>
                                         </div>
+
+                                        @if ((ViewBag.GroupDetails.ModeratorId == UserManager.GetUserId(User) && member.Member.Id != ViewBag.GroupDetails.ModeratorId) || User.IsInRole("Administrator"))
+                                        {
+                                            if (@member.Member.Id != ViewBag.GroupDetails.ModeratorId){
+                                                <form method="post" asp-controller="GroupMembers" asp-action="RemoveMember" asp-route-groupId="@member.GroupId" asp-route-memberId="@member.MemberId">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="id" value="@member.Member.Id" />
+                                                    <button type="submit" class="btn btn-sm text-danger border-0 p-0 opacity-50 hover-opacity-100" onclick="return confirm('Elimini acest utilizator?');">
+                                                        <i class="bi bi-person-x fs-5"></i>
+                                                    </button>
+                                                </form>
+                                            }
+                                        }
                                     </div>
                                 }
                             }
@@ -184,7 +201,7 @@
                                             @Html.AntiForgeryToken()
                                             <input type="hidden" name="MemberId" value="@member.Member.Id" />
                                             <input type="hidden" name="GroupId" value="@ViewBag.GroupDetails.GroupId" />
-                                            <button type="submit" class="btn btn-success w-100 btn-sm rounded-pill fw-bold">Aprobă</button>
+                                            <button type="submit" class="btn btn-custom-accept w-100 btn-sm rounded-pill fw-bold">Aprobă</button>
                                         </form>
                                     </div>
                                 }
@@ -204,33 +221,29 @@
         color: #1c1e21 !important;
     }
 
-    /* Starea inițială a butonului (gri deschis, discret) */
     .btn-lookit-gray {
-        background-color: #f0f2f5; /* Griul tău "nu dens" */
-        color: #6c757d; /* Text gri pentru a nu fi strident initial */
+        background-color: #f0f2f5; 
+        color: #6c757d; 
         border: none;
         transition: all 0.3s ease;
     }
 
         .btn-lookit-gray i {
-            color: #6c757d; /* Iconița gri la început */
+            color: #6c757d; 
         }
 
-        /* Starea de HOVER (Roz pal cu scris magenta) */
         .btn-lookit-gray:hover {
-            background-color: #FBF1F7 !important; /* Rozul tău pal (fundalul "nu dens") */
-            color: #B13079 !important; /* Scrisul magenta închis */
-            transform: translateY(-2px); /* Mișcarea pe care o avem la restul butoanelor */
+            background-color: #FBF1F7 !important; 
+            color: #B13079 !important; 
+            transform: translateY(-2px); 
             box-shadow: 0 4px 8px rgba(177, 48, 121, 0.1) !important;
             border: 1px solid #B13079 !important;
         }
 
-            /* Forțăm și iconița să devină magenta la hover */
             .btn-lookit-gray:hover i {
                 color: #B13079 !important;
             }
 
-        /* Reset la apăsare */
         .btn-lookit-gray:active {
             transform: translateY(0);
         }
@@ -292,5 +305,23 @@
 
         .btn-join-community:active {
             transform: translateY(-1px);
+        }
+
+    .btn-custom-accept {
+        background-color: #F2F2F2; 
+        color: #B13079; 
+        border: 1px solid #E5E5E5; 
+        transition: all 0.3s ease; 
+    }
+
+        .btn-custom-accept:hover {
+
+            background-color: #98D8AA;
+            border-color: #98D8AA;
+            color: #ffffff; 
+  
+            transform: translateY(-3px);
+
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
 </style>

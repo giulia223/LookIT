@@ -5,18 +5,18 @@
 
 <div class="container mt-4 mb-5" style="max-width: 600px;">
 
-    @* ---  HEADER (Buton inapoi + Titlu + Badge) --- *@
+    @* --- 1. HEADER (Buton Inapoi + Titlu + Badge) --- *@
     <div class="d-flex align-items-center mb-4">
-        @* Buton inapoi *@
+        @* Buton Înapoi *@
         <a href="javascript:history.back()" class="btn btn-light rounded-circle shadow-sm d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
             <i class="bi bi-arrow-left"></i>
         </a>
 
         <div class="d-flex align-items-center">
-            <h4 class="fw-bold mb-0 text-black">Cereri de urmărire</h4>
+            <h4 class="fw-bold mb-0 me-2">Cereri de urmărire</h4>
             @if (Model.Any())
             {
-                <span class="badge rounded-pill ms-2" style="background-color: #B13079;">
+                <span class="badge rounded-pill bg-danger" style="background-color: #B13079 !important;">
                     @Model.Count noi
                 </span>
             }
@@ -25,22 +25,25 @@
 
     @if (!Model.Any())
     {
-        @* --- EMPTY STATE  --- *@
+        @* --- 2. EMPTY STATE (Stilizat cu cerc roz) --- *@
         <div class="text-center py-5 bg-white border-0 shadow-sm rounded-4 mt-2">
 
             <div class="mb-4 d-inline-block">
+                @* Cercul Roz Pal *@
                 <div class="rounded-circle d-flex align-items-center justify-content-center"
                      style="width: 100px; height: 100px; background-color: #FBF1F7;">
+                    @* Iconița Magenta *@
                     <i class="bi bi-person-check" style="font-size: 3rem; color: #B13079;"></i>
                 </div>
-                <h5 class="fw-bold text-black">Totul e la zi</h5>
-                <p class="text-muted small">Nu ai nicio cerere de urmărire în așteptare.</p>
             </div>
+
+            <h5 class="fw-bold text-dark">Totul e la zi</h5>
+            <p class="text-muted small mb-0">Nu ai nicio cerere de urmărire în așteptare.</p>
         </div>
     }
     else
     {
-        @* ---  LISTA DE CERERI --- *@
+        @* --- 3. LISTA DE CERERI --- *@
         <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
             <div class="card-body p-0">
                 @foreach (var req in Model)
@@ -49,14 +52,15 @@
 
                         @* INFO UTILIZATOR (Stanga) *@
                         <div class="d-flex align-items-center flex-grow-1 overflow-hidden">
-                            <a asp-controller="Profile" asp-action="Details" asp-route-userId="@req.FollowerId" class="text-decoration-none">
+                            <a asp-controller="Profile" asp-action="Details" asp-route-userId="@req.FollowerId">
                                 <img src="@(!string.IsNullOrEmpty(req.Follower.ProfilePictureUrl) ? req.Follower.ProfilePictureUrl : "/images/default-profile.png")"
-                                     class="rounded-circle profile-img-request me-3"
+                                     class="rounded-circle border me-3"
+                                     style="width: 48px; height: 48px; object-fit: cover;"
                                      alt="Profile">
                             </a>
                             <div class="d-flex flex-column text-truncate">
                                 <a asp-controller="Profile" asp-action="Details" asp-route-userId="@req.FollowerId"
-                                   class="text-decoration-none text-black fw-bold text-truncate"
+                                   class="text-decoration-none text-dark fw-bold text-truncate"
                                    style="font-size: 0.95rem;">
                                     @req.Follower.FullName
                                 </a>
@@ -68,11 +72,11 @@
 
                         @* BUTOANE ACTIUNE (Dreapta) *@
                         <div class="d-flex gap-2 ms-3">
-
+                            @* BUTON CONFIRMĂ (Magenta) *@
                             <form asp-action="HandleRequest" method="post">
                                 <input type="hidden" name="requestId" value="@req.Id" />
                                 <input type="hidden" name="decision" value="accept" />
-                                <button type="submit" class="btn btn-accept-request shadow-sm">
+                                <button type="submit" class="btn btn-primary btn-sm px-3 fw-bold rounded-pill shadow-sm" style="min-width: 80px;">
                                     Confirmă
                                 </button>
                             </form>
@@ -81,7 +85,7 @@
                             <form asp-action="HandleRequest" method="post">
                                 <input type="hidden" name="requestId" value="@req.Id" />
                                 <input type="hidden" name="decision" value="decline" />
-                                <button type="submit" class="btn btn-decline-request">
+                                <button type="submit" class="btn btn-light border btn-sm px-3 fw-bold rounded-pill text-secondary" style="min-width: 80px;">
                                     Șterge
                                 </button>
                             </form>
@@ -96,7 +100,7 @@
 
 
 <style>
-   
+    
     .request-item:last-child {
         border-bottom: none !important;
     }
