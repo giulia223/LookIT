@@ -7,18 +7,17 @@
 
 <div class="container mt-4 mb-5">
 
-    @* --- 0. BUTON ÎNAPOI (NOU) --- *@
+    @* ---  BUTON INAPOI  --- *@
     <div class="mb-4">
         <a href="javascript:history.back()" class="btn btn-sm btn-light rounded-pill px-3 fw-bold text-muted border-0 shadow-sm">
             <i class="bi bi-arrow-left me-1"></i> Înapoi
         </a>
     </div>
 
-    @* --- 1. CARD PROFIL HEADER --- *@
+    @* ---  CARD PROFIL HEADER --- *@
     <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
         <div class="card-body p-4 text-center">
-            
-            @* Poza de profil *@
+
             <div class="d-inline-block position-relative mb-3">
                 <img src="@(!string.IsNullOrEmpty(Model.ProfilePictureUrl) ? Model.ProfilePictureUrl : "/images/default-profile.png")"
                      alt="Profile Picture"
@@ -28,7 +27,7 @@
 
             <h3 class="fw-bold mb-1">@Model.FullName</h3>
             
-            @* Descriere *@
+
             <p class="text-muted small mx-auto mb-3" style="max-width: 500px;">
                 @if (!string.IsNullOrEmpty(Model.Description))
                 {
@@ -40,16 +39,15 @@
                 }
             </p>
 
-            @* Statistici (Postări, Urmăritori, Urmăriri) *@
+            @* Statistici (Postari, Urmaritori, Urmariri) *@
             <div class="d-flex justify-content-center gap-4 gap-md-5 my-4 border-top border-bottom py-3 bg-light bg-opacity-25">
                 
-                @* Postări *@
                 <div class="text-center">
                     <span class="fw-bold d-block fs-5 text-dark">@ViewBag.UserPosts.Count</span>
                     <small class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">Postări</small>
                 </div>
 
-                @* Urmăritori *@
+                @* Urmaritori *@
                 <div class="text-center">
                     @if (showFullProfile)
                     {
@@ -65,7 +63,7 @@
                     }
                 </div>
 
-                @* Urmăriri *@
+                @* Urmariri *@
                 <div class="text-center">
                     @if (showFullProfile)
                     {
@@ -82,7 +80,6 @@
                 </div>
             </div>
 
-            @* Cont Privat Badge *@
             @if (!Model.Public)
             {
                 <div class="mb-3">
@@ -92,11 +89,10 @@
                 </div>
             }
 
-            @* --- ZONA DE ACȚIUNI (BUTOANE) --- *@
+            @* --- ZONA DE ACTIUNI (BUTOANE) --- *@
             <div class="d-flex flex-wrap justify-content-center gap-2">
                 @if (ViewBag.IsOwner)
                 {
-                    @* PROPRIETAR *@
                     <a asp-action="Edit" class="btn btn-outline-secondary rounded-pill px-4 fw-bold btn-action">
                         <i class="bi bi-pencil-square me-1"></i> Editează
                     </a>
@@ -121,7 +117,6 @@
                 }
                 else if (User.Identity.IsAuthenticated)
                 {
-                    @* VIZITATOR *@
                     <form asp-action="FollowToggle" asp-route-userId="@Model.Id" method="post">
                         @if (ViewBag.IsFollowing)
                         {
@@ -147,7 +142,7 @@
         </div>
     </div>
 
-    @* --- 2. GRID POSTĂRI --- *@
+    @* ---  GRID POSTARI --- *@
     @if (showFullProfile)
     {
         var posts = ViewBag.UserPosts as List<LookIT.Models.Post>;
@@ -160,7 +155,7 @@
                         <a asp-controller="Posts" asp-action="Show" asp-route-id="@post.PostId" class="text-decoration-none user-select-none d-block">
                             <div class="ratio ratio-1x1 border-0 rounded-0 overflow-hidden position-relative shadow-sm bg-light post-card-hover">
                                 
-                                @* Iconiță tip conținut *@
+                                @* Iconita tip continut *@
                                 <div class="position-absolute top-0 end-0 m-2" style="z-index: 10;">
                                     @if (!string.IsNullOrEmpty(post.VideoUrl))
                                     {
@@ -176,7 +171,6 @@
                                     }
                                 </div>
 
-                                @* Content *@
                                 @if (!string.IsNullOrEmpty(post.ImageUrl))
                                 {
                                     <img src="@post.ImageUrl" class="w-100 h-100" style="object-fit: cover;" alt="Post Image">
@@ -212,7 +206,7 @@
         }
         else
         {
-            @* FĂRĂ POSTĂRI *@
+            @* FARA POSTARI *@
             <div class="text-center py-5 mt-4 rounded-4 bg-light border border-dashed">
                 <div class="mb-3 text-muted opacity-25">
                     <i class="bi bi-grid-3x3" style="font-size: 3rem;"></i>
@@ -223,7 +217,6 @@
     }
     else
     {
-        @* CONT PRIVAT *@
         <div class="text-center py-5 mt-4 rounded-4 bg-light border border-dashed">
             <div class="mb-3 text-muted opacity-50">
                 <i class="bi bi-lock-fill" style="font-size: 3rem;"></i>
@@ -236,7 +229,7 @@
     }
 </div>
 
-@* --- STILURI CSS --- *@
+
 <style>
     .hover-magenta:hover { color: #B13079 !important; }
 

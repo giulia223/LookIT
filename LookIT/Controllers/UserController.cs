@@ -17,9 +17,5 @@ namespace LookIT.Controllers
             _userManager = userManager;
             _context = context;
         }
-        //public IActionResult Index()
-        //{
-        //    return View();
-        //}
     }
 }

@@ -83,8 +83,8 @@ namespace LookIT.Areas.Identity.Pages.Account
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
-            [Required]
-            [EmailAddress]
+            [Required(ErrorMessage = "Adresa de email este obligatorie.")]
+            [EmailAddress(ErrorMessage = "Adresa de email nu este validă.")]
             [Display(Name = "Email")]
             public string Email { get; set; }
 
@@ -92,10 +92,10 @@ namespace LookIT.Areas.Identity.Pages.Account
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
-            
 
-            [Required]
-            [StringLength(100, ErrorMessage = "Parola trebuie sa aiba intre {2} si {1} caractere.", MinimumLength = 6)]
+
+            [Required(ErrorMessage = "Parola este obligatorie.")]
+            [StringLength(100, ErrorMessage = "Parola trebuie să aibă între {2} și {1} caractere.", MinimumLength = 6)]
             [DataType(DataType.Password)]
             [Display(Name = "Password")]
             public string Password { get; set; }
@@ -109,16 +109,17 @@ namespace LookIT.Areas.Identity.Pages.Account
             [Compare("Password", ErrorMessage = "Cele doua parole nu coincid.")]
             public string ConfirmPassword { get; set; }
 
-            [Required]
+            [Required(ErrorMessage = "Numele complet este obligatoriu.")]
             [Display(Name = "Full Name")]
             [StringLength(100, MinimumLength = 3, ErrorMessage = "Numele trebuie să aibă între {2} și {1} caractere.")]
             public string FullName { get; set; }
 
+            [Required(ErrorMessage = "Descrierea este obligatorie.")]
             [Display(Name = "Description")]
             [StringLength(500, ErrorMessage = "Descrierea nu poate depăși {1} caractere.")]
             public string Description { get; set; }
 
-
+            [Required(ErrorMessage = "Trebuie să încărcați o poză de profil.")]
             [Display(Name = "Profile Picture")]
             public IFormFile ProfilePicture { get; set; }
         }
@@ -134,13 +135,13 @@ namespace LookIT.Areas.Identity.Pages.Account
         {
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+
             if (ModelState.IsValid)
             {
                 var user = CreateUser();
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
-                var result = await _userManager.CreateAsync(user, Input.Password);
 
                 user.FullName = Input.FullName;
                 user.Description = Input.Description;
@@ -164,6 +165,8 @@ namespace LookIT.Areas.Identity.Pages.Account
                     }
                     user.ProfilePictureUrl = "/images/profile/" + fileName;
                 }
+
+                var result = await _userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)
                 {

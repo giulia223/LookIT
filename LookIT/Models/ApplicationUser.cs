@@ -7,15 +7,18 @@ namespace LookIT.Models
 {
     public class ApplicationUser : IdentityUser
     {
-       
+
+        [Required(ErrorMessage = "Numele este obligatoriu.")]
         [StringLength(100, MinimumLength = 3, ErrorMessage = "Numele trebuie să aibă între {2} și {1} caractere.")]
-        public string? FullName { get; set; }
+        public string FullName { get; set; }
 
+        [Required(ErrorMessage = "Descrierea este obligatorie.")]
         [StringLength(500, ErrorMessage = "Descrierea nu poate depăși {1} caractere.")]
-        public string? Description { get; set; }
+        public string Description { get; set; }
 
+        [Required(ErrorMessage = "Poza de profil este obligatorie.")]
         [StringLength(500)]
-        public string? ProfilePictureUrl { get; set; } = "/images/unknown_person.jpg";
+        public string ProfilePictureUrl { get; set; }
 
         public bool Public { get; set; } = true;
 

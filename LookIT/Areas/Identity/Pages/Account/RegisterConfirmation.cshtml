@@ -8,11 +8,10 @@
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
 
-            @* Card container *@
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
                 <div class="card-body p-5 text-center">
 
-                    @* --- HEADER COMUN: ICONIȚĂ --- *@
+                    @* iconita plic *@
                     <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-4"
                          style="width: 90px; height: 90px; background-color: #FBF1F7;">
                         <i class="bi bi-envelope-check-fill fs-1" style="color: #B13079;"></i>
@@ -23,7 +22,7 @@
                     @{
                         if (@Model.DisplayConfirmAccountLink)
                         {
-                            @* --- SCENARIUL 1: DEVELOPMENT (Confirmare Manuală) --- *@
+                            @* scenariul de dezvoltare - link direct *@
                             <div class="alert alert-info border-0 rounded-3 shadow-sm text-start mb-4">
                                 <div class="d-flex">
                                     <i class="bi bi-info-circle-fill fs-4 me-3 text-info"></i>
@@ -45,7 +44,7 @@
                         }
                         else
                         {
-                            @* --- SCENARIUL 2: PRODUCȚIE (Verifică Email) --- *@
+                            @* scenariul de productie - verifica email *@
                             <p class="text-muted mb-4 fs-5">
                                 Te rugăm să îți verifici adresa de email pentru a confirma contul.
                             </p>

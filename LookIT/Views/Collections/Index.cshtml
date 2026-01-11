@@ -2,7 +2,6 @@
     ViewData["Title"] = "Colecțiile mele";
 }
 
-@* --- 1. ALERTĂ MESAJ --- *@
 @if (ViewBag.Message != null)
 {
     <div class="container mt-3">
@@ -24,14 +23,12 @@
 
 <div class="container mt-4 mb-5">
 
-    @* --- 2. BUTON ÎNAPOI --- *@
     <div class="mb-4">
         <a asp-controller="Profile" asp-action="Details" asp-route-userId="@ViewBag.UserCurent" class="btn btn-sm btn-light rounded-pill px-3 fw-bold text-muted border-0 shadow-sm">
             <i class="bi bi-arrow-left me-1"></i> Înapoi la Profil
         </a>
     </div>
 
-    @* --- 3. HEADER --- *@
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-end align-items-md-center mb-5 pb-3 border-bottom gap-3">
         <div>
             <h2 class="fw-bold mb-1">Colecțiile mele</h2>
@@ -43,7 +40,7 @@
         </a>
     </div>
 
-    @* --- 4. GRID COLECȚII --- *@
+
     @if (ViewBag.Collections.Count > 0)
     {
         <div class="collections-grid">
@@ -52,7 +49,6 @@
                 <a asp-controller="Collections" asp-action="Show" asp-route-Id="@collection.CollectionId" class="text-decoration-none">
                     <div class="card h-100 border-0 shadow-sm rounded-4 collection-card overflow-hidden">
 
-                        @* --- ICONIȚĂ PINNED (DOAR PENTRU ALL POSTS) --- *@
                         @if (collection.Name == "All Posts")
                         {
                             <div class="position-absolute top-0 end-0 m-3" style="z-index: 10;">
@@ -66,23 +62,19 @@
 
                         <div class="card-body p-4 d-flex flex-column align-items-center text-center justify-content-center" style="min-height: 220px;">
 
-                            @* Iconiță centrală *@
                             <div class="icon-wrapper mb-3">
                                 <i class="bi bi-folder-fill"></i>
                             </div>
 
-                            @* Titlu *@
                             <h5 class="fw-bold text-dark text-truncate w-100 mb-1" style="font-size: 1.1rem;">
                                 @collection.Name
                             </h5>
 
-                            @* Data *@
                             <p class="text-muted small mb-0">
                                 Creată: @collection.CreationDate.ToString("dd MMM yyyy")
                             </p>
                         </div>
 
-                        @* Footer decorativ *@
                         <div class="card-footer border-0 p-0" style="height: 4px; background: linear-gradient(90deg, #B13079, #D87BB0);"></div>
                     </div>
                 </a>
@@ -91,7 +83,6 @@
     }
     else
     {
-        @* --- 5. EMPTY STATE --- *@
         <div class="text-center py-5 mt-4 rounded-4 bg-light border border-dashed">
             <div class="mb-4 d-inline-block position-relative">
                 <div class="bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center"
@@ -112,29 +103,27 @@
     }
 </div>
 
-@* --- 6. STILURI CSS --- *@
+
 <style>
-    /* Grid Responsive */
+
     .collections-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
         gap: 25px;
     }
 
-    /* Cardul Colecției */
     .collection-card {
         background-color: #fff;
         transition: transform 0.2s ease, box-shadow 0.3s ease;
         position: relative;
     }
 
-        /* Umbra subtilă */
         .collection-card:hover {
             transform: translateY(-2px);
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.06) !important;
         }
 
-    /* Wrapper Iconiță */
+
     .icon-wrapper {
         width: 80px;
         height: 80px;

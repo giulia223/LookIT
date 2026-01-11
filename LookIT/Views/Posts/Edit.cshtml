@@ -3,12 +3,18 @@
 @{
     ViewData["Title"] = "Editează Postarea";
 }
-
+@if (TempData["message"] != null)
+{
+    <div class="alert @TempData["messageType"] alert-dismissible fade show" role="alert">
+        @*  motivul respingerii venit din Controller *@
+        <strong>Atentie!</strong> @TempData["message"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
 <div class="container mt-5 mb-5">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
 
-            @* Mesaje de eroare/succes *@
             @if (ViewBag.Message != null)
             {
                 <div class="alert @ViewBag.Alert border-0 shadow-sm rounded-4 text-center mb-4 p-3">
@@ -19,7 +25,6 @@
 
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
 
-                @* HEADER *@
                 <div class="card-header bg-white border-bottom py-3 px-4 d-flex justify-content-between align-items-center">
                     <h5 class="fw-bold mb-0">Editează Postarea</h5>
                     <a asp-action="Show" asp-route-id="@Model.PostId" class="btn btn-sm btn-outline-secondary rounded-pill">
@@ -34,13 +39,10 @@
 
                         <div asp-validation-summary="All" class="text-danger mb-3 small"></div>
 
-                        @* ========================================== *@
-                        @* SECȚIUNEA IMAGINE             *@
-                        @* ========================================== *@
+                        @* sectiunea de imagine*@
                         <div class="mb-4">
                             <label class="form-label small text-muted fw-bold ms-1">IMAGINE</label>
 
-                            @* 1. Buton Upload Imagine *@
                             <div class="position-relative mb-3">
                                 <input type="file" name="Image" id="imageInput" class="position-absolute top-0 start-0 w-100 h-100 opacity-0 cursor-pointer" accept="image/*" style="z-index: 10;" />
                                 <div class="bg-light border-0 rounded-3 p-3 text-center upload-box transition-hover d-flex align-items-center justify-content-center gap-2" style="cursor: pointer;">
@@ -52,7 +54,7 @@
                                 <small class="text-muted fst-italic ms-1" style="font-size: 0.7rem;">Formate: jpg, jpeg, png, gif.</small>
                             </div>
 
-                            @* 2. Imagine CURENTĂ (Dacă există) *@
+                            @*sectiunea pentru imaginea curenta (daca exista)*@
                             @if (!string.IsNullOrEmpty(Model.ImageUrl))
                             {
                                 <div id="currentImageWrapper">
@@ -64,7 +66,7 @@
                                                 <span class="small fw-bold text-white">Imagine Curentă</span>
                                             </div>
 
-                                            @* Buton X ștergere definitivă *@
+                                            @*buton de stergere al imaginii curente*@
                                             <button type="button" onclick="markImageForDeletion()"
                                                     class="btn btn-sm btn-light rounded-circle shadow-sm position-absolute top-0 end-0 m-2"
                                                     style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;"
@@ -78,12 +80,12 @@
                                 <input class="form-check-input d-none" type="checkbox" name="DeleteImage" value="true" id="deleteImageCheck">
                             }
 
-                            @* 3. Imagine NOUĂ (Preview) *@
+                            @* preview ul imaginii noi *@
                             <div id="newImageContainer" class="d-none text-center position-relative mb-3">
                                 <div class="d-inline-block position-relative rounded-3 overflow-hidden border shadow-sm">
                                     <img id="newImagePreview" src="#" class="img-fluid" style="max-height: 250px;" />
 
-                                    @* Buton X pentru anulare upload nou *@
+                                    @*buton de stergere al noii imagini*@
                                     <button type="button" id="removeNewImage" class="btn btn-sm btn-light rounded-circle shadow-sm position-absolute top-0 end-0 m-2" style="width: 30px; height: 30px; padding: 0; z-index: 20;">
                                         <i class="bi bi-x fs-5"></i>
                                     </button>
@@ -95,13 +97,10 @@
                             </div>
                         </div>
 
-                        @* ========================================== *@
-                        @* SECȚIUNEA VIDEO              *@
-                        @* ========================================== *@
+                        @* sectiunea pt video *@
                         <div class="mb-4">
                             <label class="form-label small text-muted fw-bold ms-1">VIDEO</label>
 
-                            @* 1. Buton Upload Video *@
                             <div class="position-relative mb-3">
                                 <input type="file" name="Video" id="videoInput" class="position-absolute top-0 start-0 w-100 h-100 opacity-0 cursor-pointer" accept="video/*" style="z-index: 10;" />
                                 <div class="bg-light border-0 rounded-3 p-3 text-center upload-box transition-hover d-flex align-items-center justify-content-center gap-2" style="cursor: pointer;">
@@ -113,7 +112,7 @@
                                 <small class="text-muted fst-italic ms-1" style="font-size: 0.7rem;">Formate: MP4, WebM.</small>
                             </div>
 
-                            @* 2. Video CURENT (Dacă există) *@
+                            @* videoclipul curent, daca exista*@
                             @if (!string.IsNullOrEmpty(Model.VideoUrl))
                             {
                                 <div id="currentVideoWrapper">
@@ -127,7 +126,7 @@
                                                 <span class="small fw-bold text-muted">Video Curent</span>
                                             </div>
 
-                                            @* Buton X ștergere definitivă *@
+                                            @*buton de stergere pentru videoclipul curent *@
                                             <button type="button" onclick="markVideoForDeletion()"
                                                     class="btn btn-sm btn-light rounded-circle shadow-sm position-absolute top-0 end-0 m-2"
                                                     style="width: 32px; height: 32px; padding: 0; z-index: 10; display: flex; align-items: center; justify-content: center;"
@@ -141,7 +140,7 @@
                                 <input class="form-check-input d-none" type="checkbox" name="DeleteVideo" value="true" id="deleteVideoCheck">
                             }
 
-                            @* 3. Video NOU (Preview) *@
+                            @* preview ul pentru videoclipul nou*@
                             <div id="newVideoContainer" class="d-none text-center position-relative mb-3">
                                 <div class="d-inline-block position-relative rounded-3 overflow-hidden border shadow-sm w-100">
                                     <video id="newVideoPreview" controls class="w-100" style="max-height: 250px; background-color: #000;">
@@ -169,7 +168,6 @@
                             <span asp-validation-for="TextContent" class="text-danger small ms-1"></span>
                         </div>
 
-                        @* BUTON SAVE *@
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-primary rounded-pill py-2 fw-bold shadow-sm">
                                 Salvează Modificările
@@ -185,7 +183,7 @@
     </div>
 </div>
 
-@* STILURI CSS SUPLIMENTARE *@
+
 <style>
     .cursor-pointer {
         cursor: pointer;
@@ -230,23 +228,31 @@
         // ==========================================
 
         function markImageForDeletion() {
-            // Ascundem vizual containerul imaginii vechi
+            //ascundem vizual containerul imaginii vechi
             const wrapper = document.getElementById('currentImageWrapper');
-            if(wrapper) wrapper.classList.add('d-none');
+            if(wrapper) {
+                wrapper.classList.add('d-none');
+            }
 
             // Bifăm checkbox-ul ascuns ca serverul să șteargă fișierul
             const checkbox = document.getElementById('deleteImageCheck');
-            if(checkbox) checkbox.checked = true;
+            if(checkbox) {
+                checkbox.checked = true;
+            }
         }
 
         function markVideoForDeletion() {
-            // Ascundem vizual containerul video vechi
+            //ascundem vizual containerul video vechi
             const wrapper = document.getElementById('currentVideoWrapper');
-            if(wrapper) wrapper.classList.add('d-none');
+            if(wrapper) {
+                wrapper.classList.add('d-none');
+            }
 
             // Bifăm checkbox-ul ascuns
             const checkbox = document.getElementById('deleteVideoCheck');
-            if(checkbox) checkbox.checked = true;
+            if(checkbox) {
+                checkbox.checked = true;
+            }
         }
 
 
@@ -254,7 +260,6 @@
         //  LOGICA PENTRU ELEMENTE NOI (UPLOAD)
         // ==========================================
 
-        // --- IMAGINE ---
         const imageInput = document.getElementById('imageInput');
         const newImgContainer = document.getElementById('newImageContainer');
         const newImgPreview = document.getElementById('newImagePreview');
@@ -288,7 +293,6 @@
             }
         }
 
-        // --- VIDEO ---
         const videoInput = document.getElementById('videoInput');
         const newVidContainer = document.getElementById('newVideoContainer');
         const newVidPreview = document.getElementById('newVideoPreview');
@@ -304,9 +308,14 @@
                     newVidPreview.src = URL.createObjectURL(file);
                     newVidContainer.classList.remove('d-none');
 
-                    // Ascundem video vechi
-                    if(currentVidWrapper) currentVidWrapper.classList.add('d-none');
-                    if(deleteVidCheck) deleteVidCheck.checked = false;
+                    // ascundem video vechi
+                    if(currentVidWrapper) {
+                        currentVidWrapper.classList.add('d-none');
+                    }
+
+                    if(deleteVidCheck) {
+                        deleteVidCheck.checked = false;
+                    }
                 }
             });
 

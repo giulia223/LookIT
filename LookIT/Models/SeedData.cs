@@ -55,7 +55,9 @@ namespace LookIT.Models
                         NormalizedEmail = "ADMINISTRATOR@TEST.COM",
                         Email = "administrator@test.com",
                         NormalizedUserName = "ADMINISTRATOR@TEST.COM",
-                        PasswordHash = hasher.HashPassword(null,"Admin1!")
+                        PasswordHash = hasher.HashPassword(null,"Admin1!"),
+                        ProfilePictureUrl = "/images/unknown_person.jpg",
+                        Description = "-"
                     },
 
                     new ApplicationUser
@@ -67,7 +69,9 @@ namespace LookIT.Models
                         NormalizedEmail = "USER@TEST.COM",
                         Email = "user@test.com",
                         NormalizedUserName = "USER@TEST.COM",
-                        PasswordHash = hasher.HashPassword(null, "User1!")
+                        PasswordHash = hasher.HashPassword(null, "User1!"),
+                        ProfilePictureUrl = "/images/unknown_person.jpg",
+                        Description = "-"
                     } 
                 );
 
