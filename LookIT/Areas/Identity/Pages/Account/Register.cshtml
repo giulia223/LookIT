@@ -37,7 +37,10 @@
                             </div>
 
                             @* Input ascuns *@
-                            <input asp-for="Input.ProfilePicture" class="d-none" accept="image/*" onchange="previewProfileImage(this)" />
+                            <input asp-for="Input.ProfilePicture"
+                                   accept="image/*"
+                                   onchange="previewProfileImage(this)"
+                                   style="opacity: 0; position: absolute; z-index: -1; width: 1px; height: 1px;" />
                             <span asp-validation-for="Input.ProfilePicture" class="text-danger small d-block mt-1"></span>
                         </div>
 
