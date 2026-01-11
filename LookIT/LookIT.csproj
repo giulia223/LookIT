@@ -42,6 +42,8 @@
 	  
     <Folder Include="Migrations\" />
 	  
+    <Folder Include="wwwroot\images\messages\" />
+	  
     <Folder Include="wwwroot\images\profile\" />
 	  
     <Folder Include="wwwroot\videos\posts\" />
