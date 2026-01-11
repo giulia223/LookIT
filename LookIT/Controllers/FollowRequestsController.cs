@@ -23,7 +23,7 @@ namespace LookIT.Controllers
             return View();
         }
 
-        //  Pagina care listează cererile primite
+        //  Pagina care listeaza cererile primite
         [Authorize]
         [HttpGet]
         public async Task<IActionResult> MyRequests()
@@ -38,7 +38,7 @@ namespace LookIT.Controllers
             return View(requests);
         }
 
-        //  Acțiunea de Accept / Decline
+        //  Actiunea de Accept / Decline
         [Authorize]
         [HttpPost]
         public async Task<IActionResult> HandleRequest(int requestId, string decision)
@@ -47,7 +47,7 @@ namespace LookIT.Controllers
 
             if (request == null) return NotFound();
 
-            //Verific dacă cererea îmi este adresată mie
+            //Verific dacă cererea imi este adresata mie
             var currentUser = await _userManager.GetUserAsync(User);
             if (request.FollowingId != currentUser.Id) return Forbid();
 
@@ -63,7 +63,7 @@ namespace LookIT.Controllers
 
             await _context.SaveChangesAsync();
 
-            // Reîncarc pagina ca să dispară cererea procesată
+            // Reincarc pagina ca sa dispara cererea procesata
             return RedirectToAction("MyRequests");
         }
     }

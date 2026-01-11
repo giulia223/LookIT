@@ -66,7 +66,7 @@ namespace LookIT.Controllers
             var groupModerator = _context.GroupMembers
             .FirstOrDefault(gm => gm.GroupId == GroupId && gm.MemberId == _userManager.GetUserId(User));
 
-            if (groupModerator.Status != "moderator")
+            if (groupModerator.Status != "moderator" && !User.IsInRole("Administrator"))
             {
                 TempData["message"] = "Nu ai permisiunea de a elimina membri din acest grup.";
                 TempData["messageType"] = "danger";

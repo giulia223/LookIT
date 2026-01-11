@@ -112,13 +112,6 @@ namespace LookIT.Controllers
             }
             SetAccessRights();
 
-            if (!IsMember(Id))
-            {
-                TempData["message"] = "Trebuie să fii membru pentru a vedea conținutul acestui grup.";
-                TempData["messageType"] = "alert-danger";
-                return RedirectToAction("Index");
-            }
-
             ViewBag.GroupDetails = grp;
             ViewBag.Messages = grp.Messages.OrderByDescending(m => m.Date).ToList();
             ViewBag.ActiveMembersCount = grp.Members.Count(m => m.Status != "Pending");

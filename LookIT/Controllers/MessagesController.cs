@@ -52,6 +52,11 @@ namespace LookIT.Controllers
             var messages = _context.Messages.Include(m => m.User).Where(m => m.isReported == true).ToList();
             ViewBag.Count = messages.Count();
             ViewBag.Messages = messages;
+            if (TempData.ContainsKey("message"))
+            {
+                ViewBag.Message = TempData["message"].ToString();
+                ViewBag.Alert = TempData["messageType"];
+            }
             return View();
         }
 
@@ -306,7 +311,8 @@ namespace LookIT.Controllers
                         string? initialImageUrl = msg.ImageUrl;
                         string? initialVideoUrl = msg.VideoUrl;
 
-                        msg.TextContent = requestmsg.TextContent;
+                        msg.TextContent = sanitizer.Sanitize(requestmsg.TextContent);
+                        string cleanText = System.Text.RegularExpressions.Regex.Replace(msg.TextContent ?? "", "<.*?>", string.Empty);
 
                         //daca am ales o poza, o vom modifica
                         if (Image != null && Image.Length > 0)
@@ -411,7 +417,7 @@ namespace LookIT.Controllers
                         //daca am editat si am ajuns la o postare goala (toate cele 3 campuri TextContent, ImageUrl si VideoUrl sunt
                         //nule), nu pot face modiifcarea si voi mentine starea intiiala a postarii
                         //ne intoarcem in view cu valorile initiale
-                        if (string.IsNullOrWhiteSpace(msg.TextContent) && msg.ImageUrl == null && msg.VideoUrl == null)
+                        if (string.IsNullOrWhiteSpace(cleanText) && msg.ImageUrl == null && msg.VideoUrl == null)
                         {
                             msg.TextContent = initialTextContent;
                             msg.ImageUrl = initialImageUrl;
@@ -445,9 +451,7 @@ namespace LookIT.Controllers
                                 System.IO.File.Delete(oldPath);
                             }
                         }
-                        msg.TextContent = sanitizer.Sanitize(requestmsg.TextContent);
-                        string cleanText = System.Text.RegularExpressions.Regex.Replace(msg.TextContent ?? "", "<.*?>", string.Empty);
-
+                      
                         var sentimentResult = await _sentimentService.AnalyzeSentimentAsync(cleanText);
                         if (sentimentResult.Success)
                         {

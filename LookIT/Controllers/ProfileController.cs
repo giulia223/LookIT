@@ -118,6 +118,16 @@ namespace LookIT.Controllers
             if (user == null)
                 return NotFound();
 
+            ModelState.Remove(nameof(model.Id));
+            ModelState.Remove(nameof(model.UserName));
+            ModelState.Remove(nameof(model.NormalizedUserName));
+            ModelState.Remove(nameof(model.Email));
+            ModelState.Remove(nameof(model.NormalizedEmail));
+            ModelState.Remove(nameof(model.PasswordHash));
+            ModelState.Remove(nameof(model.SecurityStamp));
+            ModelState.Remove(nameof(model.ConcurrencyStamp));
+            ModelState.Remove(nameof(model.PhoneNumber));
+
             if (!ModelState.IsValid)
                 return View(model);
 

@@ -274,8 +274,14 @@ namespace LookIT.Controllers
             {
                 _context.Likes.RemoveRange(liking);
             }
+  
 
-            //salvam toate modiifcarile
+            var groupsModerator = _context.Groups.Where(gp => gp.ModeratorId == Id).ToList();
+            if (groupsModerator.Any())
+            {
+                _context.Groups.RemoveRange(groupsModerator);
+            }
+            // salvam toate modiifcarile
             await _context.SaveChangesAsync();
 
             var result = await _userManager.DeleteAsync(user);
