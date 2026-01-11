@@ -22,6 +22,11 @@ namespace LookIT.Controllers
             _roleManager = roleManager;
         }
 
+        private bool IsMember(int groupId)
+        {
+            var userId = _userManager.GetUserId(User);
+            return _context.GroupMembers.Any(gm => gm.GroupId == groupId && gm.MemberId == userId && (gm.Status == "Accepted" || gm.Status == "moderator"));
+        }
 
         //afisare toate grupurile
         public IActionResult Index(string? search)
@@ -33,17 +38,15 @@ namespace LookIT.Controllers
                         .Include(g => g.Moderator)
                         .AsQueryable();
 
-            // 2. Logică de căutare (SEARCH)
+            // 2. Logica de cautare 
             if (!string.IsNullOrEmpty(search))
             {
-                // Căutăm în Numele Grupului sau în Descriere (case-insensitive implicit în SQL)
                 groupsQuery = groupsQuery.Where(g => g.GroupName.Contains(search) || g.Description.Contains(search));
             }
 
-            // Putem adăuga și o ordonare (de exemplu, cele mai noi grupuri primele)
             groupsQuery = groupsQuery.OrderByDescending(g => g.Date);
 
-            // 3. Executăm query-ul
+            // 3. Executam query-ul
             var groups = groupsQuery.ToList();
             //verificam de fiecare data numarul postarilor totale
             int totalItems = groups.Count();
@@ -99,22 +102,30 @@ namespace LookIT.Controllers
                 .Where(g => g.GroupId == Id)
                 .Include(g => g.Moderator)
                 .Include(g => g.Messages)
+                    .ThenInclude(m => m.User)
                 .Include(g => g.Members)
-                .ThenInclude(g => g.Member)
+                    .ThenInclude(g => g.Member)
                 .FirstOrDefault();
             if (grp == null)
             {
                 return NotFound();
             }
             SetAccessRights();
+
+            if (!IsMember(Id))
+            {
+                TempData["message"] = "Trebuie să fii membru pentru a vedea conținutul acestui grup.";
+                TempData["messageType"] = "alert-danger";
+                return RedirectToAction("Index");
+            }
+
             ViewBag.GroupDetails = grp;
             ViewBag.Messages = grp.Messages.OrderByDescending(m => m.Date).ToList();
             ViewBag.ActiveMembersCount = grp.Members.Count(m => m.Status != "Pending");
 
-            // 2. Facem o listă doar cu cererile în așteptare
+     
             ViewBag.PendingRequests = grp.Members.Where(m => m.Status == "Pending").ToList();
 
-            // 3. Facem o listă cu membrii deja acceptați (pentru lista de membri)
             ViewBag.AcceptedMembers = grp.Members.Where(m => m.Status != "Pending").ToList();
 
             if (TempData.ContainsKey("message"))
@@ -125,7 +136,7 @@ namespace LookIT.Controllers
 
             var currentUserId = _userManager.GetUserId(User);
 
-            // Găsim intrarea GroupMember pentru userul curent și grupul dat
+  
             var userGroupEntry = grp.Members.FirstOrDefault(m => m.MemberId == currentUserId);
 
             string statusForView;
@@ -147,7 +158,7 @@ namespace LookIT.Controllers
 
         //JOIN GROUP
         [HttpPost]
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = "User,Administrator")]
         public IActionResult JoinGroup([FromForm] GroupMember gpm)
         {
             gpm.Date = DateTime.Now;
@@ -202,15 +213,16 @@ namespace LookIT.Controllers
         }
 
         //CREARE GRUP
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = "User,Administrator")]
         public IActionResult New()
         {
+
             Group gp = new Group();
           
             return View(gp);
         }
         [HttpPost]
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = "User,Administrator")]
         public IActionResult New(Group gp)
         {
             // preluam Id-ul utilizatorului care face grupul
@@ -252,6 +264,7 @@ namespace LookIT.Controllers
         public IActionResult Edit(int Id)
         {
             Group? grp = _context.Groups.Find(Id);
+            SetAccessRights();
             if (grp == null)
             {
                 return NotFound();
@@ -259,14 +272,14 @@ namespace LookIT.Controllers
             if (grp.ModeratorId == _userManager.GetUserId(User) || User.IsInRole("Administrator")) 
             {
                 return View(grp);
-                SetAccessRights();
+                
             }
             else
             {
 
                 TempData["message"] = "Nu aveti dreptul sa faceti modificari asupra unui grup care nu va apartine";
                 TempData["messageType"] = "alert-danger";
-                return RedirectToAction("Show", "Groups", Id);
+                return RedirectToAction("Show", "Groups", new { Id = grp.GroupId });
             }
         }
 

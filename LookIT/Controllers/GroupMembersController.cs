@@ -22,6 +22,13 @@ namespace LookIT.Controllers
             _roleManager = roleManager;
         }
 
+        private bool IsMember(int groupId)
+        {
+            var userId = _userManager.GetUserId(User);
+            return _context.GroupMembers.Any(gm => gm.GroupId == groupId && gm.MemberId == userId && (gm.Status == "Accepted" || gm.Status == "moderator"));
+        }
+
+
         //afisare grupurile unui user
         [Authorize(Roles = "User,Administrator")]
         public IActionResult Show()
@@ -74,7 +81,7 @@ namespace LookIT.Controllers
 
         //acceptare cerere de membru
         [HttpPost]
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = "User,Administrator")]
         public IActionResult AcceptMember(int groupId, string memberId)
         {
             var groupMember = _context.GroupMembers
@@ -107,7 +114,7 @@ namespace LookIT.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = "User,Administrator")]
         public IActionResult LeaveGroup(int groupId)
         {
 
@@ -116,6 +123,13 @@ namespace LookIT.Controllers
             if (groupMember == null)
             {
                 return NotFound();
+            }
+
+            if (!IsMember(groupId))
+            {
+                TempData["message"] = "Trebuie să fii membru pentru a iesi dintr-un grup.";
+                TempData["messageType"] = "alert-danger";
+                return RedirectToAction("Index");
             }
             _context.GroupMembers.Remove(groupMember);
             _context.SaveChanges();

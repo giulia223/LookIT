@@ -64,7 +64,7 @@ namespace LookIT.Controllers
             return View(user);
         }
 
-        // afișare postări pentru un user
+        // afisare postări pentru un user
         public async Task<IActionResult> ManageContent(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
@@ -88,7 +88,8 @@ namespace LookIT.Controllers
             return View();
         }
 
-        // afișare comentarii pentru un user
+        // afisare comentarii pentru un user
+        [Authorize(Roles ="Administrator")]
         public async Task<IActionResult> ManageComm(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
@@ -113,7 +114,8 @@ namespace LookIT.Controllers
             return View();
         }
 
-        // afișare grupuri pentru un user
+        // afisare grupuri pentru un user
+        [Authorize(Roles ="Administrator")]
         public async Task<IActionResult> ManageGroups(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
@@ -138,7 +140,8 @@ namespace LookIT.Controllers
             return View();
         }
 
-        // afișare mesaje pentru un user
+        [Authorize(Roles ="Administrator")]
+        // afisare mesaje pentru un user
         public async Task<IActionResult> ManageMessages(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
@@ -398,17 +401,6 @@ namespace LookIT.Controllers
 
             return RedirectToAction("Index");
 
-            //if (result.Succeeded)
-            //{
-            //    //TempData["StatusMessage"] = $"Utilizatorul {user.UserName} a fost promovat cu succes.";
-            //    return RedirectToAction("Index");
-            //}
-            //else
-            //{
-            //    // Gestionează erorile, de exemplu dacă rolul nu a fost găsit
-            //    // TempData["ErrorMessage"] = $"Eroare la promovare: {string.Join(", ", result.Errors.Select(e => e.Description))}";
-            //    return RedirectToAction("Index");
-            //}
         }
 
         private void SetAccessRights()

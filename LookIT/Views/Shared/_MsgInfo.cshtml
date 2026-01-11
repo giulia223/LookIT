@@ -95,7 +95,7 @@
                 <i class="bi bi-pencil me-1"></i> Editează
             </a>
 
-            @* Buton Ștergere *@
+            @* Buton Stergere *@
             <form method="post" asp-controller="Messages" asp-action="DeleteMessage" asp-route-id="@Model.MessageId"
                   onsubmit="return confirm('Sigur vrei să ștergi acest mesaj?');">
                 <button class="btn btn-discard px-3 py-1" type="submit"

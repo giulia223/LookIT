@@ -6,7 +6,7 @@ using System.Runtime.ConstrainedExecution;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-
+using LookIT.Models;
 
 namespace LookIT.Services
 {
@@ -18,30 +18,28 @@ namespace LookIT.Services
     }
 
     // Interfata serviciului pentru dependency injection
-    public interface ISentimentAnalysisService
+    public interface IMesajeAnalizaService
     {
         Task<SentimentMessageResult> AnalyzeSentimentAsync(string text);
     }
 
     // Implementarea serviciului de analiza de sentiment folosind OpenAI API
-    public class SentimentAnalysisService : ISentimentAnalysisService
+    public class MesajeAnalizaService : IMesajeAnalizaService
     {
         private readonly HttpClient _httpClient;
         private readonly string _apiKey;
-        private readonly ILogger<SentimentAnalysisService> _logger;
-        public SentimentAnalysisService(IConfiguration configuration, ILogger<SentimentAnalysisService> logger)
+        private readonly ILogger<MesajeAnalizaService> _logger;
+        public MesajeAnalizaService(IConfiguration configuration, ILogger<MesajeAnalizaService> logger)
         {
             _httpClient = new HttpClient();
             _apiKey = configuration["OpenAI:ApiKey"] ?? throw new
             ArgumentNullException("OpenAI:ApiKey not configured");
             _logger = logger;
             // Configurare HttpClient pentru OpenAI API
-            _httpClient.BaseAddress = new
-            Uri("https://api.openai.com/v1/");
-            _httpClient.DefaultRequestHeaders.Authorization = new
-            AuthenticationHeaderValue("Bearer", _apiKey);
-            _httpClient.DefaultRequestHeaders.Accept.Add(new
-            MediaTypeWithQualityHeaderValue("application/json"));
+
+            _httpClient.BaseAddress = new Uri("https://api.openai.com/v1/");
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
+            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
         public async Task<SentimentMessageResult> AnalyzeSentimentAsync(string text)
@@ -100,7 +98,7 @@ namespace LookIT.Services
 
                 // Parsam raspunsul de la OpenAI
 
-                var openAiResponse = JsonSerializer.Deserialize<OpenAiResponse>(responseContent);
+                var openAiResponse = JsonSerializer.Deserialize<Open_AiResponse>(responseContent);
 
                 var assistantMessage = openAiResponse?.Choices?.FirstOrDefault()?.Message?.Content;
 
@@ -120,7 +118,7 @@ namespace LookIT.Services
                 // Parsam JSON-ul din raspunsul asistentului
                 var sentimentData = JsonSerializer.Deserialize<SentimentResponse>(assistantMessage, new JsonSerializerOptions
                     {
-                        PropertyNameCaseInsensitive = true // Ajută dacă AI-ul scrie isDecent sau IsDecent
+                        PropertyNameCaseInsensitive = true 
                     }
                 );  
 
@@ -161,18 +159,19 @@ namespace LookIT.Services
             }
         }
     }
-    // Clase pentru deserializarea raspunsului OpenAI
-    public class OpenAiResponse
+
+    // //Clase pentru deserializarea raspunsului OpenAI
+    public class Open_AiResponse
     {
         [JsonPropertyName("choices")]
-        public List<Choice>? Choices { get; set; }
+        public List<CHOICE>? Choices { get; set; }
     }
-    public class Choice
+    public class CHOICE
     {
         [JsonPropertyName("message")]
-        public Message? Message { get; set; }
+        public Mssg? Message { get; set; }
     }
-    public class Message
+    public class Mssg
     {
         [JsonPropertyName("content")]
         public string? Content { get; set; }

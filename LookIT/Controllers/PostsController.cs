@@ -21,7 +21,6 @@ namespace LookIT.Controllers
         private readonly IWebHostEnvironment _env = env;
         private readonly IModerationService _moderationService = moderationService;
 
-        
 
         //au acces la aceasta metoda atat utilizatorii inregistrati, cat si neinregistrati si administratorii
         //afisarea postarilor apartinand conturilor publice sau urmaritorilor (daca sunt conturi private)
