@@ -48,16 +48,16 @@ namespace LookIT.Controllers
             return RedirectToAction("Details", new { userId = user.Id });
         }
 
-        [AllowAnonymous]
-        //creare profil user
-        public IActionResult CreateProfile()
-        {
-            if (!User.Identity.IsAuthenticated)
-            {
-                return RedirectToAction("Register", "???");
-            }
-            return View();
-        }
+        //[AllowAnonymous]
+        ////creare profil user
+        //public IActionResult CreateProfile()
+        //{
+        //    if (!User.Identity.IsAuthenticated)
+        //    {
+        //        return RedirectToAction("Register", "???");
+        //    }
+        //    return View();
+        //}
 
         [AllowAnonymous]
         [HttpPost]
